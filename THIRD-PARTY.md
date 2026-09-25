@@ -58,11 +58,11 @@ carry a declaration or do not have one anywhere in the tree:
 | `.inc` / `.lua` / `.cfg` / `.js` | 548 / 9 / 398 / 4 | No `[Metadata]` section exists in these formats |
 | `.png` / `.jpg` / `.gif` / `.ico` / `.bmp` / `.thm` | 1434 / 103 / 21 / 100 / 5 / 7 | No sidecar licence anywhere in the tree |
 | `.txt` / `.html` / `.url` / `.lnk` / `.bat` / `.wav` / `.xml` | 60 / 3 / 2 / 12 / 2 / 1 / 1 | Various; no licence stated |
-| `.exe` / `.ttf` | 7 / 7 | See sections 3 and 4 |
+| `.exe` / `.ttf` | 7 / 1 | See sections 3 and 4 |
 
 ## 2. This fork's own changes
 
-Measured with `git diff --name-status upstream/master`: **14 files added, 35 modified, 10 deleted.**
+Measured with `git diff --name-status upstream/master`: **14 files added, 46 modified, 16 deleted.**
 
 Added:
 
@@ -82,21 +82,29 @@ Modified: seven language packs (a `PanelAgenda` key each), the gallery registrat
 (`WP7/Gallery/cat1.inc`, `WP7/Gallery/cat7.inc`, `WP7/Gallery/Intro/intro.ini`), the shared
 icon layer (`WP7/@Resources/Graphics/Gallery/mask-essential.png`), three default-value files
 (`WP7/@Resources/Common/Variables/UserVariables.inc`, `WP7/@Resources/Common/Color/color.inc`,
-`WP7/@Resources/Config/Panels/Network/UserVariables.inc`), 18 panel files under
-`WP7/Panels/` (twelve dangling `!CommandMeasure GetMhz "Run"` calls plus the thirteenth call
-and its measure in the RAM panel, which spawned an unused `wmic MemoryChip` child process on
-every refresh; a `FontSize` expression with an empty operand in DigitalClock4; a byte/bit
-suffix and a dropped `AutoScale` in the Network panel; two `Hidden` lines in the Network
-panel that contradicted their settings toggle; and the base `Height` of the Slideshow and
-DigitalClock tiers the desktop layout loads), two AutoIt tool sources (`AutoIT/OmnimoApp.au3`,
-whose folder/app pickers passed `StringReplace`'s arguments in the wrong order so the choice
-went to a stray file and the panel config was never updated, and `AutoIT/Config.au3`, whose
-border-color branch read an undeclared variable instead of the color picker's result — both
-source-only fixes, the shipped binaries are unchanged, see section 3), and `readme.md`.
+`WP7/@Resources/Config/Panels/Network/UserVariables.inc`), 27 panel files under `WP7/Panels/`
+— thirteen of them (eight HDD, four RAM, one Multimeter) dropped a dangling
+`!CommandMeasure GetMhz "Run"` call, only the RAM panel's second tier having defined that
+measure and no meter having displayed its value, so the other twelve spawned an unused
+`wmic MemoryChip` child process on every refresh; the Slideshow and DigitalClock panels now
+carry the same base `Height` across every size tier, so a card no longer jumps when the
+Alternative menu switches tier; the Volume panel's progress bar is recentered in the single
+and halfsingle tiers, where the tile background adds `#Padding#` on both sides but the bar's
+origin did not add it back; plus a `FontSize` expression with an empty operand in
+DigitalClock4, a byte/bit suffix and a dropped `AutoScale` in the Network panel, and two
+`Hidden` lines in the Network panel that contradicted their settings toggle — the two AutoIt
+tool sources (`AutoIT/OmnimoApp.au3`, whose folder/app pickers passed `StringReplace`'s
+arguments in the wrong order so the choice went to a stray file and the panel config was
+never updated, and `AutoIT/Config.au3`, whose border-color branch read an undeclared
+variable instead of the color picker's result) and the two shipped executables they build,
+`OmnimoApp.exe` and `config.exe`, rebuilt with AutoIt 3.3.8.1 so those fixes reach the
+binaries users run (see section 3), and `readme.md`.
 
 Deleted: the Corona panel — four files under `WP7/Panels/Corona/` and six under
-`WP7/@Resources/Config/Panels/Corona/`, removed at the user's request; the gallery row and
-the icon layer were reflowed to match.
+`WP7/@Resources/Config/Panels/Corona/`, removed at the user's request, with the gallery row
+and the icon layer reflowed to match; and the six Microsoft Segoe `.ttf` files under
+`WP7/@Resources/Fonts/`, not licensed for redistribution and never loaded by the skin (see
+section 4).
 
 Our changes inherit the terms of the file they touch: GPL-2.0 where upstream puts that file under
 GPL-2.0, CC BY-NC-SA 3.0 where the file self-declares it. No rights are claimed over upstream
@@ -126,22 +134,23 @@ originals; the other five remain upstream's builds.
 
 ## 4. Bundled fonts
 
-`WP7/@Resources/Fonts/` contains seven font files. Six are Microsoft Segoe family faces, which
-Microsoft does not license for redistribution; `OptimusPrinceps.ttf` is not a Microsoft face.
+Upstream shipped seven font files here: six Microsoft Segoe faces plus `OptimusPrinceps.ttf`. The six
+Segoe files were never licensed for redistribution, so this fork drops them and keeps only
+`OptimusPrinceps.ttf`, which is not a Microsoft face.
 
 ```
-segoeui.ttf              517384 bytes   Microsoft Segoe UI
-segoeuil.ttf             330908 bytes   Microsoft Segoe UI Light
-SegoeWP.ttf               56416 bytes   Microsoft Segoe WP
-SegoeWP-Light.ttf         60216 bytes   Microsoft Segoe WP Light
-SegoeWP-Semibold.ttf      70496 bytes   Microsoft Segoe WP Semibold
-SegoeWP-Black.ttf         75084 bytes   Microsoft Segoe WP Black
 OptimusPrinceps.ttf       41416 bytes   not a Microsoft face
 ```
 
-Upstream ships them the same way, so a plain fork inherits the problem. A compliant distribution drops
-the six Segoe files and has the skin resolve those faces from the system; the cost is that Segoe WP is
-not installed by default, so panels that name it would fall back to another face. Listed in section 8.
+Nothing in the skin loaded the Segoe files: Rainmeter resolves a meter's `FontFace` by system font
+name, and no `.ini`, script or installer in the tree referenced `Fonts/` or those filenames, so they
+were inert payload rather than a font the skin installed. Dropping them therefore does not change how
+the skin renders — the faces were always resolved from the system.
+
+One caveat is unchanged by the removal: Segoe WP is not a Windows default, so on a system without it
+the panels that name it (`FontFace=Segoe WP …`, reached through the `#FontTypeWP#` variable) fall back
+to whatever substitute the system provides. That was already the behaviour, since the bundled files
+were never installed. Listed in section 8.
 
 ## 5. AutoIt user-defined functions
 
@@ -182,7 +191,7 @@ licensing is not determined by Rainmeter's.
 | 1 | Upstream's GPL-2.0 vs CC BY-NC-SA 3.0 statement conflict | Recorded in section 1; per-file declarations treated as governing that file. |
 | 2 | 22 `.ini` plus 960 `.inc`/`.lua`/`.cfg`/`.js` and 1670 images with no declaration | Carried as-is with provenance traceable through the retained git history. No rights claimed. |
 | 3 | 7 upstream `.exe` with no source and no declared licence | Repository-only. Closes if the binaries are dropped and users build from `AutoIT/`. |
-| 4 | 6 Microsoft Segoe `.ttf` in `WP7/@Resources/Fonts/` | Not licensed for redistribution. Dropping them costs the Segoe WP faces on systems that lack them. |
+| 4 | ~~6 Microsoft Segoe `.ttf` in `WP7/@Resources/Fonts/`~~ | Resolved: the six files are removed. The skin resolved those faces by system name and never loaded the files, so nothing renders differently; the Segoe WP fallback on systems without that face is unchanged. |
 | 5 | The repository has no README of its own; upstream's `readme.md` is unchanged | A short note that this is a fork with a Chinese localization is not yet written. |
 
 ---

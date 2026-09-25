@@ -231,7 +231,7 @@ WP7/Gallery/MultiManager/Saved/2/screenshot.png                # 布局保存时
 | 3 | ~~是否发新版~~ | **已发布 v0.2.0**；`v0.1.0`、`v0.1.1` 的 Release 与 tag 已按用户要求删除 |
 | 4 | AutoIt 工具默认语言 | 保持英文（运行时值），用户需在设置界面选一次「简体中文」 |
 | 5 | 7 个表面键保持英文 | 见 §4；设置界面里对应 7 格也随之显示英文 |
-| 6 | 6 个 Microsoft Segoe 字体 | 未获再分发授权（`THIRD-PARTY.md` 第 8 节第 4 条） |
+| 6 | ~~6 个 Microsoft Segoe 字体~~ | **已移除**：`WP7/@Resources/Fonts/` 下 6 个 Segoe `.ttf` 已删，仅留非微软字面 `OptimusPrinceps.ttf`。皮肤按系统字体名解析 `FontFace`、从不加载这些文件（全仓无任何 `.ini`/脚本/安装器引用 `Fonts/` 或这些文件名），故删除不改变渲染；Segoe UI 本就是 Windows 系统字体，Segoe WP 非默认装、缺失时回退到系统替代字面（与删除前一致）。见 `THIRD-PARTY.md` §4 与 §8 第 4 条 |
 | 7 | 提交前要还原的运行时文件 | `WP7\Gallery\main.ini`、`scroll.inc`、`MultiManager\TimeSettings.inc`、`MultiManager\Saved\*\screenshot.png` 会被 Rainmeter 运行时改写；`git checkout --` 还原或按 §8 第 5 条标记。（`.git/info/exclude` 里陈旧的 `WP7/_agenda/` 条目已清） |
 | 8 | ~~AutoIT 源码修了 2 处但 exe 未重编译~~ | **已重编译**：`OmnimoApp.au3`（StringReplace 参数顺序）与 `Config.au3`（边框色分支读了未声明变量）已修源码，并用 AutoIt 3.3.8.1（`Aut2Exe`、x86、no UPX、源码自带图标）重编译 `OmnimoApp.exe` 与 `config.exe`（对照编译验证源码修复已嵌入）；`build.bat` 依赖 wmic 且经 AutoIt3Wrapper，本机均不可用，故直接调 `Aut2Exe`。其余 5 个 exe 仍是上游构建，见 `THIRD-PARTY.md` §3 |
 | 9 | ~~`Chinese.inc` 约半数键未译~~ | **已按产品决策收敛**：磁贴表面短标签与 Donate 面板作者留言保持英文（可视面要"酷"）；设置界面 / 功能提示类 21 键已补中文（含 `24HourTime`、`Missing1`）。现 284 键中 143 个值含中文；剩余未译＝刻意英文的表面键 ∪ 全库无消费方的上游死键（`ChangeColors`/`RefreshAll`/`SidebarColors` 等），不算遗漏 |
