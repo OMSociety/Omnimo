@@ -181,7 +181,7 @@ WP7/Gallery/Intro/save.inc
 
 ## 10. 当前状态与已知未决项
 
-**相对 `upstream/master`（实测）：新增 13 / 修改 22 / 删除 0**（`git diff --name-status upstream/master -- .`）
+**相对 `upstream/master`（实测）：新增 13 / 修改 28 / 删除 10**（`git diff --name-status upstream/master -- .`）
 
 已发布 **v0.1.0**（annotated tag + GitHub Release）。仓库**工作区干净**，无未提交项。
 
@@ -196,7 +196,7 @@ WP7/Gallery/Intro/save.inc
 
 | # | 项 | 现状 |
 |---|---|---|
-| 1 | 待办同步 | 未开始 |
+| 1 | 待办同步 | 用户决定不做 |
 | 2 | 静置回顶 | **已验证**（干净判据：光标移离面板后，`returned` 与 `top` 逐字节相同、`scrolled` 不同） |
 | 3 | Agenda 磁贴图标 | **已解决**：图标是固定位置图层，用覆盖表 + `Graphics\Icons\Calendar.png` 叠出日历图标（覆盖表放在文件末尾、用表定位变量，见 §5 第 11 条） |
 | 4 | AutoIt 工具默认语言 | 保持英文（运行时值），需用户在设置界面选一次「简体中文」 |
