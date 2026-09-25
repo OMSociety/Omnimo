@@ -9,8 +9,11 @@
 
 local DAYNAMES = { 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat' }
 
+-- 死源判定阈值（秒）：WebParser 默认 30s 超时，超过此值仍无有效 ICS 即判源不可用
+local LOAD_TIMEOUT = 45
+
 local feeds, VIS, headerH, eventH, viewH, listTop, rowW, padX, style, tc, rangeDays, hasData
-local lastOff, lastMove
+local lastOff, lastMove, loadStart
 
 local function num(v, d)
   local n = tonumber(v)
@@ -279,12 +282,20 @@ function Update()
     end
     -- 仅在从未取到过数据时提示：某轮刷新期间源暂时为空，不该把已显示的内容顶上这行字
     if not hasData then
-      set('Msg', 'Text', 'loading feed...')
+      local now = os.time()
+      if loadStart == nil then loadStart = now end
+      -- 区分「还在加载」与「源已死」：超过 LOAD_TIMEOUT 仍无有效 ICS 则报不可用
+      if now - loadStart >= LOAD_TIMEOUT then
+        set('Msg', 'Text', 'feed unavailable')
+      else
+        set('Msg', 'Text', 'loading feed...')
+      end
       set('Msg', 'Hidden', 0)
       SKIN:Bang('!UpdateMeter Msg')
     end
     return 'loading'
   end
+  loadStart = nil
 
   local today = os.date('*t')
   local t0 = os.time({ year = today.year, month = today.month, day = today.day, hour = 0 })
