@@ -1,3 +1,26 @@
+# Omnimo (Chinese-localized fork)
+
+This repository is a fork of [fediaFedia/Omnimo](https://github.com/fediaFedia/Omnimo).
+It keeps upstream's design and panel set, and changes only four things:
+
+- Simplified Chinese for the settings and save panels, and for the panel
+  context menus. Tile surfaces stay English, because they are laid out around
+  English string widths. The language picker offers 简体中文 for this mode.
+- An Agenda panel that reads published ICS calendar subscriptions (up to three
+  per panel, merged and sorted by time). Private CalDAV endpoints need
+  PROPFIND, which Rainmeter cannot issue; a published subscription URL is a
+  plain GET and works.
+- A handful of panel defects fixed (see `CHANGELOG.md`).
+- Licensing brought in order: `LICENSE` (GPL-2.0) and `THIRD-PARTY.md`.
+
+Working on this fork: read `AGENTS.md` first. It records the file encodings,
+the Rainmeter behaviours that bite, and the credential rules that apply to
+calendar subscription URLs.
+
+`CHANGELOG.md` lists the changes per release.
+
+---
+
 Omnimo 10 for Rainmeter
 =======================
 ![Test Image 4](https://raw.githubusercontent.com/fediaFedia/Omnimo/master/Rainstaller.bmp)
