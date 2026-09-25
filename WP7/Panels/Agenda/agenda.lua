@@ -259,6 +259,12 @@ function Update()
   end)
 
   if not fetched then
+    if #feeds == 0 then
+      set('Msg', 'Text', 'no feed configured')
+      set('Msg', 'Hidden', 0)
+      SKIN:Bang('!UpdateMeter Msg')
+      return 'no feeds'
+    end
     -- 仅在从未取到过数据时提示：某轮刷新期间源暂时为空，不该把已显示的内容顶上这行字
     if not hasData then
       set('Msg', 'Text', 'loading feed...')
@@ -296,7 +302,7 @@ function Update()
   SKIN:Bang('!SetVariable MaxOffset ' .. mx)
 
   if #rows == 0 then
-    set('Msg', 'Text', 'no events in the next 7 days')
+    set('Msg', 'Text', 'no events in the next ' .. (rangeDays + 1) .. ' days')
     set('Msg', 'Hidden', 0)
   else
     set('Msg', 'Hidden', 1)
