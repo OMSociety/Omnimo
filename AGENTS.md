@@ -181,7 +181,7 @@ WP7/Gallery/Intro/save.inc
 
 ## 10. 当前状态与已知未决项
 
-**相对 `upstream/master`（实测）：新增 13 / 修改 28 / 删除 10**（`git diff --name-status upstream/master -- .`）
+**相对 `upstream/master`（实测）：新增 14 / 修改 30 / 删除 10**（`git diff --name-status upstream/master -- .`）
 
 已发布 **v0.1.0**（annotated tag + GitHub Release）。仓库**工作区干净**，无未提交项。
 
@@ -197,10 +197,10 @@ WP7/Gallery/Intro/save.inc
 | # | 项 | 现状 |
 |---|---|---|
 | 1 | 待办同步 | 用户决定不做 |
-| 2 | 静置回顶 | **已验证**（干净判据：光标移离面板后，`returned` 与 `top` 逐字节相同、`scrolled` 不同） |
-| 3 | Agenda 磁贴图标 | **已解决**：图标是固定位置图层，用覆盖表 + `Graphics\Icons\Calendar.png` 叠出日历图标（覆盖表放在文件末尾、用表定位变量，见 §5 第 11 条） |
+| 2 | 静置回顶 | **已验证**（变量判据：光标移离面板后 `returned` 与 `top` 逐字节相同、`scrolled` 不同；真实滚轮下滚动已确认生效，回顶未做无干扰复核，因为滚轮需要光标停在面板上） |
+| 3 | Agenda 磁贴图标 | **已解决**：直接改图标层 `mask-essential.png`（日历字形取自它自己 Date 那格），磁贴本身不额外叠表，见 §5 第 11 条 |
 | 4 | AutoIt 工具默认语言 | 保持英文（运行时值），需用户在设置界面选一次「简体中文」 |
 | 5 | 7 个表面键保持英文 | 见 §4；设置界面中对应 7 格也随之显示英文 |
 | 6 | 6 个 Microsoft Segoe 字体 | 未获再分发授权（`THIRD-PARTY.md` 第 8 节第 4 条） |
 | 7 | 面板名本地化 | **已解决**：登记表里覆盖 `Text=#PanelAgenda#`，8 份语言包都补了该键（中文＝日程） |
-| 8 | Corona 面板 | 已按用户要求删除（面板目录、配置目录、登记项）；其格子留了一块空白占位以保持图标层对齐 |
+| 8 | Corona 面板 | 已删除（面板目录、配置目录、登记项）；`cat1.inc` 与图标层里其后字形整体左移一格，该行不留空洞 |
