@@ -176,6 +176,13 @@ x=(360*#ScaleDpi#)
 [Stopwatch]
 Meter=String
 MeterStyle=EssentialPanel
+[Agenda]
+Meter=String
+MeterStyle=EssentialPanel
+solidcolor=#colorskin# ,215
+Text="#PanelAgenda#"
+ToolTipText=#PanelAgenda#
+
 [cat1Subtitle3]
 Meter=String
 Text=" #Information#"
@@ -208,10 +215,6 @@ solidcolor=#colorskin# ,230
 Meter=String
 MeterStyle=EssentialPanel
 solidcolor=#colorskin# ,240
-[Corona]
-Meter=String
-MeterStyle=EssentialPanel
-solidcolor=#colorskin# ,200
 [QuoteDay]
 Meter=String
 MeterStyle=EssentialPanel
