@@ -8,7 +8,7 @@ Omnimo 是 Rainmeter 桌面皮肤（磁贴式面板集合）；本仓库是它�
 |---|---|
 | 本地路径 | `D:\WorkSpace\Omnimo` |
 | `origin` / `upstream` | `OMSociety/Omnimo` / `fediaFedia/Omnimo` |
-| 分支 / 已发布 | `master`（唯一分支）；annotated tag `v0.1.1` + 同名 GitHub Release |
+| 分支 / 已发布 | `master`（唯一分支）；annotated tag `v0.1.1`、`v1.1.0` + 同名 GitHub Release |
 | 桌面映射 | `C:\Users\<用户>\Documents\Rainmeter\Skins\WP7` 是指向本仓库 `WP7\` 的目录联接（junction） |
 
 **只做四件小事**：① 设置面板 / 保存面板中文化（界面中文，磁贴表面英文）；② 日程同步（只做公开 ICS 订阅，见 §5 第 4 条）；③ 修既有 bug；④ 一点微小的工作。
@@ -226,8 +226,13 @@ WP7/Gallery/MultiManager/Saved/2/screenshot.png                # 布局保存时
 |---|---|---|
 | 1 | ~~`Panels\Agenda` 缺滚轮动作~~ | **已修复并验证**：三个 ini 的 `[Rainmeter]` 段已补 `MouseScrollUp/DownAction`（照 `Volume` 的写法）；差异像素占比判据实测 滚动 14.2% / 静置回顶 0.04% |
 | 2 | ~~滚动 / 静置回顶复核~~ | **已完成**（判据见 §7 第 5 条） |
-| 3 | ~~是否发 `v0.1.1`~~ | **已发布 v0.1.1**；`v0.1.0` 的 Release 与 tag 已按用户要求删除 |
+| 3 | ~~是否发新版~~ | **已发布 v0.1.1、v1.1.0**；`v0.1.0` 的 Release 与 tag 已按用户要求删除 |
 | 4 | AutoIt 工具默认语言 | 保持英文（运行时值），用户需在设置界面选一次「简体中文」 |
 | 5 | 7 个表面键保持英文 | 见 §4；设置界面里对应 7 格也随之显示英文 |
 | 6 | 6 个 Microsoft Segoe 字体 | 未获再分发授权（`THIRD-PARTY.md` 第 8 节第 4 条） |
 | 7 | 提交前要还原的运行时文件 | `WP7\Gallery\main.ini`、`scroll.inc`、`MultiManager\TimeSettings.inc`、`MultiManager\Saved\*\screenshot.png` 会被 Rainmeter 运行时改写；`git checkout --` 还原或按 §8 第 5 条标记。另：`.git/info/exclude` 里 `WP7/_agenda/` 已无对应目录，可删 |
+| 8 | AutoIT 源码修了 2 处但 exe 未重编译 | `OmnimoApp.au3`（StringReplace 参数顺序）与 `Config.au3`（边框色分支读了未声明变量）已修源码；分发 exe 行为不变，重编译是独立决策（与 `config.exe` 同性质，见 `THIRD-PARTY.md` §3） |
+| 9 | `EnglishChinese.inc` 约半数键未译 | 284 键中 123 个值含中文；`24HourTime`（`Settings\settings.ini:87`）、`Missing1`（`TextItems\Extra\MissingComponents\Item.ini:47`）有实测消费方，中文界面下显示英文。补哪些键是产品决策。注意 `ChangeColors`/`RefreshAll`/`SidebarColors` 全库无消费方（上游遗留死键），不算遗漏 |
+| 10 | Agenda 死源提示的残余边界 | 非 ICS 响应（404/登录页）现在停在 "loading feed..."，不再误报 "no events"；要区分「还在加载」与「源已死」需加超时启发（若干轮后显示 feed unavailable），待决策 |
+| 11 | `agenda.lua:280` 夏令时 | 用定长 86400 秒推窗口末日，夏令时回拨那周末一天会被少算（`buildRows` 用 `hour=12` 规避了同类问题，此处没有）；本机时区无夏令时，实际影响为零 |
+| 12 | AutoIT 其余 9 项加固项 | 参数个数检查缺/错 4 处、`Execute()` 求值 ini 坐标、`DirRemove` 无路径校验 3 处、数组上限 2 处、`build.bat` 依赖 wmic、多处 CWD 相对路径——均为上游既有债或需本机权限前置，未动；明细见仓库外 `D:\WorkSpace\Omnimo-代码质量复审报告.md` |
