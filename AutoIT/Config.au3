@@ -895,8 +895,8 @@ While 1
 
 
 			$Chose = _ChooseColor ( 2 )
-			GUICtrlSetBkColor($Color3, $SelectColor)
-			$Color3Value = $SelectColor
+			GUICtrlSetBkColor($Color3, $Chose)
+			$Color3Value = $Chose
 
 		Case $Image
 			$State = _Iif(GUICtrlRead($Image) = $GUI_CHECKED, $GUI_DISABLE, $GUI_ENABLE)
