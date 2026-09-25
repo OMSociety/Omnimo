@@ -160,7 +160,7 @@ Icon2=Agenda.png
 2. 激活：`Rainmeter.exe "!RefreshApp"` → 等约 9 秒 → `Rainmeter.exe "!ActivateConfig" "WP7\Panels\<Name>" "Item.ini"`。
 3. 取窗口：类名 `RainmeterMeterWindow`，标题含配置路径；`GetWindowRect` 定位后 `CopyFromScreen` 截图（进程需 DPI 感知：`SetThreadDpiAwarenessContext(-4)`）。
 4. **比对判据的两个前提**：内容加载完成（WebParser 是异步的，早拍会拍到"数据还在进入"的画面）；**把光标移离面板**（底板 `[bg]` 的 `MouseOverAction` 会改卡片 tint）。违反任一条都会得到假阳性。
-5. 判据选择：验证留白/裁剪这类视觉问题用图像哈希；验证状态量（如滚动偏移、`Active`）直接读变量更稳。收尾：`!DeactivateConfig`；`git checkout -- WP7\Gallery\scroll.inc WP7\Gallery\main.ini`（它们会被运行时写脏）。
+5. 判据选择：验证状态量（如 `Active`）直接读变量最稳；视觉问题用图像比对，但**面板是半透明的**（透出壁纸），亚像素渲染抖动会让「逐字节相同」永远不成立——实测两张「稳定」截图仍有 0.04% 的像素差。正确做法是算**差异像素占比并给阈值**：实测滚动生效 = 14.2%，静置回顶 = 0.04%。另外，这类测试期间要**停用 Slideshow**（它每 20 秒换一次壁纸，会让半透明面板的每张截图都不同）。收尾：`!DeactivateConfig`；`git checkout -- WP7\Gallery\scroll.inc WP7\Gallery\main.ini`（它们会被运行时写脏）。
 
 ## 8. 凭据与隐私纪律
 
@@ -211,8 +211,8 @@ WP7/_agenda/
 
 | # | 未决项 | 现状 |
 |---|---|---|
-| 1 | **`Panels\Agenda` 缺滚轮动作（回归）** | 三个 ini 的 `[Rainmeter]` 段都没有 `MouseScrollUp/DownAction`（实测 0 处）；原型版本是有的（`_backup\agenda-proto-20260925\*.ini` 各 2 处）。用户反馈"从面板库召唤的面板滚不动"即此，需按 §5 第 10 条补回并重测 |
-| 2 | 滚动 / 静置回顶复核 | 补回滚轮动作后重测；真实滚轮下若用哈希比对，须先等内容加载完（否则会拍到数据仍在进入的画面而得到假阳性） |
+| 1 | ~~`Panels\Agenda` 缺滚轮动作~~ | **已修复并验证**：三个 ini 的 `[Rainmeter]` 段已补 `MouseScrollUp/DownAction`（照 `Volume` 的写法）；差异像素占比判据实测 滚动 14.2% / 静置回顶 0.04% |
+| 2 | ~~滚动 / 静置回顶复核~~ | **已完成**（判据见 §7 第 5 条） |
 | 3 | 是否发 `v0.1.1` | `v0.1.0` 之后已有 11 个提交，未发新版 |
 | 4 | AutoIt 工具默认语言 | 保持英文（运行时值），用户需在设置界面选一次「简体中文」 |
 | 5 | 7 个表面键保持英文 | 见 §4；设置界面里对应 7 格也随之显示英文 |
