@@ -8,7 +8,7 @@ Omnimo 是 Rainmeter 桌面皮肤（磁贴式面板集合）；本仓库是它�
 |---|---|
 | 本地路径 | `D:\WorkSpace\Omnimo` |
 | `origin` / `upstream` | `OMSociety/Omnimo` / `fediaFedia/Omnimo` |
-| 分支 / 已发布 | `master`（唯一分支）；annotated tag `v0.1.0` + 同名 GitHub Release |
+| 分支 / 已发布 | `master`（唯一分支）；annotated tag `v0.1.1` + 同名 GitHub Release |
 | 桌面映射 | `C:\Users\<用户>\Documents\Rainmeter\Skins\WP7` 是指向本仓库 `WP7\` 的目录联接（junction） |
 
 **只做四件小事**：① 设置面板 / 保存面板中文化（界面中文，磁贴表面英文）；② 日程同步（只做公开 ICS 订阅，见 §5 第 4 条）；③ 修既有 bug；④ 一点微小的工作。
@@ -23,7 +23,7 @@ Omnimo 是 Rainmeter 桌面皮肤（磁贴式面板集合）；本仓库是它�
 | `WP7\` | 皮肤根 | 子目录 `@Resources` `Background` `Gallery` `Hubs` `Panels` `TextItems`；根下 `Launcher.ini` `LauncherDark.ini` |
 | `WP7\@Resources\Common\Variables\UserVariables.inc` | 全局变量 | 纯 ASCII、无 BOM、1243 字节、纯 CRLF；含 `MainLanguage=EnglishChinese` |
 | `WP7\@Resources\Common\Variables\Languages\` | 语言包 | 8 个语言（`English` `EnglishChinese` `German` `Spanish` `Russian` `Dutch` `French` `Portuguese`）+ `lang.inc`（`langcode`、`DominantRSS`） |
-| `WP7\@Resources\Common\Color\color.inc` | 当前主题色 | 纯 ASCII、纯 CRLF；被 523 个配置 include（在语言包之后，故覆盖语言包同名键） |
+| `WP7\@Resources\Common\Color\color.inc` | 当前主题色 | 纯 ASCII、纯 CRLF；被 523 个配置 include（在语言包之后，故覆盖语言包同名键）。**全库唯一定义 `Padding`/`Opacity`/`Opacity2`/`Globalblurenable`/`Xposition` 的文件**，卡片尺寸由 `Padding` 决定（见 §5 第 15 条） |
 | `WP7\@Resources\Common\Background\Language\` | AutoIt 工具语言 | 每份 33 键 34 行，UTF-16LE+BOM |
 | `WP7\@Resources\Structure\<档位>\Main.inc` | 面板档位底板 | **13 档**：`Circle Double DoubleV HalfDouble HalfSingle Huge HugeV Mini miniCircle Single Square win10 win7`；提供 `[bg]` `[overlay]` `[TextStyle]` `[FullTextStyle]` `[IconStyle]` 与 `TypeW/TypeH/PaddingW/PaddingH` |
 | `WP7\@Resources\Config\Panels\<Name>\` | 每面板配置 | **85 个目录**，各含 `UserVariables.inc`（用户参数）+ `RainConfigure.cfg`（设置界面 schema） |
@@ -112,7 +112,7 @@ Rainmeter 变量**后写者胜**，include 编号顺序即优先级。
 | 12 | 面板库常用面板那排是**两层**的 | 插/删一格磁贴，后面的图标全错位 | 磁贴是 `catN.inc` 手写的 String 表；图标是 `mask-<类>.png` 里**按格烤好的 2 倍图**，由 `[Cat1Mask]` 类表 + `imagetint=#textcolor2#` 绘制。**增删/移动磁贴必须同时改两处**，几何见 §6 路线 A 第 6 步 |
 | 13 | 往磁贴之间插辅助表 | 其后所有区块的标签整体偏移 | 相对定位（`Y=...R`/`X=...r`）只看**文件里上一个表**。辅助表要放**文件末尾**并用 `[表名:X]`/`[表名:Y]` 绝对定位 |
 | 14 | 新建的皮肤目录 | 启动后新目录不被发现 | 先 `!RefreshApp`，再 `!ActivateConfig` |
-| 15 | **每套主题自带 `Padding`，它决定所有卡片的尺寸** | 换版本或换主题后，所有面板看起来「缩了一圈」 | 卡片宽度公式是 `(#Height#+(#Padding#*2))*#ScaleDpi#`，而 `Padding` **只由主题文件** `@Resources\Common\Color\*.inc` 定义（`Structure\*\Main.inc` 与 85 个面板配置里都是 0 处，实测），所以它直接生效、不会被覆盖。master 的 33 套主题取 0（少数取 3 或 4），而 Omnimo 10 Lite 里用户桌面用的那套取 5 —— 差 10 逻辑像素，且卡片还内缩 5px（`X=(5-#Padding#)`）。本机主题值不进仓库（`color.inc` 是主题状态、已 `skip-worktree`） |
+| 15 | **每套主题自带 `Padding`，它决定所有卡片的尺寸** | 换版本或换主题后，所有面板看起来「缩了一圈」 | 卡片宽度公式是 `(#Height#+(#Padding#*2))*#ScaleDpi#`，而 `Padding` **只由主题文件** `@Resources\Common\Color\*.inc` 定义（`Structure\*\Main.inc` 与 85 个面板配置里都是 0 处，实测），所以它直接生效、不会被覆盖。master 的 33 套主题取 0（少数取 3 或 4），而 Omnimo 10 Lite 里用户桌面用的那套取 5 —— 差 10 逻辑像素，且卡片还内缩 5px（`X=(5-#Padding#)`）。本仓库已把该文件的当前值提交为默认（`Padding=5`、`Opacity=50`、`Opacity2=240`、`Globalblurenable=0`、`Xposition=10`）；注意**在面板库换主题会把 `Padding` 改回那套主题自带的值**（master 的主题多为 0，少数 3/4） |
 
 ## 6. 新增一个面板的标准流程
 
@@ -161,7 +161,7 @@ Icon2=Agenda.png
 2. 激活：`Rainmeter.exe "!RefreshApp"` → 等约 9 秒 → `Rainmeter.exe "!ActivateConfig" "WP7\Panels\<Name>" "Item.ini"`。
 3. 取窗口：类名 `RainmeterMeterWindow`，标题含配置路径；`GetWindowRect` 定位后 `CopyFromScreen` 截图（进程需 DPI 感知：`SetThreadDpiAwarenessContext(-4)`）。
 4. **比对判据的两个前提**：内容加载完成（WebParser 是异步的，早拍会拍到"数据还在进入"的画面）；**把光标移离面板**（底板 `[bg]` 的 `MouseOverAction` 会改卡片 tint）。违反任一条都会得到假阳性。
-5. 判据选择：验证状态量（如 `Active`）直接读变量最稳；视觉问题用图像比对，但**面板是半透明的**（透出壁纸），亚像素渲染抖动会让「逐字节相同」永远不成立——实测两张「稳定」截图仍有 0.04% 的像素差。正确做法是算**差异像素占比并给阈值**：实测滚动生效 = 14.2%，静置回顶 = 0.04%。另外，这类测试期间要**停用 Slideshow**（它每 20 秒换一次壁纸，会让半透明面板的每张截图都不同）。收尾：`!DeactivateConfig`；`git checkout -- WP7\Gallery\scroll.inc WP7\Gallery\main.ini`（它们会被运行时写脏）。
+5. 判据选择：验证状态量（如 `Active`）直接读变量最稳；视觉问题用图像比对，但**面板是半透明的**（透出壁纸），亚像素渲染抖动会让「逐字节相同」永远不成立——实测两张「稳定」截图仍有 0.04% 的像素差。正确做法是算**差异像素占比并给阈值**：实测滚动生效 = 14.2%，静置回顶 = 0.04%。另外，测试期间要关掉**第三方动态壁纸**（实测：动态壁纸每帧都在变，会让半透明面板的每张截图都不同；面板库里的 Slideshow 面板不是原因）。收尾：`!DeactivateConfig`；`git checkout -- WP7\Gallery\scroll.inc WP7\Gallery\main.ini`（它们会被运行时写脏）。
 
 ## 8. 凭据与隐私纪律
 
@@ -187,7 +187,14 @@ WP7/_agenda/
 ```
 
 4. **exclude 只对未跟踪文件生效**：已跟踪文件照旧出现在 `git status`，也不受它保护。改这些文件的默认值要 `git add -f`（已这样提交过 `Common\Variables\UserVariables.inc`、`Config\Panels\Network\UserVariables.inc`）。
-5. 本地已对 `Config\Panels\Agenda\UserVariables.inc` 打 **`skip-worktree`**（`git ls-files -v` 显示 `S`），因此**用户填进去的私人订阅链接不会出现在 `git status`，也不会被误提交**。撤销：`git update-index --no-skip-worktree WP7/@Resources/Config/Panels/Agenda/UserVariables.inc`。
+5. 本地已对下列文件打 **`skip-worktree`**（`git ls-files -v` 显示 `S`）：这些是**会被用户或运行时改写**的已跟踪文件，标记后既不显示为脏、也不会被误提交。撤销用 `git update-index --no-skip-worktree <路径>`。
+
+```
+WP7/@Resources/Config/Panels/Agenda/UserVariables.inc      # 用户填的私人订阅链接（凭据）
+WP7/@Resources/Config/Panels/Slideshow/UserVariables.inc   # 用户自己的图片目录
+WP7/@Resources/Config/Panels/WorldClock/UserVariables.inc  # 面板会写成运行机器所在时区
+WP7/Gallery/MultiManager/TimeSettings.inc                  # 布局保存的运行时状态
+```
 6. `Config\Panels\Network\UserVariables.inc`（`PingURL`）等同理：这类"用户参数文件"都是已跟踪的，改动会显示为脏，提交前逐个确认。
 
 ## 9. 提交与发版规范
@@ -200,22 +207,22 @@ WP7/_agenda/
 
 ## 10. 当前状态与未决项
 
-**相对 `upstream/master`（已提交，实测）：新增 14 / 修改 30 / 删除 10**
+**相对 `upstream/master`（已提交，实测）：新增 14 / 修改 35 / 删除 10**
 
 | 类别 | 内容 |
 |---|---|
 | 新增 | `LICENSE`、`THIRD-PARTY.md`、`AGENTS.md`、`CHANGELOG.md`、`Languages\EnglishChinese.inc`、皮肤侧与源码侧两份 `Chinese.cfg`、`Panels\Agenda\`（`Item/Item2/Item3.ini` + `agenda.lua` + `Agenda.png`）、`Config\Panels\Agenda\`（`UserVariables.inc` + `RainConfigure.cfg`） |
-| 修改 | 15 个面板文件（缺陷修复）、8 份语言包（补 `PanelAgenda` 键）、`Gallery\cat1.inc`（Agenda 磁贴落在时间与日期第 2 行；Corona 移除后整段回流）、`Gallery\cat7.inc`（语言列表「简体中文」取代 `[Help Translate]`）、`Gallery\Intro\intro.ini`、`Gallery\panels.inc`、`Graphics\Gallery\mask-essential.png`（图标层）、`Common\Variables\UserVariables.inc`（`MainLanguage`）、`Config\Panels\Network\UserVariables.inc`（默认 ping 改字面 IP）、`readme.md` |
+| 修改 | 15 个面板文件（缺陷修复）、8 份语言包（补 `PanelAgenda` 键）、`Gallery\cat1.inc`（Agenda 磁贴落在时间与日期第 2 行；Corona 移除后整段回流）、`Gallery\cat7.inc`（语言列表「简体中文」取代 `[Help Translate]`）、`Gallery\Intro\intro.ini`、`Gallery\panels.inc`、`Graphics\Gallery\mask-essential.png`（图标层）、`Common\Variables\UserVariables.inc`（`MainLanguage`）、`Config\Panels\Network\UserVariables.inc`（默认 ping 改字面 IP）、`Common\Color\color.inc`（默认主题改为桌面所依据的那套值）、`Gallery\panels.inc`（撤掉重复的自定义面板登记）、`Panels\Slideshow\Item.ini` 与 `Panels\DigitalClock\Item.ini`（`Height` 对齐到桌面所依据的版本）、`readme.md` |
 | 删除 | `Panels\Corona\`、`Config\Panels\Corona\`（共 10 个文件，用户要求删；`cat1.inc` 与图标层已同步回流） |
 
-**已实机验证**：设置界面 7 页中文且无溢出；语言列表出现「简体中文」；面板右键菜单全中文；Agenda 面板在面板库可见可加、卡片裁剪正确、订阅抓取成功（日志无 12006）、静置回顶在**变量判据**下逐字节成立；网络面板显示真实延迟；被修表达式在日志中的报错消失。
+**已实机验证**：设置界面 7 页中文且无溢出；语言列表出现「简体中文」；面板右键菜单全中文；Agenda 面板在面板库可见可加、卡片裁剪正确、订阅抓取成功（日志无 12006）、真实滚轮滚动生效（差异像素占比 14.2%）且静置回顶成立（0.04%）；网络面板显示真实延迟；桌面布置与备份逐面板对齐（含尺寸）；被修表达式在日志中的报错消失。
 
 | # | 未决项 | 现状 |
 |---|---|---|
 | 1 | ~~`Panels\Agenda` 缺滚轮动作~~ | **已修复并验证**：三个 ini 的 `[Rainmeter]` 段已补 `MouseScrollUp/DownAction`（照 `Volume` 的写法）；差异像素占比判据实测 滚动 14.2% / 静置回顶 0.04% |
 | 2 | ~~滚动 / 静置回顶复核~~ | **已完成**（判据见 §7 第 5 条） |
-| 3 | 是否发 `v0.1.1` | `v0.1.0` 之后已有 11 个提交，未发新版 |
+| 3 | ~~是否发 `v0.1.1`~~ | **已发布 v0.1.1**；`v0.1.0` 的 Release 与 tag 已按用户要求删除 |
 | 4 | AutoIt 工具默认语言 | 保持英文（运行时值），用户需在设置界面选一次「简体中文」 |
 | 5 | 7 个表面键保持英文 | 见 §4；设置界面里对应 7 格也随之显示英文 |
 | 6 | 6 个 Microsoft Segoe 字体 | 未获再分发授权（`THIRD-PARTY.md` 第 8 节第 4 条） |
-| 7 | 两处纯清理 | ① `WP7\Gallery\main.ini`、`scroll.inc` 会被 Rainmeter 运行时改写，提交前 `git checkout --` 还原；② `.git/info/exclude` 里 `WP7/_agenda/` 已无对应目录，可删 |
+| 7 | 提交前要还原的运行时文件 | `WP7\Gallery\main.ini`、`scroll.inc`、`MultiManager\TimeSettings.inc`、`MultiManager\Saved\*\screenshot.png` 会被 Rainmeter 运行时改写；`git checkout --` 还原或按 §8 第 5 条标记。另：`.git/info/exclude` 里 `WP7/_agenda/` 已无对应目录，可删 |
