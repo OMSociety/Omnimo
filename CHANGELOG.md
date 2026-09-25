@@ -3,6 +3,51 @@
 Notable changes to this fork of Omnimo. Upstream predates this file, so the
 first entry covers everything the fork has changed so far.
 
+## [1.1.0] - 2026-09-26
+
+### Fixed
+
+- RSS and other text feeds rendered `?` in place of ä, ö and –: the three
+  substitution targets in the shared feed table had lost their characters
+  together with their closing quotes in an encoding pass, which also left the
+  table's quotes unbalanced for every meter consuming it.
+- The Intro wizard's 简体中文 entry wrote `MainLanguage English`, switching the
+  interface back to English. It now writes `EnglishChinese`, matching the
+  gallery's language list.
+- DigitalClock4 hid the clock exactly when "show seconds" was ticked: its
+  `Hidden` expression contradicted the settings checkbox, which writes 0 when
+  the option is enabled. The same suspicion against `Item.ini` did not survive
+  reading the checkbox write code; that file was correct as shipped.
+- The Network panel's grid toggle hid the grid when ticked. Both tiers now
+  follow the setting.
+- Agenda panel: the empty-range message hard-coded 7 days while the window is
+  configurable (6 by default); a panel with no feeds configured sat on
+  "loading feed..." forever; a dead subscription answering with an HTML error
+  page was reported as "no events in the next N days"; all-day events exported
+  with a date-time end rendered as "00:00-HH:MM"; the hint text was the only
+  meter in the tier ignoring the DPI scale.
+- AutoIt sources: OmnimoApp's folder/app pickers passed `StringReplace`'s
+  arguments in the wrong order, so the user's choice went to a stray file and
+  the panel's configuration was never updated; the settings tool's
+  border-color branch read an undeclared variable and discarded the chosen
+  color. Both fixes are source-only; the shipped binaries are unchanged, the
+  same situation THIRD-PARTY.md section 3 already records for config.exe.
+
+### Changed
+
+- AGENTS.md rewritten around measured facts: the settings checkbox's write
+  contract, the encoding and line-ending census, the six skip-worktree files,
+  corrected diff counts, and a panels.inc example that matches the tree.
+- THIRD-PARTY.md's change-set section regenerated from the actual diff; the
+  fictitious ChineseUI.inc entry is gone and the Corona deletions are listed.
+- The readme now notes the one exception to English tile surfaces: the Agenda
+  tile's name is localized through its gallery entry.
+- The 0.1.1 entry below was corrected in place: the calendar tile fills a cell
+  upstream's icon layer left blank rather than replacing the digital clock;
+  the height revert touched only the tier each layout loads; the GetMhz
+  entry's causality (an unused per-refresh `wmic` child process, not a removed
+  plugin).
+
 ## [0.1.1] - 2026-09-25
 
 ### Added
