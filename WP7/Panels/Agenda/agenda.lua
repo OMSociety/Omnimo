@@ -27,9 +27,21 @@ end
 
 local function parseDT(v)
   if not v then return nil end
-  v = v:gsub('^[^:]*:', ''):gsub('Z$', '')
+  v = v:gsub('^[^:]*:', '')
+  local isUTC = v:sub(-1) == 'Z'
+  v = v:gsub('Z$', '')
   local y, m, d, H, M = v:match('^(%d%d%d%d)(%d%d)(%d%d)T(%d%d)(%d%d)')
-  if y then return { y = num(y), m = num(m), d = num(d), H = num(H), M = num(M) } end
+  if y then
+    y, m, d, H, M = num(y), num(m), num(d), num(H), num(M)
+    if isUTC then
+      -- 源以 UTC(Z) 给出时刻；os.time 把入参当本地时间，需补回本地与 UTC 的偏移再读本地分量
+      local e = os.time({ year = y, month = m, day = d, hour = H, min = M, sec = 0 })
+      local off = os.difftime(os.time(os.date('*t', e)), os.time(os.date('!*t', e)))
+      local lt = os.date('*t', e + off)
+      y, m, d, H, M = lt.year, lt.month, lt.day, lt.hour, lt.min
+    end
+    return { y = y, m = m, d = d, H = H, M = M }
+  end
   local y2, m2, d2 = v:match('^(%d%d%d%d)(%d%d)(%d%d)')
   if y2 then return { y = num(y2), m = num(m2), d = num(d2) } end
   return nil
