@@ -5,7 +5,9 @@ It keeps upstream's design and panel set, and changes only four things:
 
 - Simplified Chinese for the settings and save panels, and for the panel
   context menus. Tile surfaces stay English, because they are laid out around
-  English string widths. The language picker offers 简体中文 for this mode.
+  English string widths; the one exception is the Agenda tile, whose name is
+  localized through its gallery entry (日程 in this mode). The language picker
+  offers 简体中文 for this mode.
 - An Agenda panel that reads published ICS calendar subscriptions (up to three
   per panel, merged and sorted by time). Private CalDAV endpoints need
   PROPFIND, which Rainmeter cannot issue; a published subscription URL is a
