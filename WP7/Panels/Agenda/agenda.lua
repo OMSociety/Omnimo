@@ -64,7 +64,7 @@ local function buildRows(events)
     local dayText = string.format('%s %d', DAYNAMES[wt.wday], ev.s.d)
 
     local r = { kind = 'ev', h = eventH, title = ev.title }
-    if ev.e and (ev.e.H or ev.e.M) then
+    if ev.s.H and ev.e and (ev.e.H or ev.e.M) then
       r.time = hhmm(ev.s) .. '-' .. hhmm(ev.e)
     elseif ev.s.H then
       r.time = hhmm(ev.s)
@@ -241,7 +241,7 @@ function Update()
   local events, seen, fetched = {}, {}, false
   for _, m in ipairs(feeds) do
     local raw = m:GetStringValue()
-    if raw and #raw > 40 then
+    if raw and raw:find('BEGIN:VCALENDAR', 1, true) then
       fetched = true
       for _, ev in ipairs(parseICS(raw)) do
         local sig = dayKey(ev.s) .. '|' .. num(ev.s.H, 0) .. ':' .. num(ev.s.M, 0) .. '|' .. ev.title
