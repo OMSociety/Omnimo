@@ -491,6 +491,7 @@ Const $PanelsInc = $skinpath & "WP7\Gallery\panels.inc"
 $index = $CmdLine[2]
 	$path = IniRead($PanelsInc, "Variables", "Path" & $index, "")
 	If $path == "" Then Exit
+	If StringInStr($path, "..") Then Exit ; refuse a panels.inc Path that traverses outside the panels folder
 	DirRemove($SkinPath & "WP7\Panels\#CustomPanels\" & $path, 1)
 	IniDelete($PanelsInc, "Variables", "Name" & $index)
 	IniDelete($PanelsInc, "Variables", "Path" & $index)

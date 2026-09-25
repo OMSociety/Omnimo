@@ -52,6 +52,7 @@ If $CmdLine[0] > 2 And $CmdLine[2] == "Delete" Then
 	$index = $CmdLine[3]
 	$path = IniRead($PanelsInc, "Variables", "Path" & $index, "")
 	If $path == "" Then Exit
+	If StringInStr($path, "..") Then Exit ; refuse a panels.inc Path that traverses outside WP7\Panels
 	DirRemove($SkinPath & "WP7\Panels\" & $path, 1)
 	IniDelete($PanelsInc, "Variables", "Name" & $index)
 	IniDelete($PanelsInc, "Variables", "Path" & $index)
