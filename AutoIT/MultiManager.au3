@@ -16,7 +16,7 @@
 
 
 ; Check arguments
-If $CmdLine[0] < 4 Then OmnimoError("Omnimo MultiManager", "Too few command line arguments specified.")
+If $CmdLine[0] < 5 Then OmnimoError("Omnimo MultiManager", "Too few command line arguments specified.")
 
 
 

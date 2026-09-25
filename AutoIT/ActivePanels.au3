@@ -8,7 +8,7 @@
 ;	If $cmdline[0] < 3 Then omnimoerror("Can't open", "Too few command line arguments specified.")
 
 ; Check arguments
-If $CmdLine[0] < 4 Then OmnimoError("Omnimo Panel Config", "Too few command line arguments specified.")
+If $CmdLine[0] < 5 Then OmnimoError("Omnimo Panel Config", "Too few command line arguments specified.")
 
 
 

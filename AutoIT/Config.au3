@@ -22,7 +22,7 @@
 
 ; Check arguments
 
-If $CmdLine[0] < 5 Then OmnimoError("Omnimo Panel Config", "Too few command line arguments specified.")
+If $CmdLine[0] < 6 Then OmnimoError("Omnimo Panel Config", "Too few command line arguments specified.")
 
 
 
