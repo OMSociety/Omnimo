@@ -214,6 +214,7 @@ Func ReadActiveSkins()
 				$config = StringReplace($Sections[$i], "WP7\", "WP7\@Resources\Config\") & "\RainConfigure.cfg"
 				If IniRead($config, "Options", "Colorizable", "1") == "0" Then ContinueLoop
 				GUICtrlSetData($PanelList, StringRegExpReplace($Sections[$i], "WP7\\(Installed|Donator)?Panels\\", ""))
+				If $NumPanels >= 100 Then ExitLoop ; $panels holds 100 entries
 				$Panels[$NumPanels] = $Sections[$i]
 				$NumPanels += 1
 			EndIf

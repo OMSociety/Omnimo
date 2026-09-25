@@ -170,6 +170,8 @@ Else
 			Case ""
 				$Comments &= @CRLF
 			Case Else
+				If $VarCount >= 50 Then OmnimoError("Unable to read RainConfigure.cfg", "More than 50 configurable variables; the list was truncated.")
+				ExitLoop
 				$VarName[$VarCount] = $name
 				$VarDescription[$VarCount] = FileReadLine($CfgFile)
 				$VarType[$VarCount] = FileReadLine($CfgFile)
