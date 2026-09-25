@@ -206,7 +206,7 @@ WP7/Gallery/MultiManager/TimeSettings.inc                  # 布局保存的运�
 
 ## 10. 当前状态与未决项
 
-**相对 `upstream/master`（已提交，实测）：新增 14 / 修改 35 / 删除 10**
+**相对 `upstream/master`（已提交，实测）：新增 14 / 修改 32 / 删除 10**
 
 | 类别 | 内容 |
 |---|---|
