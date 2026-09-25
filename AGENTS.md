@@ -21,7 +21,7 @@ Omnimo 是 Rainmeter 桌面皮肤（磁贴式面板集合）；本仓库是它�
 | 路径 | 作用 | 实测要点 |
 |---|---|---|
 | `WP7\` | 皮肤根 | 子目录 `@Resources` `Background` `Gallery` `Hubs` `Panels` `TextItems`；根下 `Launcher.ini` `LauncherDark.ini` |
-| `WP7\@Resources\Common\Variables\UserVariables.inc` | 全局变量 | 纯 ASCII、无 BOM、1243 字节、纯 CRLF；含 `MainLanguage=EnglishChinese` |
+| `WP7\@Resources\Common\Variables\UserVariables.inc` | 全局变量 | ANSI(cp1252)、无 BOM、1246 字节、纯 CRLF；含 `MainLanguage=EnglishChinese`；`SubstituteFeed` 尾部三个替换目标是 cp1252 单字节字符（`ä`=0xE4、`ö`=0xF6、`–`=0x96），故本文件不是纯 ASCII |
 | `WP7\@Resources\Common\Variables\Languages\` | 语言包 | 8 个语言（`English` `EnglishChinese` `German` `Spanish` `Russian` `Dutch` `French` `Portuguese`）+ `lang.inc`（`langcode`、`DominantRSS`） |
 | `WP7\@Resources\Common\Color\color.inc` | 当前主题色 | 纯 ASCII、纯 CRLF；被 523 个配置 include（在语言包之后，故覆盖语言包同名键）。**全库唯一定义 `Padding`/`Opacity`/`Opacity2`/`Globalblurenable`/`Xposition` 的文件**，卡片尺寸由 `Padding` 决定（见 §5 第 15 条） |
 | `WP7\@Resources\Common\Background\Language\` | AutoIt 工具语言 | 每份 33 键 34 行，UTF-16LE+BOM |
@@ -30,15 +30,16 @@ Omnimo 是 Rainmeter 桌面皮肤（磁贴式面板集合）；本仓库是它�
 | `WP7\Gallery\` | 设置界面（面板库） | `main.ini`、`scroll.inc`（运行时状态）、`panels.inc`（自定义面板清单）、`cat1.inc`…`cat7.inc`（分类登记表）、`Settings\`；5 个子目录 |
 | `WP7\Panels\` | 面板本体 | **62 个目录**，**一档一个文件**（如 `RAM\Item.ini`…`Item4.ini`） |
 | `WP7\@Resources\Graphics\Gallery\mask-*.png` | 面板库图标层 | 4 张：`mask-essential` `mask-shortcut` `mask-textitems` `mask-contrib`，与分类表一一对应 |
-| `AutoIT\` | 配置工具源码 | 10 个 `.au3`（`Config.au3` `ConfigBackground.au3` `PanelCreator.au3`…）+ `build.bat` + `Language\*.cfg` + `Includes\` |
+| `AutoIT\` | 配置工具源码 | 9 个 `.au3`（`Config.au3` `ConfigBackground.au3` `PanelCreator.au3`…）+ `build.bat` + `Language\*.cfg` + `Includes\` |
 
 **面板库的三个样式**（定义在 `@Resources\Common\Gallery\Color\Modern\<Dark|Light>\tt.inc`）：`[EssentialPanel]`（常用面板磁贴，`tt.inc:232`）、`[EssentialPanelText]`（`tt.inc:252`）、`[EssentialPanelBlank]`（自定义面板格子，`tt.inc:268`）。
 `[EssentialPanel]` 的动作是 `!ToggleConfig "WP7\Panels\#CURRENTSECTION#" "Item.ini"`，即**磁贴表名 = 面板目录名**（实测）。
 
 ## 3. 编码与行尾（最容易翻车）
 
-**实测分布**（`WP7\` 下 `.ini/.inc/.cfg` 共 1562 个）：ASCII 1437；UTF-16LE+BOM 92；UTF-8 无 BOM 31；UTF-8+BOM 2。
-**行尾**：纯 CRLF 1533；混合或其它 25；纯裸 LF 4。
+**实测分布**（`WP7\` 下 `.ini/.inc/.cfg` 共 1562 个）：ASCII 1436；UTF-16LE+BOM 92；ANSI(cp1252) 28；UTF-8 无 BOM 4；UTF-8+BOM 2。
+**行尾**：纯 CRLF 1533；混合 16；单行无换行 9；纯裸 LF 4（均为 UTF-16 的上游文件）。
+**口径**：以上两个分布都是**检出层**（本机 `core.autocrlf=true`）的量；存储层除被 git 判为二进制的文件外全是 LF。`.lua` 不在 `.gitattributes` 覆盖内（该文件只给 `*.ini`/`*.inc` 配了 diff 驱动），所以 `agenda.lua` 在工作树里就是纯裸 LF。
 
 | 抽检文件 | 编码 | 行尾 |
 |---|---|---|
@@ -113,6 +114,7 @@ Rainmeter 变量**后写者胜**，include 编号顺序即优先级。
 | 13 | 往磁贴之间插辅助表 | 其后所有区块的标签整体偏移 | 相对定位（`Y=...R`/`X=...r`）只看**文件里上一个表**。辅助表要放**文件末尾**并用 `[表名:X]`/`[表名:Y]` 绝对定位 |
 | 14 | 新建的皮肤目录 | 启动后新目录不被发现 | 先 `!RefreshApp`，再 `!ActivateConfig` |
 | 15 | **每套主题自带 `Padding`，它决定所有卡片的尺寸** | 换版本或换主题后，所有面板看起来「缩了一圈」 | 卡片宽度公式是 `(#Height#+(#Padding#*2))*#ScaleDpi#`，而 `Padding` **只由主题文件** `@Resources\Common\Color\*.inc` 定义（`Structure\*\Main.inc` 与 85 个面板配置里都是 0 处，实测），所以它直接生效、不会被覆盖。master 的 33 套主题取 0（少数取 3 或 4），而 Omnimo 10 Lite 里用户桌面用的那套取 5 —— 差 10 逻辑像素，且卡片还内缩 5px（`X=(5-#Padding#)`）。本仓库已把该文件的当前值提交为默认（`Padding=5`、`Opacity=50`、`Opacity2=240`、`Globalblurenable=0`、`Xposition=10`）；注意**在面板库换主题会把 `Padding` 改回那套主题自带的值**（master 的主题多为 0，少数 3/4） |
+| 16 | **`RainConfigure.cfg` 的 `Checkbox:a:b` 是「未勾选写 a、勾选写 b」** | 把 `Checkbox:1:0` 读成"勾选=1"会把 `Hidden=#X#` 的语义判反（本仓库因此误"修"过 DigitalClock 两处） | 源码 `Config.au3`：`StringSplit` 后 `VarOpts[2]=a`、`VarOpts[3]=b`；写盘 `_WriteOption` 勾选取 `VarOpts[3]`、未勾选取 `VarOpts[2]`（实测行 458），显示态 `$value == VarOpts[3]` 即勾选（行 507）。推论：`Checkbox:1:0` 的变量**勾选启用时值为 0**，`Hidden=#X#` 恰好是"启用即显示"；判断 `Update=#X#1000` 这类拼接也要按真实取值展开（`0`→`01000`→十进制 1000，Rainmeter 源码 `wcstol(…, 10)`，前导零不是八进制） |
 
 ## 6. 新增一个面板的标准流程
 
@@ -142,14 +144,15 @@ ToolTipText=#<语言键>#     ; 可选
 **路线 B：进「自定义面板」（内容型面板走这条，源码 `AutoIT\PanelCreator.au3` 就是这么干的）**
 
 1. 图标放**面板自己的目录**：`WP7\Panels\<Name>\<Name>.png`（源码第 446 行给面板配置写 `IconLocation=<Name>.png`）。
-2. 在 `WP7\Gallery\panels.inc` 追加三元组（源码第 291 行 `IniWrite($PanelsInc,"Variables","Icon"&$i, $foldername&'.png')`）：
+2. 在 `WP7\Gallery\panels.inc` 追加三元组（源码第 291 行 `IniWrite($PanelsInc,"Variables","Icon"&$i, $foldername&'.png')`）。`panels.inc` 现状只有 `TaskManager` 一组，序号从 2 起：
 
 ```
-Name2=Agenda
-Path2=Agenda
-Icon2=Agenda.png
+Name2=Example
+Path2=Example
+Icon2=Example.png
 ```
 
+   注意 Agenda **不走这条路**：它已按路线 A 登记进 `cat1.inc` 的常用面板排，`panels.inc` 里的 Agenda 条目是早期尝试的残留，已删除（该文件与上游净 diff 为零）。
 3. 前端在 `cat4.inc`（自定义面板）：`[c2] Meter=Image / MeterStyle=EssentialPanelBlank / ImageName="#ROOTCONFIGPATH#Panels\#Path2#\#Icon2#" / LeftMouseUpAction=!ToggleConfig "WP7\Panels\#Path2#" "Item.ini"`。格子通用，**增删不会错位**。
 4. 删除面板时两处都要清（源码第 52-57 行：`DirRemove` 面板目录 + `IniDelete` 该条 + `!Refresh WP7\Gallery`）。
 
@@ -167,7 +170,7 @@ Icon2=Agenda.png
 
 日历订阅链接（`https://…/published/2/…`）**本身就是凭据**：拿到链接的任何人都能读那份日历。
 
-1. **绝不写进仓库、脚本或文档**。测试时以命令行参数传入，落点只能是本地忽略目录；测完重新生成并全文检索确认干净。`git log -S'caldav.icloud' --all` 应无输出。
+1. **绝不写进仓库、脚本或文档**。测试时以命令行参数传入，落点只能是本地忽略目录；测完重新生成并全文检索确认干净。自检要用**不自我匹配**的判据：`git log -p --all -- "WP7/@Resources/Config/Panels/Agenda/UserVariables.inc"` 里 `Feed1=` 的取值只应出现本条第 2 款的公开默认源；快速比对用「值长度 + sha256 前 16 位」的指纹即可。**不要**用 `git log -S'<关键词>' --all` 当这条自检：关键词会随本文档一起进提交，检索必然命中引入它的那次提交（实测命中 `8853d7bb`），自检永远失败；同理不要把任何检索字面量写进文档。
 2. 仓库里带的默认订阅必须是公开源（实测可用：`https://www.officeholidays.com/ics/china`、`…/south-korea`、`…/hong-kong`）。Apple 的 `calendars.icloud.com` 是 gzip 传输，Python 直取会拿到二进制（实测），不适合做默认。
 3. `.git/info/exclude` 实际内容（本机生效、不入库；`WP7/_agenda/` 是原型期的**陈旧条目**，目录已删）：
 
@@ -190,9 +193,12 @@ WP7/_agenda/
 5. 本地已对下列文件打 **`skip-worktree`**（`git ls-files -v` 显示 `S`）：这些是**会被用户或运行时改写**的已跟踪文件，标记后既不显示为脏、也不会被误提交。撤销用 `git update-index --no-skip-worktree <路径>`。
 
 ```
-WP7/@Resources/Config/Panels/Agenda/UserVariables.inc      # 用户填的私人订阅链接（凭据）
-WP7/@Resources/Config/Panels/WorldClock/UserVariables.inc  # 面板会写成运行机器所在时区
-WP7/Gallery/MultiManager/TimeSettings.inc                  # 布局保存的运行时状态
+WP7/@Resources/Config/Panels/Agenda/UserVariables.inc          # 用户填的私人订阅链接（凭据）
+WP7/@Resources/Config/Panels/WorldClock/UserVariables.inc      # 面板会写成运行机器所在时区
+WP7/Gallery/MultiManager/TimeSettings.inc                      # 布局保存的运行时状态
+WP7/@Resources/Config/Panels/Slideshow/UserVariables.inc       # 用户本机的图片目录与播放参数
+WP7/@Resources/Config/TextItems/MultiManager/UserVariables.inc # 各布局格的保存标记
+WP7/Gallery/MultiManager/Saved/2/screenshot.png                # 布局保存时生成的缩略图
 ```
 6. `Config\Panels\Network\UserVariables.inc`（`PingURL`）等同理：这类"用户参数文件"都是已跟踪的，改动会显示为脏，提交前逐个确认。
 
@@ -206,12 +212,12 @@ WP7/Gallery/MultiManager/TimeSettings.inc                  # 布局保存的运�
 
 ## 10. 当前状态与未决项
 
-**相对 `upstream/master`（已提交，实测）：新增 14 / 修改 32 / 删除 10**
+**相对 `upstream/master`（已提交，实测）：新增 14 / 修改 33 / 删除 10**
 
 | 类别 | 内容 |
 |---|---|
 | 新增 | `LICENSE`、`THIRD-PARTY.md`、`AGENTS.md`、`CHANGELOG.md`、`Languages\EnglishChinese.inc`、皮肤侧与源码侧两份 `Chinese.cfg`、`Panels\Agenda\`（`Item/Item2/Item3.ini` + `agenda.lua` + `Agenda.png`）、`Config\Panels\Agenda\`（`UserVariables.inc` + `RainConfigure.cfg`） |
-| 修改 | 15 个面板文件（缺陷修复）、8 份语言包（补 `PanelAgenda` 键）、`Gallery\cat1.inc`（Agenda 磁贴落在时间与日期第 2 行；Corona 移除后整段回流）、`Gallery\cat7.inc`（语言列表「简体中文」取代 `[Help Translate]`）、`Gallery\Intro\intro.ini`、`Gallery\panels.inc`、`Graphics\Gallery\mask-essential.png`（图标层）、`Common\Variables\UserVariables.inc`（`MainLanguage`）、`Config\Panels\Network\UserVariables.inc`（默认 ping 改字面 IP）、`Common\Color\color.inc`（默认主题改为桌面所依据的那套值）、`Panels\Slideshow\Item.ini` 与 `Panels\DigitalClock\Item.ini`（`Height` 对齐到桌面所依据的版本）、`readme.md` |
+| 修改 | 16 个面板文件（缺陷修复）、7 份语言包（补 `PanelAgenda` 键；第 8 份中文包是新增文件）、`Gallery\cat1.inc`（Agenda 磁贴落在时间与日期第 2 行；Corona 移除后整段回流）、`Gallery\cat7.inc`（语言列表「简体中文」取代 `[Help Translate]`）、`Gallery\Intro\intro.ini`、`Graphics\Gallery\mask-essential.png`（图标层）、`Common\Variables\UserVariables.inc`（`MainLanguage` 与 `SubstituteFeed` 编码修复）、`Config\Panels\Network\UserVariables.inc`（默认 ping 改字面 IP）、`Common\Color\color.inc`（默认主题改为桌面所依据的那套值）、`Panels\Slideshow\Item.ini` 与 `Panels\DigitalClock\Item.ini`（`Height` 对齐到桌面所依据的版本）、`readme.md` |
 | 删除 | `Panels\Corona\`、`Config\Panels\Corona\`（共 10 个文件，用户要求删；`cat1.inc` 与图标层已同步回流） |
 
 **已实机验证**：设置界面 7 页中文且无溢出；语言列表出现「简体中文」；面板右键菜单全中文；Agenda 面板在面板库可见可加、卡片裁剪正确、订阅抓取成功（日志无 12006）、真实滚轮滚动生效（差异像素占比 14.2%）且静置回顶成立（0.04%）；网络面板显示真实延迟；桌面布置与备份逐面板对齐（含尺寸）；被修表达式在日志中的报错消失。
