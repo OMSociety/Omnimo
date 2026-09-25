@@ -3,6 +3,44 @@
 Notable changes to this fork of Omnimo. Upstream predates this file, so the
 first entry covers everything the fork has changed so far.
 
+## [Unreleased]
+
+### Fixed
+
+- Volume panel: the bottom progress bar sat off-center in the single and
+  halfsingle tiers. The tile background adds `#Padding#` on both sides, but the
+  bar's origin did not add it back, so the bar was shifted left by one padding
+  unit; the origin now includes it and the bar centers under the tile.
+- Agenda panel: events exported with a UTC (`Z`) timestamp were placed at the
+  raw clock time instead of the local one, shifting them by the UTC offset. The
+  parser now converts `Z` times to local.
+- Agenda panel: a subscription that never returned a valid calendar sat on
+  "loading feed..." forever. After a 45-second timeout with no data the panel
+  now reports the feed as unavailable; a source that had already shown events
+  keeps its last content rather than reverting to the timeout message.
+- The shipped `OmnimoApp.exe` and `config.exe` are now rebuilt from the
+  corrected sources with AutoIt 3.3.8.1 (`Aut2Exe`, x86, no UPX, the sources'
+  own icons), the interpreter version embedded in the originals. The 0.2.0
+  source-only fixes to the folder/app picker and the border-color branch now
+  reach the binaries users actually run.
+
+### Changed
+
+- Panel size tiers: the digital clock's and the slideshow's base `Height` is
+  now the same across every tier, so a card keeps its proportions whichever
+  layout loads it.
+- The Simplified Chinese language pack was renamed from `EnglishChinese.inc` to
+  `Chinese.inc`; references updated to match.
+- Chinese coverage of the settings and configuration strings was extended by 21
+  keys (among them `24HourTime`, the limited-mode `Missing` notices and the
+  panel-creator labels). Tile surfaces and the Donate panel's author note stay
+  English by design.
+- Agenda panel: private calendar subscriptions now load from a gitignored
+  `UserVariables.local.inc` override that falls back to the committed public
+  defaults when absent. A published calendar URL grants read access to that
+  calendar, so keeping personal feeds in a local, uncommitted file stops them
+  from ever entering the repository.
+
 ## [0.2.0] - 2026-09-26
 
 ### Fixed
