@@ -180,22 +180,25 @@ WP7/Gallery/Intro/save.inc
 
 ## 10. 当前状态与已知未决项
 
-**相对 `upstream/master`（已提交部分，实测）：新增 5 / 修改 20 / 删除 0**
+**相对 `upstream/master`（实测）：新增 13 / 修改 22 / 删除 0**（`git diff --name-status upstream/master -- .`）
 
-新增：`AutoIT/Language/Chinese.cfg`、`LICENSE`、`THIRD-PARTY.md`、`WP7/@Resources/Common/Background/Language/Chinese.cfg`、`WP7/@Resources/Common/Variables/Languages/EnglishChinese.inc`。
-修改：15 个面板文件（缺陷修复）、`Gallery\cat7.inc`（语言列表加「简体中文」）、`Gallery\Intro\intro.ini`（向导按钮）、`Gallery\cat1.inc`（登记 Agenda）、全局 `UserVariables.inc`（`MainLanguage`）、`Config\Panels\Network\UserVariables.inc`（默认 ping 改字面 IP）。
+已发布 **v0.1.0**（annotated tag + GitHub Release）。仓库**工作区干净**，无未提交项。
 
-**未提交**（工作区实测）：AGENTS.md 本身；`WP7\Panels\Agenda\`（`Item.ini` `Item2.ini` `Item3.ini` `agenda.lua`，无 BOM UTF-8）；`WP7\@Resources\Config\Panels\Agenda\`（`UserVariables.inc` `RainConfigure.cfg`）；`WP7\Gallery\cat1.inc` 的 `[Agenda]` 登记。原 `WP7\_agenda\` 原型已并入 `Panels\Agenda\`。
+| 类别 | 内容 |
+|---|---|
+| 新增 | `LICENSE`、`THIRD-PARTY.md`、`AGENTS.md`、`CHANGELOG.md`、两份 `Chinese.cfg`（皮肤侧 + AutoIt 源码侧）、`EnglishChinese.inc`、`Panels\Agenda\`（`Item/Item2/Item3.ini` + `agenda.lua`）、`Config\Panels\Agenda\`（`UserVariables.inc` + `RainConfigure.cfg`） |
+| 修改 | 15 个面板文件（缺陷修复）、`Gallery\cat7.inc`（语言列表的「简体中文」取代 `[Help Translate]`）、`Gallery\cat1.inc`（登记 Agenda）、`Gallery\Intro\intro.ini`（向导按钮）、全局 `UserVariables.inc`（`MainLanguage=EnglishChinese`）、`Config\Panels\Network\UserVariables.inc`（默认 ping 改字面 IP）、`readme.md`（fork 说明） |
 
-已完成的验证：设置界面 7 页中文且无溢出；语言列表出现「简体中文」；面板右键菜单全中文；网络面板显示真实延迟（原先主机名 ping 不通而显示失败值）；被修表达式在日志中的报错消失。
+已完成的验证（均为实机）：设置界面 7 页中文无溢出；语言列表出现「简体中文」；面板右键菜单全中文；Agenda 面板在面板库可见并可用、滚轮滚动生效、卡片裁剪正确、订阅抓取成功（日志无 12006）；网络面板显示真实延迟；被修表达式在日志中的报错消失。
 
 未决项：
 
 | # | 项 | 现状 |
 |---|---|---|
 | 1 | 待办同步 | 未开始 |
-| 2 | 日程面板 | 已接入 `Panels\Agenda\` 并在 `cat1.inc` 登记；滚轮滚动已验证，静置回顶尚无干净判据的验证；未提交 |
-| 3 | AutoIt 工具默认语言 | 保持英文（运行时值），需用户在设置界面选一次「简体中文」 |
-| 4 | 7 个表面键保持英文 | 见 §4；设置界面中对应 7 格也随之显示英文 |
-| 5 | 6 个 Microsoft Segoe 字体 | 未获再分发授权（`THIRD-PARTY.md` 第 8 节第 4 条） |
-| 6 | 仓库自己的 README | 未写；上游 `readme.md` 保持原样（`THIRD-PARTY.md` 第 8 节第 5 条） |
+| 2 | 静置回顶的干净验证 | 功能已实现；此前的像素/哈希比对受底板 `MouseOver` 染色干扰（见 §7 第 4 条），尚未用干净判据复核 |
+| 3 | Agenda 磁贴图标 | 面板库中的磁贴显示兜底图形；图标映射机制未查清（已排除：无按面板名命名的 PNG、`Gallery\hex.lua` 仅 7 行且与图标无关、`[EssentialPanel]` 样式无 `ImageName`） |
+| 4 | AutoIt 工具默认语言 | 保持英文（运行时值），需用户在设置界面选一次「简体中文」 |
+| 5 | 7 个表面键保持英文 | 见 §4；设置界面中对应 7 格也随之显示英文 |
+| 6 | 6 个 Microsoft Segoe 字体 | 未获再分发授权（`THIRD-PARTY.md` 第 8 节第 4 条） |
+| 7 | 面板名本地化 | 面板库里的名字来自目录名（`Text=#CURRENTSECTION#`），未本地化 |
