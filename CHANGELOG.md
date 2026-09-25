@@ -40,6 +40,11 @@ first entry covers everything the fork has changed so far.
   defaults when absent. A published calendar URL grants read access to that
   calendar, so keeping personal feeds in a local, uncommitted file stops them
   from ever entering the repository.
+- Removed the six bundled Microsoft Segoe font files from
+  `@Resources/Fonts/`, which Microsoft does not license for redistribution.
+  The skin resolves font faces by system name and never loaded the files, so
+  nothing renders differently; `OptimusPrinceps.ttf`, not a Microsoft face,
+  stays.
 
 ## [0.2.0] - 2026-09-26
 
