@@ -187,13 +187,14 @@ WP7/Gallery/main.ini
 WP7/Gallery/scroll.inc
 WP7/Gallery/Intro/save.inc
 WP7/_agenda/
+
+WP7/@Resources/Config/Panels/Agenda/UserVariables.local.inc
 ```
 
 4. **exclude 只对未跟踪文件生效**：已跟踪文件照旧出现在 `git status`，也不受它保护。改这些文件的默认值要 `git add -f`（已这样提交过 `Common\Variables\UserVariables.inc`、`Config\Panels\Network\UserVariables.inc`）。
 5. 本地已对下列文件打 **`skip-worktree`**（`git ls-files -v` 显示 `S`）：这些是**会被用户或运行时改写**的已跟踪文件，标记后既不显示为脏、也不会被误提交。撤销用 `git update-index --no-skip-worktree <路径>`。
 
 ```
-WP7/@Resources/Config/Panels/Agenda/UserVariables.inc          # 用户填的私人订阅链接（凭据）
 WP7/@Resources/Config/Panels/WorldClock/UserVariables.inc      # 面板会写成运行机器所在时区
 WP7/Gallery/MultiManager/TimeSettings.inc                      # 布局保存的运行时状态
 WP7/@Resources/Config/Panels/Slideshow/UserVariables.inc       # 用户本机的图片目录与播放参数
@@ -201,6 +202,7 @@ WP7/@Resources/Config/TextItems/MultiManager/UserVariables.inc # 各布局格的
 WP7/Gallery/MultiManager/Saved/2/screenshot.png                # 布局保存时生成的缩略图
 ```
 6. `Config\Panels\Network\UserVariables.inc`（`PingURL`）等同理：这类"用户参数文件"都是已跟踪的，改动会显示为脏，提交前逐个确认。
+7. **私人订阅走本地覆盖 include，不再靠 skip-worktree**：`Config\Panels\Agenda\UserVariables.local.inc`（未跟踪、在 exclude 里）由 `Panels\Agenda\Item/Item2/Item3.ini` 的 `@include5` 引入，覆盖 `@include3` 的公开默认。该文件缺失时皮肤照常加载并回落公开源（实测：移除后刷新显示 officeholidays 公开假日、无报错；放回后渲染与基线逐像素一致）。已跟踪的 `Config\Panels\Agenda\UserVariables.inc` 因此保持公开默认、无 skip-worktree 标记。
 
 ## 9. 提交与发版规范
 
