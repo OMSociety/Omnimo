@@ -8,7 +8,7 @@ Omnimo 是 Rainmeter 桌面皮肤（磁贴式面板集合）；本仓库是它�
 |---|---|
 | 本地路径 | `D:\WorkSpace\Omnimo` |
 | `origin` / `upstream` | `OMSociety/Omnimo` / `fediaFedia/Omnimo` |
-| 分支 / 已发布 | `master`（唯一分支）；annotated tag `v0.1.1`、`v0.2.0` + 同名 GitHub Release |
+| 分支 / 已发布 | `master`（唯一分支）；annotated tag `v0.2.0` + 同名 GitHub Release |
 | 桌面映射 | `C:\Users\<用户>\Documents\Rainmeter\Skins\WP7` 是指向本仓库 `WP7\` 的目录联接（junction） |
 
 **只做四件小事**：① 设置面板 / 保存面板中文化（界面中文，磁贴表面英文）；② 日程同步（只做公开 ICS 订阅，见 §5 第 4 条）；③ 修既有 bug；④ 一点微小的工作。
@@ -226,7 +226,7 @@ WP7/Gallery/MultiManager/Saved/2/screenshot.png                # 布局保存时
 |---|---|---|
 | 1 | ~~`Panels\Agenda` 缺滚轮动作~~ | **已修复并验证**：三个 ini 的 `[Rainmeter]` 段已补 `MouseScrollUp/DownAction`（照 `Volume` 的写法）；差异像素占比判据实测 滚动 14.2% / 静置回顶 0.04% |
 | 2 | ~~滚动 / 静置回顶复核~~ | **已完成**（判据见 §7 第 5 条） |
-| 3 | ~~是否发新版~~ | **已发布 v0.1.1、v0.2.0**；`v0.1.0` 的 Release 与 tag 已按用户要求删除 |
+| 3 | ~~是否发新版~~ | **已发布 v0.2.0**；`v0.1.0`、`v0.1.1` 的 Release 与 tag 已按用户要求删除 |
 | 4 | AutoIt 工具默认语言 | 保持英文（运行时值），用户需在设置界面选一次「简体中文」 |
 | 5 | 7 个表面键保持英文 | 见 §4；设置界面里对应 7 格也随之显示英文 |
 | 6 | 6 个 Microsoft Segoe 字体 | 未获再分发授权（`THIRD-PARTY.md` 第 8 节第 4 条） |
