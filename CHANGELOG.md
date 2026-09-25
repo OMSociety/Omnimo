@@ -9,8 +9,8 @@ first entry covers everything the fork has changed so far.
 
 - The calendar panel now appears in the Date and Time row of the common panels
   page, next to Stopwatch, with its own calendar glyph in the shared icon layer
-  and its tile name localized to 日程. It replaces the digital clock that used
-  to sit there.
+  and its tile name localized to 日程. It fills a cell that upstream's icon
+  layer left blank.
 
 ### Changed
 
@@ -20,8 +20,10 @@ first entry covers everything the fork has changed so far.
   value comes only from the theme, so at zero every panel drew ten logical
   pixels narrower and inset by five.
 - The Slideshow panel's base height returns to 196 and the digital clock's to
-  160, matching the release the layout came from. A card at 150 is a quarter
-  narrower, which is why the picture no longer lined up with the column below.
+  160, matching the release the layout came from. Only the one tier file each
+  layout loads was changed; the panels' other size tiers keep 150. A card at
+  150 is a quarter narrower, which is why the picture no longer lined up with
+  the column below.
 - The calendar panel's registration was removed from the custom panels list,
   where it was a leftover from the first attempt; it belongs to the common
   panels page, which is a hand-authored list rather than a registered one.
@@ -78,7 +80,9 @@ first entry covers everything the fork has changed so far.
 - Two `Hidden=` expressions in the DigitalClock panel that read the setting
   inverted, and a `FontSize` formula with an empty operand that logged a parse
   error on every update.
-- Twelve panels calling a `GetMhz` measure that no longer exists (a plugin for
-  it was removed upstream), which logged a script error on every load.
+- Thirteen panel tiers ran a `GetMhz` measure on every refresh. Only the RAM
+  panel's second tier defined it, and no meter displayed its value, yet it
+  spawned a `wmic MemoryChip` child process on every refresh; the other twelve
+  calls were dangling. All thirteen call sites and the one measure are removed.
 - A `Ping` meter whose auto-scaled unit was injected into the numeric format,
   turning milliseconds into "kms" past 1024.
