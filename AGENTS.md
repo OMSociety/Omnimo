@@ -232,7 +232,7 @@ WP7/Gallery/MultiManager/Saved/2/screenshot.png                # 布局保存时
 | 6 | 6 个 Microsoft Segoe 字体 | 未获再分发授权（`THIRD-PARTY.md` 第 8 节第 4 条） |
 | 7 | 提交前要还原的运行时文件 | `WP7\Gallery\main.ini`、`scroll.inc`、`MultiManager\TimeSettings.inc`、`MultiManager\Saved\*\screenshot.png` 会被 Rainmeter 运行时改写；`git checkout --` 还原或按 §8 第 5 条标记。另：`.git/info/exclude` 里 `WP7/_agenda/` 已无对应目录，可删 |
 | 8 | AutoIT 源码修了 2 处但 exe 未重编译 | `OmnimoApp.au3`（StringReplace 参数顺序）与 `Config.au3`（边框色分支读了未声明变量）已修源码；分发 exe 行为不变，重编译是独立决策（与 `config.exe` 同性质，见 `THIRD-PARTY.md` §3） |
-| 9 | `Chinese.inc` 约半数键未译 | 284 键中 123 个值含中文；`24HourTime`（`Settings\settings.ini:87`）、`Missing1`（`TextItems\Extra\MissingComponents\Item.ini:47`）有实测消费方，中文界面下显示英文。补哪些键是产品决策。注意 `ChangeColors`/`RefreshAll`/`SidebarColors` 全库无消费方（上游遗留死键），不算遗漏 |
-| 10 | Agenda 死源提示的残余边界 | 非 ICS 响应（404/登录页）现在停在 "loading feed..."，不再误报 "no events"；要区分「还在加载」与「源已死」需加超时启发（若干轮后显示 feed unavailable），待决策 |
-| 11 | `agenda.lua:280` 夏令时 | 用定长 86400 秒推窗口末日，夏令时回拨那周末一天会被少算（`buildRows` 用 `hour=12` 规避了同类问题，此处没有）；本机时区无夏令时，实际影响为零 |
+| 9 | ~~`Chinese.inc` 约半数键未译~~ | **已按产品决策收敛**：磁贴表面短标签与 Donate 面板作者留言保持英文（可视面要"酷"）；设置界面 / 功能提示类 21 键已补中文（含 `24HourTime`、`Missing1`）。现 284 键中 143 个值含中文；剩余未译＝刻意英文的表面键 ∪ 全库无消费方的上游死键（`ChangeColors`/`RefreshAll`/`SidebarColors` 等），不算遗漏 |
+| 10 | ~~Agenda 死源提示的残余边界~~ | **已修**：`agenda.lua` 加 `LOAD_TIMEOUT=45` 超时启发——从未取到有效 ICS 且超阈值则显示 "feed unavailable"，此前停在 "loading feed..."；已显示过事件的源之后失效则保留最后内容（`hasData` 为真时不进该分支） |
+| 11 | `agenda.lua:303` 夏令时 | 用定长 86400 秒推窗口末日，夏令时回拨那周末一天会被少算（`buildRows` 用 `hour=12` 规避了同类问题，此处没有）；本机时区无夏令时，实际影响为零 |
 | 12 | AutoIT 其余 9 项加固项 | 参数个数检查缺/错 4 处、`Execute()` 求值 ini 坐标、`DirRemove` 无路径校验 3 处、数组上限 2 处、`build.bat` 依赖 wmic、多处 CWD 相对路径——均为上游既有债或需本机权限前置，未动；明细见仓库外 `D:\WorkSpace\Omnimo-代码质量复审报告.md` |
