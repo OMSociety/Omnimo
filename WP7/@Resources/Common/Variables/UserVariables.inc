@@ -1,13 +1,13 @@
 [Variables]
 language=dutch
 Enc=file://#SKINSPATH#\WP7\Common\Variables\Dependencies\0\notes.txt
-SubstituteFeed="&apos;":"'","&quot;":"","&Quot;":"","&amp;":"&","&lt;br&gt;":"","![CDATA[":"","]]":"","...":"","<":"",">":"","/PRE&gt;":"","PRE&gt;":"","&lt;":"","&#39;":"'","&#228;":"ä","&#246;":"ö","&#8211;":"–"
+SubstituteFeed="&apos;":"'","&quot;":"","&Quot;":"","&amp;":"&","&lt;br&gt;":"","![CDATA[":"","]]":"","...":"","<":"",">":"","/PRE&gt;":"","PRE&gt;":"","&lt;":"","&#39;":"'","&#228;":"?,"&#246;":"?,"&#8211;":"?
 SubstituteLink="&amp;":"&","<![CDATA[":"","]]>":""
 skincolor=Images
 Enc0=#SKINSPATH#WP7\Common\Variables\Dependencies\0\notes.txt
 C:\Users\User\Documents\Rainmeter\Skins\\WP7\Common\Panel\Rounded=none
 TimeFormat=%H:%M
-MainLanguage=English
+MainLanguage=EnglishChinese
 timeformatsetting12=on1
 timeformatsetting24=off
 InterfaceOff=on
