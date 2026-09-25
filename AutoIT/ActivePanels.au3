@@ -35,7 +35,7 @@ Const $uservars = $skinpath & "WP7\@Resources\Common\Variables\UserVariables.inc
 
 
 
-FileDelete ( "hue.ini" )
+FileDelete ( @ScriptDir & "\hue.ini" )
 
 
 
@@ -203,7 +203,7 @@ $row8 = 0
 
 
 ;MsgBox($MB_SYSTEMMODAL, "Title", $Sections[$i], 1)
-IniWrite ( 'hue.ini', "Variables", "Panel" & $iCount, $Sections[$i] )
+IniWrite ( @ScriptDir & '\hue.ini', "Variables", "Panel" & $iCount, $Sections[$i] )
 
 
 

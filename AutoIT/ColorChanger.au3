@@ -61,7 +61,7 @@ GUISetState(@SW_SHOW)
 
 ; Read colors into an array
 Global $colors[19]
-_FileReadToArray('colors.txt', $colors)
+_FileReadToArray(@ScriptDir & '\colors.txt', $colors)
 If @error Then OmnimoError("Individual Panel Color", "Unable to read colors from colors.txt.")
 
 Global $Color = IniRead($SkinPath & '\WP7\@Resources\Common\Color\color.inc', 'Variables', 'ColorSkin', '27,161,226') & ',' & $Opacity
@@ -94,7 +94,7 @@ While 1
 	Switch $nMsg
 
 		Case $GUI_EVENT_CLOSE
-			_FileWriteFromArray("colors.txt", $colors, 1)
+			_FileWriteFromArray(@ScriptDir & "\colors.txt", $colors, 1)
 			Exit
 
 		Case $SelectAll
@@ -116,7 +116,7 @@ While 1
 			_GUICtrlMenu_TrackPopupMenu(GUICtrlGetHandle($hContextMenu), $hGUI)
 
 		Case $_Default
-			_FileReadToArray("defaultcolors.txt", $colors)
+			_FileReadToArray(@ScriptDir & "\defaultcolors.txt", $colors)
 			SetColorButtons()
 
 		Case $_Colorful

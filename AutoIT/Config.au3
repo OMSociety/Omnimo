@@ -205,7 +205,7 @@ EndIf
 
 ; Read config size from Config.cfg based on first command line argument
 Global $SizeOptions[6]
-$SizeOptions = StringSplit(IniRead("Config.cfg", "Variables", $CmdLine[1], "1:1:0:0:0"), ":")
+$SizeOptions = StringSplit(IniRead(@ScriptDir & "\Config.cfg", "Variables", $CmdLine[1], "1:1:0:0:0"), ":")
 Global $GuiOptions = _Iif($SizeOptions[5] == "1", Default, BitOR($WS_VISIBLE, $WS_BORDER, $WS_POPUP))
 $W  = Int($SizeOptions[1])
 $H  = Int($SizeOptions[2])
@@ -217,9 +217,9 @@ $listH  = $height - $Size / 3
 $CommentLimit = $height / 25
 
 ; Read label variables from Config.cfg
-$ResetText = IniRead("Config.cfg", "Variables", "Reset", $Language.Item("Reset"))
-$BrowseText = IniRead("Config.cfg", "Variables", "Browse", $Language.Item("Browse"))
-$ColorText = IniRead("Config.cfg", "Variables", "Color", $Language.Item("Color"))
+$ResetText = IniRead(@ScriptDir & "\Config.cfg", "Variables", "Reset", $Language.Item("Reset"))
+$BrowseText = IniRead(@ScriptDir & "\Config.cfg", "Variables", "Browse", $Language.Item("Browse"))
+$ColorText = IniRead(@ScriptDir & "\Config.cfg", "Variables", "Color", $Language.Item("Color"))
 
 ; Work around for Rainmeter not properly positioning full-screen skins
 If $YPosition < 0 Then

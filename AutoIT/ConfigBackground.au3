@@ -26,7 +26,7 @@ Const $VarFile = $CmdLine[1]
 Const $skinpath = $CmdLine[2]
 
 
-Const $CurrentLanguage = IniRead("Varrar.inc", "Variables", "Language", "English")
+Const $CurrentLanguage = IniRead(@ScriptDir & "\Varrar.inc", "Variables", "Language", "English")
 Const $LangFile = @ScriptDir & "\Language\" & $CurrentLanguage & ".cfg"
 
 
