@@ -212,12 +212,12 @@ WP7/Gallery/MultiManager/Saved/2/screenshot.png                # 布局保存时
 
 ## 10. 当前状态与未决项
 
-**相对 `upstream/master`（已提交，实测）：新增 14 / 修改 33 / 删除 10**
+**相对 `upstream/master`（已提交，实测）：新增 14 / 修改 35 / 删除 10**
 
 | 类别 | 内容 |
 |---|---|
 | 新增 | `LICENSE`、`THIRD-PARTY.md`、`AGENTS.md`、`CHANGELOG.md`、`Languages\EnglishChinese.inc`、皮肤侧与源码侧两份 `Chinese.cfg`、`Panels\Agenda\`（`Item/Item2/Item3.ini` + `agenda.lua` + `Agenda.png`）、`Config\Panels\Agenda\`（`UserVariables.inc` + `RainConfigure.cfg`） |
-| 修改 | 16 个面板文件（缺陷修复）、7 份语言包（补 `PanelAgenda` 键；第 8 份中文包是新增文件）、`Gallery\cat1.inc`（Agenda 磁贴落在时间与日期第 2 行；Corona 移除后整段回流）、`Gallery\cat7.inc`（语言列表「简体中文」取代 `[Help Translate]`）、`Gallery\Intro\intro.ini`、`Graphics\Gallery\mask-essential.png`（图标层）、`Common\Variables\UserVariables.inc`（`MainLanguage` 与 `SubstituteFeed` 编码修复）、`Config\Panels\Network\UserVariables.inc`（默认 ping 改字面 IP）、`Common\Color\color.inc`（默认主题改为桌面所依据的那套值）、`Panels\Slideshow\Item.ini` 与 `Panels\DigitalClock\Item.ini`（`Height` 对齐到桌面所依据的版本）、`readme.md` |
+| 修改 | 16 个面板文件（缺陷修复）、7 份语言包（补 `PanelAgenda` 键；第 8 份中文包是新增文件）、`Gallery\cat1.inc`（Agenda 磁贴落在时间与日期第 2 行；Corona 移除后整段回流）、`Gallery\cat7.inc`（语言列表「简体中文」取代 `[Help Translate]`）、`Gallery\Intro\intro.ini`、`Graphics\Gallery\mask-essential.png`（图标层）、`Common\Variables\UserVariables.inc`（`MainLanguage` 与 `SubstituteFeed` 编码修复）、`Config\Panels\Network\UserVariables.inc`（默认 ping 改字面 IP）、`Common\Color\color.inc`（默认主题改为桌面所依据的那套值）、`Panels\Slideshow\Item.ini` 与 `Panels\DigitalClock\Item.ini`（`Height` 对齐到桌面所依据的版本）、`AutoIT\OmnimoApp.au3` 与 `AutoIT\Config.au3`（各一处源码级缺陷修复：StringReplace 参数顺序、边框色分支读了未声明变量；只改源码，未重编译分发 exe）、`readme.md` |
 | 删除 | `Panels\Corona\`、`Config\Panels\Corona\`（共 10 个文件，用户要求删；`cat1.inc` 与图标层已同步回流） |
 
 **已实机验证**：设置界面 7 页中文且无溢出；语言列表出现「简体中文」；面板右键菜单全中文；Agenda 面板在面板库可见可加、卡片裁剪正确、订阅抓取成功（日志无 12006）、真实滚轮滚动生效（差异像素占比 14.2%）且静置回顶成立（0.04%）；网络面板显示真实延迟；桌面布置与备份逐面板对齐（含尺寸）；被修表达式在日志中的报错消失。

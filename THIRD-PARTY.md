@@ -62,7 +62,7 @@ carry a declaration or do not have one anywhere in the tree:
 
 ## 2. This fork's own changes
 
-Measured with `git diff --name-status upstream/master`: **14 files added, 33 modified, 10 deleted.**
+Measured with `git diff --name-status upstream/master`: **14 files added, 35 modified, 10 deleted.**
 
 Added:
 
@@ -88,7 +88,11 @@ and its measure in the RAM panel, which spawned an unused `wmic MemoryChip` chil
 every refresh; a `FontSize` expression with an empty operand in DigitalClock4; a byte/bit
 suffix and a dropped `AutoScale` in the Network panel; two `Hidden` lines in the Network
 panel that contradicted their settings toggle; and the base `Height` of the Slideshow and
-DigitalClock tiers the desktop layout loads), and `readme.md`.
+DigitalClock tiers the desktop layout loads), two AutoIt tool sources (`AutoIT/OmnimoApp.au3`,
+whose folder/app pickers passed `StringReplace`'s arguments in the wrong order so the choice
+went to a stray file and the panel config was never updated, and `AutoIT/Config.au3`, whose
+border-color branch read an undeclared variable instead of the color picker's result — both
+source-only fixes, the shipped binaries are unchanged, see section 3), and `readme.md`.
 
 Deleted: the Corona panel — four files under `WP7/Panels/Corona/` and six under
 `WP7/@Resources/Config/Panels/Corona/`, removed at the user's request; the gallery row and
