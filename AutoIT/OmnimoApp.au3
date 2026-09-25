@@ -536,7 +536,7 @@ Case 'Select'
 			If @error Then Exit
 			$split = StringSplit($folder, "\")
 			$FolderName = UBound($split) - 1
-			$ConfigPath = StringReplace("WP7\", "WP7\@Resources\Config\", $CmdLine[4]) & "\UserVariables.inc"
+			$ConfigPath = StringReplace($CmdLine[4], "WP7\", "WP7\@Resources\Config\") & "\UserVariables.inc"
 			IniWrite($ConfigPath, "Variables", $CmdLine[3], $folder)
 			IniWrite($ConfigPath, "Variables", "FolderName", $split[$FolderName])
 			SendBangLonger("!Refresh " & $CmdLine[5])
@@ -557,7 +557,7 @@ Case 'Select'
 				$info = $TestPath[3]
 			EndIf
 
-			$ConfigPath = StringReplace("WP7\", "WP7\@Resources\Config\", $CmdLine[7]) & "\UserVariables.inc"
+			$ConfigPath = StringReplace($CmdLine[7], "WP7\", "WP7\@Resources\Config\") & "\UserVariables.inc"
 			IniWrite($ConfigPath, "Variables", $CmdLine[3], $path)
 			IniWrite($ConfigPath, "Variables", $CmdLine[4], $info)
 
