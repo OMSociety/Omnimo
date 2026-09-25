@@ -176,13 +176,6 @@ x=(360*#ScaleDpi#)
 [Stopwatch]
 Meter=String
 MeterStyle=EssentialPanel
-[Agenda]
-Meter=String
-MeterStyle=EssentialPanel
-solidcolor=#colorskin# ,215
-Text="#PanelAgenda#"
-ToolTipText=#PanelAgenda#
-
 [cat1Subtitle3]
 Meter=String
 Text=" #Information#"
@@ -215,14 +208,10 @@ solidcolor=#colorskin# ,230
 Meter=String
 MeterStyle=EssentialPanel
 solidcolor=#colorskin# ,240
-[CoronaSlot]
+[Corona]
 Meter=String
 MeterStyle=EssentialPanel
-solidcolor=#colorskin# ,215
-Text=""
-ToolTipText=
-LeftMouseUpAction=[]
-
+solidcolor=#colorskin# ,200
 [QuoteDay]
 Meter=String
 MeterStyle=EssentialPanel
@@ -388,34 +377,4 @@ MouseActionCursor=1
 Antialias=1
 LeftMouseUpAction=!execute [[UpdateLink]?lang=#langcode#]
 Hidden=1
-DynamicVariables=1
-
-[AgendaCover]
-Meter=Image
-Group=cat1 | Bye
-SolidColor=25,25,25,255
-X=([Agenda:X]+6*#ScaleDpi#)
-Y=([Agenda:Y]+6*#ScaleDpi#)
-W=(48*#ScaleDpi#)
-H=(48*#ScaleDpi#)
-DynamicVariables=1
-
-[AgendaIcon]
-Meter=Image
-Group=cat1 | Bye
-ImageName=#@#\Graphics\Icons\Calendar.png
-X=([Agenda:X]+11*#ScaleDpi#)
-Y=([Agenda:Y]+11*#ScaleDpi#)
-W=(38*#ScaleDpi#)
-H=(38*#ScaleDpi#)
-DynamicVariables=1
-
-[CoronaCover]
-Meter=Image
-Group=cat1 | Bye
-SolidColor=25,25,25,255
-X=([CoronaSlot:X]+6*#ScaleDpi#)
-Y=([CoronaSlot:Y]+6*#ScaleDpi#)
-W=(48*#ScaleDpi#)
-H=(48*#ScaleDpi#)
 DynamicVariables=1
