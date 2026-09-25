@@ -106,6 +106,7 @@ Rainmeter 变量**后写者胜**，include 顺序即优先级。
 | 8 | 面板在 Gallery 里是 `cat1..cat7.inc` 中一个**与面板目录同名**的表 | 不登记就不出现在面板库 | 见 §6 第 6 步；`[EssentialPanel]` 样式定义在 `@Resources\Common\Gallery\Color\Modern\<Dark\|Light>\tt.inc`，动作为 `!ToggleConfig "WP7\Panels\#CURRENTSECTION#" "Item.ini"` |
 | 9 | 档位名大小写混用（`single`/`HalfDouble`/`DoubleV` 并存） | Windows 上都能用 | 靠文件系统不区分大小写。（推论：跨平台会踩，新写统一小写更稳） |
 | 10 | 新建的皮肤目录 | 启动后新目录不被发现 | 先 `!RefreshApp`，再 `!ActivateConfig` |
+| 11 | Gallery 的面板图标是**固定位置的图层**（`@Resources\Graphics\Gallery\mask-*.png`，由 `[Cat1Mask]` 之类的表绘制） | 在满行中间插一格磁贴，会把它后面所有格的图标顶错位；删掉一格，其后标签会顶到前一格的图标上 | 增删磁贴只放在**行尾空位**；确需覆盖某格图标时，另建覆盖表并用 `[表名:X]`/`[表名:Y]` 定位、**放在文件末尾**——相对定位（`Y=...R`/`X=...r`）只看文件里上一个表，把辅助表夹在磁贴之间会把其后所有区块的标签整体带偏（实测） |
 
 ## 6. 新增一个面板的标准流程
 
@@ -196,9 +197,10 @@ WP7/Gallery/Intro/save.inc
 | # | 项 | 现状 |
 |---|---|---|
 | 1 | 待办同步 | 未开始 |
-| 2 | 静置回顶的干净验证 | 功能已实现；此前的像素/哈希比对受底板 `MouseOver` 染色干扰（见 §7 第 4 条），尚未用干净判据复核 |
-| 3 | Agenda 磁贴图标 | 面板库中的磁贴显示兜底图形；图标映射机制未查清（已排除：无按面板名命名的 PNG、`Gallery\hex.lua` 仅 7 行且与图标无关、`[EssentialPanel]` 样式无 `ImageName`） |
+| 2 | 静置回顶 | **已验证**（干净判据：光标移离面板后，`returned` 与 `top` 逐字节相同、`scrolled` 不同） |
+| 3 | Agenda 磁贴图标 | **已解决**：图标是固定位置图层，用覆盖表 + `Graphics\Icons\Calendar.png` 叠出日历图标（覆盖表放在文件末尾、用表定位变量，见 §5 第 11 条） |
 | 4 | AutoIt 工具默认语言 | 保持英文（运行时值），需用户在设置界面选一次「简体中文」 |
 | 5 | 7 个表面键保持英文 | 见 §4；设置界面中对应 7 格也随之显示英文 |
 | 6 | 6 个 Microsoft Segoe 字体 | 未获再分发授权（`THIRD-PARTY.md` 第 8 节第 4 条） |
-| 7 | 面板名本地化 | 面板库里的名字来自目录名（`Text=#CURRENTSECTION#`），未本地化 |
+| 7 | 面板名本地化 | **已解决**：登记表里覆盖 `Text=#PanelAgenda#`，8 份语言包都补了该键（中文＝日程） |
+| 8 | Corona 面板 | 已按用户要求删除（面板目录、配置目录、登记项）；其格子留了一块空白占位以保持图标层对齐 |
