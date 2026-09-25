@@ -188,6 +188,10 @@ MeterStyle=EssentialPanel
 x=(360*#ScaleDpi#)
 Y=(1*#ScaleDpi#)R
 solidcolor=#colorskin# ,220
+[Agenda]
+Meter=String
+MeterStyle=EssentialPanel
+solidcolor=#colorskin# ,215
 [Weather]
 Meter=String
 MeterStyle=EssentialPanel
