@@ -33,8 +33,16 @@ MsgBox(64, "Uninstall Omnimo UI", "Omnimo UI was successfully removed from your 
 _SelfDelete()
 
 Func RemoveOmnimoFolder()
-	If DirRemove($CmdLine[1], 1) = 0 Then
-		$iMsgBoxAnswer = MsgBox(21, "Uninstall Omnimo UI", "Unable to delete folder:" & @CRLF & $CmdLine[1])
+	Local $sTarget = $CmdLine[1]
+	; Refuse to recurse into anything that is not an Omnimo install: the skin
+	; always ships a WP7 folder, so require it before deleting the tree.
+	Local $sNorm = (StringRight($sTarget, 1) = "\") ? StringTrimRight($sTarget, 1) : $sTarget
+	If Not FileExists($sNorm & "\WP7") Then
+		MsgBox(16, "Uninstall Omnimo UI", "Refusing to delete a folder that is not an Omnimo installation:" & @CRLF & $sTarget)
+		Exit
+	EndIf
+	If DirRemove($sTarget, 1) = 0 Then
+		$iMsgBoxAnswer = MsgBox(21, "Uninstall Omnimo UI", "Unable to delete folder:" & @CRLF & $sTarget)
 		Select
 			Case $iMsgBoxAnswer = 4 ; Retry
 				RemoveOmnimoFolder()
