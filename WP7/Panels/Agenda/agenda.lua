@@ -216,8 +216,10 @@ function Initialize()
       local https = url:gsub('^webcal://', 'https://')
       if https ~= url then
         set('MeasureICS' .. i, 'Url', https)
-        SKIN:Bang('!UpdateMeasure MeasureICS' .. i)
       end
+      -- 测量默认禁用，地址就位后再启用：避免加载瞬间用 webcal:// 去抓而报 12006
+      SKIN:Bang('!EnableMeasure MeasureICS' .. i)
+      SKIN:Bang('!UpdateMeasure MeasureICS' .. i)
       local ok, m = pcall(function() return SKIN:GetMeasure('MeasureICS' .. i) end)
       if ok and m then feeds[#feeds + 1] = m end
     end
