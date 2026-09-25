@@ -222,12 +222,12 @@ solidcolor=#colorskin# ,220
 [MoonPhase]
 Meter=String
 MeterStyle=EssentialPanel
-Y=(1*#ScaleDpi#)R
-x=(360*#ScaleDpi#)
 solidcolor=#colorskin# ,240
 [OmnimoTips]
 Meter=String
 MeterStyle=EssentialPanel
+Y=(1*#ScaleDpi#)R
+x=(360*#ScaleDpi#)
 solidcolor=#colorskin# ,240
 [uTorrent]
 Meter=String
