@@ -62,20 +62,37 @@ carry a declaration or do not have one anywhere in the tree:
 
 ## 2. This fork's own changes
 
-Measured with `git diff --name-status upstream/master`: **3 files added, 37 modified, none deleted.**
+Measured with `git diff --name-status upstream/master`: **14 files added, 33 modified, 10 deleted.**
 
 Added:
 
 | File | What it is |
 |---|---|
+| `LICENSE` | The GPL-2.0 text, matching the licence upstream's readme declares |
+| `AGENTS.md` | A working guide to this fork: encodings, Rainmeter pitfalls, credential rules |
+| `CHANGELOG.md` | Per-release notes for the fork |
+| `THIRD-PARTY.md` | This file |
+| `WP7/@Resources/Common/Variables/Languages/EnglishChinese.inc` | Simplified Chinese UI language pack, 284 keys, mirroring `English.inc` |
 | `WP7/@Resources/Common/Background/Language/Chinese.cfg` | Simplified Chinese strings for the AutoIt tools, 33 keys |
-| `AutoIT/Language/Chinese.cfg` | The same pack kept beside the AutoIt sources for reference |
-| `WP7/@Resources/Common/Variables/Languages/ChineseUI.inc` | Simplified Chinese strings for the settings UI, 99 keys |
+| `AutoIT/Language/Chinese.cfg` | The same pack kept beside the AutoIt sources |
+| `WP7/Panels/Agenda/` (`Item.ini`, `Item2.ini`, `Item3.ini`, `agenda.lua`, `Agenda.png`) | The Agenda calendar panel: published ICS subscriptions, merged, deduplicated and sorted |
+| `WP7/@Resources/Config/Panels/Agenda/` (`UserVariables.inc`, `RainConfigure.cfg`) | Its user parameters and settings schema |
 
-Modified: `WP7/Gallery/Intro/intro.ini` (a language-picker entry), 20 `WP7/Gallery/**` configuration
-files (one `@include` line each, pulling in `ChineseUI.inc` after the selected language file), and 15
-`WP7/Panels/**` files (source fixes: a byte/bit suffix, a latency meter's `AutoScale`, an inverted
-`Hidden`, an invalid `FontSize` expression, and dangling `!CommandMeasure` calls).
+Modified: seven language packs (a `PanelAgenda` key each), the gallery registration
+(`WP7/Gallery/cat1.inc`, `WP7/Gallery/cat7.inc`, `WP7/Gallery/Intro/intro.ini`), the shared
+icon layer (`WP7/@Resources/Graphics/Gallery/mask-essential.png`), three default-value files
+(`WP7/@Resources/Common/Variables/UserVariables.inc`, `WP7/@Resources/Common/Color/color.inc`,
+`WP7/@Resources/Config/Panels/Network/UserVariables.inc`), 18 panel files under
+`WP7/Panels/` (twelve dangling `!CommandMeasure GetMhz "Run"` calls plus the thirteenth call
+and its measure in the RAM panel, which spawned an unused `wmic MemoryChip` child process on
+every refresh; a `FontSize` expression with an empty operand in DigitalClock4; a byte/bit
+suffix and a dropped `AutoScale` in the Network panel; two `Hidden` lines in the Network
+panel that contradicted their settings toggle; and the base `Height` of the Slideshow and
+DigitalClock tiers the desktop layout loads), and `readme.md`.
+
+Deleted: the Corona panel — four files under `WP7/Panels/Corona/` and six under
+`WP7/@Resources/Config/Panels/Corona/`, removed at the user's request; the gallery row and
+the icon layer were reflowed to match.
 
 Our changes inherit the terms of the file they touch: GPL-2.0 where upstream puts that file under
 GPL-2.0, CC BY-NC-SA 3.0 where the file self-declares it. No rights are claimed over upstream
