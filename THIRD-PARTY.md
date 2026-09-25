@@ -109,17 +109,20 @@ the sources in `AutoIT/`; the binaries themselves carry no source and no declare
 
 ```
 WP7/@Resources/Common/ColorChanger.exe                       786961 bytes
-WP7/@Resources/Common/OmnimoApp.exe                          774169 bytes
+WP7/@Resources/Common/OmnimoApp.exe                          775247 bytes
 WP7/@Resources/Common/Background/ConfigBackground.exe        788363 bytes
 WP7/@Resources/Common/Config/ActivePanels.exe                938496 bytes
-WP7/@Resources/Common/Config/config.exe                      809451 bytes
-WP7/@Resources/Common/MultiManager/MultiManager.exe         1022976 bytes
-WP7/@Resources/Common/PanelCreator/PanelCreator.exe         1051419 bytes
+WP7/@Resources/Common/Config/config.exe                      757151 bytes
+WP7/@Resources/Common/MultiManager/MultiManager.exe          1022976 bytes
+WP7/@Resources/Common/PanelCreator/PanelCreator.exe          1051419 bytes
 ```
 
-Two of them no longer correspond to their sources: `config.exe` was last committed on 2020-05-18,
-while `AutoIT/Config.au3` was changed again on 2020-05-26 without a rebuild. The released `.rmskin`
-ships a newer `Config.exe` that is not in upstream's git history at all.
+Upstream let `config.exe` drift from its source: the binary was committed on 2020-05-18, while
+`AutoIT/Config.au3` was changed again on 2020-05-26 without a rebuild, and the released `.rmskin`
+ships a newer `Config.exe` that is not in upstream's git history at all. This fork rebuilds the two
+executables whose sources it modified — `OmnimoApp.exe` and `config.exe` — with AutoIt 3.3.8.1
+(`Aut2Exe`, x86, no UPX, the sources' own icons), matching the interpreter version embedded in the
+originals; the other five remain upstream's builds.
 
 ## 4. Bundled fonts
 
