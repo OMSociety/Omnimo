@@ -3,6 +3,43 @@
 Notable changes to this fork of Omnimo. Upstream predates this file, so the
 first entry covers everything the fork has changed so far.
 
+## [0.1.1] - 2026-09-25
+
+### Added
+
+- The calendar panel now appears in the Date and Time row of the common panels
+  page, next to Stopwatch, with its own calendar glyph in the shared icon layer
+  and its tile name localized to 日程. It replaces the digital clock that used
+  to sit there.
+
+### Changed
+
+- The default theme carries the values the desktop was laid out against:
+  `Padding=5` instead of `0`, a lighter card, no backdrop blur, and titles
+  closer to the edge. Card width is `(#Height# + #Padding# * 2)`, and that
+  value comes only from the theme, so at zero every panel drew ten logical
+  pixels narrower and inset by five.
+- The Slideshow panel's base height returns to 196 and the digital clock's to
+  160, matching the release the layout came from. A card at 150 is a quarter
+  narrower, which is why the picture no longer lined up with the column below.
+- The calendar panel's registration was removed from the custom panels list,
+  where it was a leftover from the first attempt; it belongs to the common
+  panels page, which is a hand-authored list rather than a registered one.
+- `AGENTS.md` rewritten around the findings above, with the measured cell
+  geometry of the gallery icon layer and the reference points for the settings
+  schema, the size tiers and the desktop layout.
+
+### Fixed
+
+- The calendar panel could not be scrolled: the wheel actions that the
+  prototype carried were lost when the panel files were generated. They are
+  back in the `[Rainmeter]` section of all three size tiers.
+- The panel's calendar feeds were fetched before their addresses were
+  rewritten, which logged a fetch error on every load. The measures now start
+  disabled and the script enables them once the address is in place.
+- Merged calendar feeds were not re-sorted after deduplication, so events from
+  different subscriptions interleaved instead of appearing in time order.
+
 ## [0.1.0] - 2026-09-25
 
 ### Added
