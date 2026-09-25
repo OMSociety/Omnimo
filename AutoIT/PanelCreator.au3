@@ -22,6 +22,9 @@
 
 Opt("ExpandEnvStrings", 1)
 
+; Check arguments
+If $CmdLine[0] < 1 Then OmnimoError("Omnimo Panel Creator", "Too few command line arguments specified.")
+
 
 
 

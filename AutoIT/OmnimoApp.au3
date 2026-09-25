@@ -18,6 +18,9 @@
 #include <IE.au3>
 
 
+; Check arguments: the mode selector below reads $CmdLine[1]; each Case validates any further arguments it needs
+If $CmdLine[0] < 1 Then OmnimoError("Error", "Too few command line arguments specified.")
+
 Switch $CmdLine[1]
 
 ; Open Start Menu

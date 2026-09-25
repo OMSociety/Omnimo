@@ -16,6 +16,9 @@
 #include "Includes\Common.au3"
 #include "Includes\MouseOnEvent.au3"
 
+; Check arguments
+If $CmdLine[0] < 3 Then OmnimoError("Omnimo miniShell", "Too few command line arguments specified.")
+
 ; Set up variables
 Const $font = "Segoe UI"
 Const $Config = $CmdLine[2]
