@@ -119,8 +119,20 @@ For $i = 1 To $a_rep[0][0]
 
 
 
-Global $XPosition = execute($stringE)
-Global $YPosition = execute($stringD)
+; The substituted WindowX/WindowY should be plain arithmetic (digits, operators,
+; parentheses). Evaluate only that; anything else, which could otherwise run
+; arbitrary code through Execute(), is treated as a number instead.
+Global $XPosition, $YPosition
+If StringRegExp($stringE, '^[0-9+\-*/()\s]+$') Then
+	$XPosition = Execute($stringE)
+Else
+	$XPosition = Number($stringE)
+EndIf
+If StringRegExp($stringD, '^[0-9+\-*/()\s]+$') Then
+	$YPosition = Execute($stringD)
+Else
+	$YPosition = Number($stringD)
+EndIf
 
 
 
