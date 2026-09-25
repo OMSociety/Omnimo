@@ -302,7 +302,7 @@ SendBang("!Move " & $initialX + $movebyX * $row4 - $movebyX & " " & $initialY + 
 ElseIf $iCount >= 25 AND 30 >= $iCount  Then
 $row5 += 1
 SendBang("!Move " & $initialX + $movebyX * $row5 - $movebyX & " " & $initialY + $movebyY * 6 - $movebyY & " " & $Sections[$i])
-ElseIf $iCount >= 25 AND 30 >= $iCount  Then
+ElseIf $iCount >= 30 AND 35 >= $iCount  Then
 $row6 += 1
 SendBang("!Move " & $initialX + $movebyX * $row6 - $movebyX & " " & $initialY + $movebyY * 7 - $movebyY & " " & $Sections[$i])
 Else
@@ -327,10 +327,10 @@ $row3 += 1
 SendBang("!Move " & $initialX + $movebyX * $row3 - $movebyX & " " & $initialY + $movebyY * 4 - $movebyY & " " & $Sections[$i])
 ElseIf $iCount >= 24 AND 30 >= $iCount  Then
 $row4 += 1
-SendBang("!Move " & $initialX + $movebyX * $row3 - $movebyX & " " & $initialY + $movebyY * 5 - $movebyY & " " & $Sections[$i])
+SendBang("!Move " & $initialX + $movebyX * $row4 - $movebyX & " " & $initialY + $movebyY * 5 - $movebyY & " " & $Sections[$i])
 ElseIf $iCount >= 30 AND 36 >= $iCount  Then
 $row5 += 1
-SendBang("!Move " & $initialX + $movebyX * $row3 - $movebyX & " " & $initialY + $movebyY * 6 - $movebyY & " " & $Sections[$i])
+SendBang("!Move " & $initialX + $movebyX * $row5 - $movebyX & " " & $initialY + $movebyY * 6 - $movebyY & " " & $Sections[$i])
 
 Else
 EndIf
@@ -353,7 +353,7 @@ $row3 += 1
 SendBang("!Move " & $initialX + $movebyX * $row3 - $movebyX & " " & $initialY + $movebyY * 4 - $movebyY & " " & $Sections[$i])
 ElseIf $iCount >= 28 AND 35 >= $iCount  Then
 $row4 += 1
-SendBang("!Move " & $initialX + $movebyX * $row3 - $movebyX & " " & $initialY + $movebyY * 5 - $movebyY & " " & $Sections[$i])
+SendBang("!Move " & $initialX + $movebyX * $row4 - $movebyX & " " & $initialY + $movebyY * 5 - $movebyY & " " & $Sections[$i])
 
 Else
 EndIf
@@ -376,7 +376,7 @@ $row3 += 1
 SendBang("!Move " & $initialX + $movebyX * $row3 - $movebyX & " " & $initialY + $movebyY * 4 - $movebyY & " " & $Sections[$i])
 ElseIf $iCount >= 32 AND 40 >= $iCount  Then
 $row4 += 1
-SendBang("!Move " & $initialX + $movebyX * $row3 - $movebyX & " " & $initialY + $movebyY * 5 - $movebyY & " " & $Sections[$i])
+SendBang("!Move " & $initialX + $movebyX * $row4 - $movebyX & " " & $initialY + $movebyY * 5 - $movebyY & " " & $Sections[$i])
 
 Else
 EndIf
@@ -399,7 +399,7 @@ $row3 += 1
 SendBang("!Move " & $initialX + $movebyX * $row3 - $movebyX & " " & $initialY + $movebyY * 4 - $movebyY & " " & $Sections[$i])
 ElseIf $iCount >= 36 AND 45 >= $iCount  Then
 $row4 += 1
-SendBang("!Move " & $initialX + $movebyX * $row3 - $movebyX & " " & $initialY + $movebyY * 5 - $movebyY & " " & $Sections[$i])
+SendBang("!Move " & $initialX + $movebyX * $row4 - $movebyX & " " & $initialY + $movebyY * 5 - $movebyY & " " & $Sections[$i])
 
 Else
 EndIf
