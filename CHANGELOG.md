@@ -3,7 +3,7 @@
 Notable changes to this fork of Omnimo. Upstream predates this file, so the
 first entry covers everything the fork has changed so far.
 
-## [1.1.0] - 2026-09-26
+## [0.2.0] - 2026-09-26
 
 ### Fixed
 
