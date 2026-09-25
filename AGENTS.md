@@ -9,7 +9,7 @@
 |---|---|
 | 本地路径 | `D:\WorkSpace\Omnimo` |
 | `origin` / `upstream` | `OMSociety/Omnimo` / `fediaFedia/Omnimo` |
-| 分支 / HEAD | `master`（唯一分支）/ `git log -1 --oneline；工作区状态与未决项见 §10 
+| 分支 / HEAD | `master`（唯一分支）；最新提交看 `git log -1 --oneline`，工作区状态与未决项见 §10 |
 | 用户桌面 | `Skins\WP7` 是指向本仓库 `WP7\` 的目录联接（junction） |
 
 本 fork **只做四件小事**：① 设置面板、保存面板中文化（界面中文，磁贴表面英文）；② 日程同步、待办同步（只做公开 ICS 订阅，见 §5 第 4 条）；③ 修既有 bug；④ 一点微小的工作。
