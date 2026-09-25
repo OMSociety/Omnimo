@@ -72,7 +72,7 @@ Added:
 | `AGENTS.md` | A working guide to this fork: encodings, Rainmeter pitfalls, credential rules |
 | `CHANGELOG.md` | Per-release notes for the fork |
 | `THIRD-PARTY.md` | This file |
-| `WP7/@Resources/Common/Variables/Languages/EnglishChinese.inc` | Simplified Chinese UI language pack, 284 keys, mirroring `English.inc` |
+| `WP7/@Resources/Common/Variables/Languages/Chinese.inc` | Simplified Chinese UI language pack, 284 keys, mirroring `English.inc` |
 | `WP7/@Resources/Common/Background/Language/Chinese.cfg` | Simplified Chinese strings for the AutoIt tools, 33 keys |
 | `AutoIT/Language/Chinese.cfg` | The same pack kept beside the AutoIt sources |
 | `WP7/Panels/Agenda/` (`Item.ini`, `Item2.ini`, `Item3.ini`, `agenda.lua`, `Agenda.png`) | The Agenda calendar panel: published ICS subscriptions, merged, deduplicated and sorted |

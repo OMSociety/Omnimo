@@ -21,8 +21,8 @@ Omnimo 是 Rainmeter 桌面皮肤（磁贴式面板集合）；本仓库是它�
 | 路径 | 作用 | 实测要点 |
 |---|---|---|
 | `WP7\` | 皮肤根 | 子目录 `@Resources` `Background` `Gallery` `Hubs` `Panels` `TextItems`；根下 `Launcher.ini` `LauncherDark.ini` |
-| `WP7\@Resources\Common\Variables\UserVariables.inc` | 全局变量 | ANSI(cp1252)、无 BOM、1246 字节、纯 CRLF；含 `MainLanguage=EnglishChinese`；`SubstituteFeed` 尾部三个替换目标是 cp1252 单字节字符（`ä`=0xE4、`ö`=0xF6、`–`=0x96），故本文件不是纯 ASCII |
-| `WP7\@Resources\Common\Variables\Languages\` | 语言包 | 8 个语言（`English` `EnglishChinese` `German` `Spanish` `Russian` `Dutch` `French` `Portuguese`）+ `lang.inc`（`langcode`、`DominantRSS`） |
+| `WP7\@Resources\Common\Variables\UserVariables.inc` | 全局变量 | ANSI(cp1252)、无 BOM、1239 字节、纯 CRLF；含 `MainLanguage=Chinese`；`SubstituteFeed` 尾部三个替换目标是 cp1252 单字节字符（`ä`=0xE4、`ö`=0xF6、`–`=0x96），故本文件不是纯 ASCII |
+| `WP7\@Resources\Common\Variables\Languages\` | 语言包 | 8 个语言（`English` `Chinese` `German` `Spanish` `Russian` `Dutch` `French` `Portuguese`）+ `lang.inc`（`langcode`、`DominantRSS`） |
 | `WP7\@Resources\Common\Color\color.inc` | 当前主题色 | 纯 ASCII、纯 CRLF；被 523 个配置 include（在语言包之后，故覆盖语言包同名键）。**全库唯一定义 `Padding`/`Opacity`/`Opacity2`/`Globalblurenable`/`Xposition` 的文件**，卡片尺寸由 `Padding` 决定（见 §5 第 15 条） |
 | `WP7\@Resources\Common\Background\Language\` | AutoIt 工具语言 | 每份 33 键 34 行，UTF-16LE+BOM |
 | `WP7\@Resources\Structure\<档位>\Main.inc` | 面板档位底板 | **13 档**：`Circle Double DoubleV HalfDouble HalfSingle Huge HugeV Mini miniCircle Single Square win10 win7`；提供 `[bg]` `[overlay]` `[TextStyle]` `[FullTextStyle]` `[IconStyle]` 与 `TypeW/TypeH/PaddingW/PaddingH` |
@@ -46,7 +46,7 @@ Omnimo 是 Rainmeter 桌面皮肤（磁贴式面板集合）；本仓库是它�
 | `WP7\Gallery\main.ini` | UTF-16LE+BOM（9976 字节） | **裸 CR × 224 + CRLF × 2** |
 | `WP7\Panels\Network\Item.ini` | UTF-16LE+BOM | 混合：CRLF 59 + 裸 LF 164 |
 | `WP7\Gallery\cat7.inc` | UTF-16LE+BOM | 纯 CRLF |
-| `WP7\@Resources\Common\Variables\Languages\EnglishChinese.inc` | UTF-16LE+BOM | 纯 CRLF |
+| `WP7\@Resources\Common\Variables\Languages\Chinese.inc` | UTF-16LE+BOM | 纯 CRLF |
 | `WP7\Gallery\cat1.inc` / `Panels\Volume\Item.ini` | **纯 ASCII** | 纯 CRLF |
 | `WP7\Panels\Agenda\Item.ini` | UTF-8 无 BOM | 纯 CRLF |
 | `WP7\Panels\Agenda\agenda.lua` | UTF-8 无 BOM | 纯裸 LF |
@@ -80,12 +80,12 @@ Rainmeter 变量**后写者胜**，include 编号顺序即优先级。
 
 | 文件 | 内容 |
 |---|---|
-| `Languages\EnglishChinese.inc` | **284 键**（与 `English.inc` 键数一致、行序一致），UTF-16LE+BOM；界面/菜单中文、磁贴表面英文；已是默认 `MainLanguage` |
+| `Languages\Chinese.inc` | **284 键**（与 `English.inc` 键数一致、行序一致），UTF-16LE+BOM；界面/菜单中文、磁贴表面英文；已是默认 `MainLanguage` |
 | `Common\Background\Language\Chinese.cfg` | 33 键，与同目录 `English.cfg`（33 键）键名同序 |
 | `AutoIT\Language\Chinese.cfg` | 33 键（同目录 `English.cfg` 31 键，实测源码侧多 `Apply`、`Reset`） |
 | 8 份语言包的 `PanelAgenda` 键 | 中文包＝`日程`，其余＝`Agenda`（用于面板名本地化） |
 
-**界面键与磁贴表面键的划界规则**（生成 `EnglishChinese.inc` 的依据）：
+**界面键与磁贴表面键的划界规则**（生成 `Chinese.inc` 的依据）：
 
 ```
 翻成中文的键 = (设置界面用到的键 ∪ 右键菜单用到的键) − (磁贴表面可见 Text= 用到的键)
@@ -216,7 +216,7 @@ WP7/Gallery/MultiManager/Saved/2/screenshot.png                # 布局保存时
 
 | 类别 | 内容 |
 |---|---|
-| 新增 | `LICENSE`、`THIRD-PARTY.md`、`AGENTS.md`、`CHANGELOG.md`、`Languages\EnglishChinese.inc`、皮肤侧与源码侧两份 `Chinese.cfg`、`Panels\Agenda\`（`Item/Item2/Item3.ini` + `agenda.lua` + `Agenda.png`）、`Config\Panels\Agenda\`（`UserVariables.inc` + `RainConfigure.cfg`） |
+| 新增 | `LICENSE`、`THIRD-PARTY.md`、`AGENTS.md`、`CHANGELOG.md`、`Languages\Chinese.inc`、皮肤侧与源码侧两份 `Chinese.cfg`、`Panels\Agenda\`（`Item/Item2/Item3.ini` + `agenda.lua` + `Agenda.png`）、`Config\Panels\Agenda\`（`UserVariables.inc` + `RainConfigure.cfg`） |
 | 修改 | 16 个面板文件（缺陷修复）、7 份语言包（补 `PanelAgenda` 键；第 8 份中文包是新增文件）、`Gallery\cat1.inc`（Agenda 磁贴落在时间与日期第 2 行；Corona 移除后整段回流）、`Gallery\cat7.inc`（语言列表「简体中文」取代 `[Help Translate]`）、`Gallery\Intro\intro.ini`、`Graphics\Gallery\mask-essential.png`（图标层）、`Common\Variables\UserVariables.inc`（`MainLanguage` 与 `SubstituteFeed` 编码修复）、`Config\Panels\Network\UserVariables.inc`（默认 ping 改字面 IP）、`Common\Color\color.inc`（默认主题改为桌面所依据的那套值）、`Panels\Slideshow\Item.ini` 与 `Panels\DigitalClock\Item.ini`（`Height` 对齐到桌面所依据的版本）、`AutoIT\OmnimoApp.au3` 与 `AutoIT\Config.au3`（各一处源码级缺陷修复：StringReplace 参数顺序、边框色分支读了未声明变量；只改源码，未重编译分发 exe）、`readme.md` |
 | 删除 | `Panels\Corona\`、`Config\Panels\Corona\`（共 10 个文件，用户要求删；`cat1.inc` 与图标层已同步回流） |
 
@@ -232,7 +232,7 @@ WP7/Gallery/MultiManager/Saved/2/screenshot.png                # 布局保存时
 | 6 | 6 个 Microsoft Segoe 字体 | 未获再分发授权（`THIRD-PARTY.md` 第 8 节第 4 条） |
 | 7 | 提交前要还原的运行时文件 | `WP7\Gallery\main.ini`、`scroll.inc`、`MultiManager\TimeSettings.inc`、`MultiManager\Saved\*\screenshot.png` 会被 Rainmeter 运行时改写；`git checkout --` 还原或按 §8 第 5 条标记。另：`.git/info/exclude` 里 `WP7/_agenda/` 已无对应目录，可删 |
 | 8 | AutoIT 源码修了 2 处但 exe 未重编译 | `OmnimoApp.au3`（StringReplace 参数顺序）与 `Config.au3`（边框色分支读了未声明变量）已修源码；分发 exe 行为不变，重编译是独立决策（与 `config.exe` 同性质，见 `THIRD-PARTY.md` §3） |
-| 9 | `EnglishChinese.inc` 约半数键未译 | 284 键中 123 个值含中文；`24HourTime`（`Settings\settings.ini:87`）、`Missing1`（`TextItems\Extra\MissingComponents\Item.ini:47`）有实测消费方，中文界面下显示英文。补哪些键是产品决策。注意 `ChangeColors`/`RefreshAll`/`SidebarColors` 全库无消费方（上游遗留死键），不算遗漏 |
+| 9 | `Chinese.inc` 约半数键未译 | 284 键中 123 个值含中文；`24HourTime`（`Settings\settings.ini:87`）、`Missing1`（`TextItems\Extra\MissingComponents\Item.ini:47`）有实测消费方，中文界面下显示英文。补哪些键是产品决策。注意 `ChangeColors`/`RefreshAll`/`SidebarColors` 全库无消费方（上游遗留死键），不算遗漏 |
 | 10 | Agenda 死源提示的残余边界 | 非 ICS 响应（404/登录页）现在停在 "loading feed..."，不再误报 "no events"；要区分「还在加载」与「源已死」需加超时启发（若干轮后显示 feed unavailable），待决策 |
 | 11 | `agenda.lua:280` 夏令时 | 用定长 86400 秒推窗口末日，夏令时回拨那周末一天会被少算（`buildRows` 用 `hour=12` 规避了同类问题，此处没有）；本机时区无夏令时，实际影响为零 |
 | 12 | AutoIT 其余 9 项加固项 | 参数个数检查缺/错 4 处、`Execute()` 求值 ini 坐标、`DirRemove` 无路径校验 3 处、数组上限 2 处、`build.bat` 依赖 wmic、多处 CWD 相对路径——均为上游既有债或需本机权限前置，未动；明细见仓库外 `D:\WorkSpace\Omnimo-代码质量复审报告.md` |
