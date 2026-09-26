@@ -172,7 +172,7 @@ Icon2=Example.png
 
 1. **绝不写进仓库、脚本或文档**。测试时以命令行参数传入，落点只能是本地忽略目录；测完重新生成并全文检索确认干净。自检要用**不自我匹配**的判据：`git log -p --all -- "WP7/@Resources/Config/Panels/Agenda/UserVariables.inc"` 里 `Feed1=` 的取值只应出现本条第 2 款的公开默认源；快速比对用「值长度 + sha256 前 16 位」的指纹即可。**不要**用 `git log -S'<关键词>' --all` 当这条自检：关键词会随本文档一起进提交，检索必然命中引入它的那次提交（实测命中 `8853d7bb`），自检永远失败；同理不要把任何检索字面量写进文档。
 2. 仓库里带的默认订阅必须是公开源（实测可用：`https://www.officeholidays.com/ics/china`、`…/south-korea`、`…/hong-kong`）。Apple 的 `calendars.icloud.com` 是 gzip 传输，Python 直取会拿到二进制（实测），不适合做默认。
-3. `.git/info/exclude` 实际内容（本机生效、不入库；`WP7/_agenda/` 是原型期的**陈旧条目**，目录已删）：
+3. `.git/info/exclude` 实际内容（本机生效、不入库）：
 
 ```
 WP7/@Resources/**/UserVariables.inc
@@ -186,8 +186,8 @@ WP7/Gallery/MultiManager/Saved/
 WP7/Gallery/main.ini
 WP7/Gallery/scroll.inc
 WP7/Gallery/Intro/save.inc
-WP7/_agenda/
 
+# 日程面板的本地订阅覆盖（含真实订阅链接＝凭据，绝不提交）
 WP7/@Resources/Config/Panels/Agenda/UserVariables.local.inc
 ```
 
