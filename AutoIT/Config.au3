@@ -22,7 +22,7 @@
 
 ; Check arguments
 
-If $CmdLine[0] < 6 Then OmnimoError("Omnimo Panel Config", "Too few command line arguments specified.")
+If $CmdLine[0] < 5 Then OmnimoError("Omnimo Panel Config", "Too few command line arguments specified.")
 
 
 
@@ -182,8 +182,7 @@ Else
 			Case ""
 				$Comments &= @CRLF
 			Case Else
-				If $VarCount >= 50 Then OmnimoError("Unable to read RainConfigure.cfg", "More than 50 configurable variables; the list was truncated.")
-				ExitLoop
+				If $VarCount >= 50 Then OmnimoError("Unable to read RainConfigure.cfg", "More than 50 configurable variables; aborting.")
 				$VarName[$VarCount] = $name
 				$VarDescription[$VarCount] = FileReadLine($CfgFile)
 				$VarType[$VarCount] = FileReadLine($CfgFile)
