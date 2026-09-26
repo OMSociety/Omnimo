@@ -214,12 +214,12 @@ WP7/Gallery/MultiManager/Saved/2/screenshot.png                # 布局保存时
 
 ## 10. 当前状态与未决项
 
-**相对 `upstream/master`（已提交，实测）：新增 14 / 修改 59 / 删除 16**
+**相对 `upstream/master`（已提交，实测）：新增 14 / 修改 60 / 删除 16**
 
 | 类别 | 内容 |
 |---|---|
 | 新增 | `LICENSE`、`THIRD-PARTY.md`、`AGENTS.md`、`CHANGELOG.md`、`Languages\Chinese.inc`、皮肤侧与源码侧两份 `Chinese.cfg`、`Panels\Agenda\`（`Item/Item2/Item3.ini` + `agenda.lua` + `Agenda.png`）、`Config\Panels\Agenda\`（`UserVariables.inc` + `RainConfigure.cfg`） |
-| 修改 | 27 个面板文件（缺陷修复：13 处删去悬挂的 `!CommandMeasure GetMhz "Run"`、Slideshow/DigitalClock 各尺寸档 `Height` 对齐、Volume 进度条居中、Network/DigitalClock4 若干表达式与 `Hidden`）、7 份语言包（补 `PanelAgenda` 键；第 8 份中文包是新增文件）、`Gallery\cat1.inc`（Agenda 磁贴落在时间与日期第 2 行；Corona 移除后整段回流）、`Gallery\cat7.inc`（语言列表「简体中文」取代 `[Help Translate]`）、`Gallery\Intro\intro.ini`、`Graphics\Gallery\mask-essential.png`（图标层）、`Common\Variables\UserVariables.inc`（`MainLanguage` 与 `SubstituteFeed` 编码修复）、`Config\Panels\Network\UserVariables.inc`（默认 ping 改字面 IP）、`Common\Color\color.inc`（默认主题改为桌面所依据的那套值）、`AutoIT\` 下 10 个源码文件（`OmnimoApp.au3`/`Config.au3` 各一处行为缺陷修复，加上覆盖全部工具的加固 pass——参数个数检查、数组上限、面板删除路径校验、`Execute()` 限制、5x5–9x9 布局计数器、`@ScriptDir` 路径锚定、`build.bat` 去 wmic、卸载器 `WP7` 标记校验——已全部编译进分发二进制，见第 8、12 项）、7 个 exe（`OmnimoApp.exe`、`config.exe`、`ColorChanger.exe`、`ConfigBackground.exe`、`PanelCreator.exe`、`ActivePanels.exe`、`MultiManager.exe`；AutoIt 3.3.18.0 重编译产物，FileVersion/ProductVersion 盖为 `0.3.0.0`）、`readme.md` |
+| 修改 | 27 个面板文件（缺陷修复：13 处删去悬挂的 `!CommandMeasure GetMhz "Run"`、Slideshow/DigitalClock 各尺寸档 `Height` 对齐、Volume 进度条居中、Network/DigitalClock4 若干表达式与 `Hidden`）、7 份语言包（补 `PanelAgenda` 键；第 8 份中文包是新增文件）、`Gallery\cat1.inc`（Agenda 磁贴落在时间与日期第 2 行；Corona 移除后整段回流）、`Gallery\cat7.inc`（语言列表「简体中文」取代 `[Help Translate]`）、`Gallery\Intro\intro.ini`、`Graphics\Gallery\mask-essential.png`（图标层）、`Common\Variables\UserVariables.inc`（`MainLanguage` 与 `SubstituteFeed` 编码修复）、`Config\Panels\Network\UserVariables.inc`（默认 ping 改字面 IP）、`Common\Color\color.inc`（默认主题改为桌面所依据的那套值）、`AutoIT\` 下 10 个源码文件（`OmnimoApp.au3`/`Config.au3` 各一处行为缺陷修复，加上覆盖全部工具的加固 pass——参数个数检查、数组上限、面板删除路径校验、`Execute()` 限制、5x5–9x9 布局计数器、`@ScriptDir` 路径锚定、`build.bat` 去 wmic、卸载器 `WP7` 标记校验——已全部编译进分发二进制，见第 8、12 项）、7 个 exe（`OmnimoApp.exe`、`config.exe`、`ColorChanger.exe`、`ConfigBackground.exe`、`PanelCreator.exe`、`ActivePanels.exe`、`MultiManager.exe`；AutoIt 3.3.18.0 重编译产物，FileVersion/ProductVersion 盖为 `0.3.0.0`）、`.gitignore`（忽略 Agenda 私人订阅本地覆盖 `UserVariables.local.inc`，规则入库故任何 clone 都成立）、`readme.md` |
 | 删除 | `Panels\Corona\`、`Config\Panels\Corona\`（共 10 个文件，用户要求删；`cat1.inc` 与图标层已同步回流）、`@Resources\Fonts\` 下 6 个 Microsoft Segoe `.ttf`（不可再分发、皮肤从不加载，见第 6 项与 `THIRD-PARTY.md` §4）——合计 16 |
 
 **已实机验证**：设置界面 7 页中文且无溢出；语言列表出现「简体中文」；面板右键菜单全中文；Agenda 面板在面板库可见可加、卡片裁剪正确、订阅抓取成功（日志无 12006）、真实滚轮滚动生效（差异像素占比 14.2%）且静置回顶成立（0.04%）；网络面板显示真实延迟；桌面布置与备份逐面板对齐（含尺寸）；被修表达式在日志中的报错消失。

@@ -62,7 +62,7 @@ carry a declaration or do not have one anywhere in the tree:
 
 ## 2. This fork's own changes
 
-Measured with `git diff --name-status upstream/master`: **14 files added, 59 modified, 16 deleted.**
+Measured with `git diff --name-status upstream/master`: **14 files added, 60 modified, 16 deleted.**
 
 Added:
 
@@ -101,7 +101,8 @@ picker's result, both fixed; a later hardening pass then touched every AutoIt so
 `Execute()` restriction, a panel-layout counter fix, `@ScriptDir` path anchoring, and dropping
 the `wmic` dependency from the build script). All seven shipped executables are rebuilt from
 these corrected sources (see section 3), so both the fixes and the hardening reach the binaries
-users run; and `readme.md`.
+users run; `.gitignore`, which now excludes the Agenda panel's per-machine feed override so a
+private calendar URL can never be committed; and `readme.md`.
 
 Deleted: the Corona panel — four files under `WP7/Panels/Corona/` and six under
 `WP7/@Resources/Config/Panels/Corona/`, removed at the user's request, with the gallery row
