@@ -3,7 +3,7 @@
 Notable changes to this fork of Omnimo. Upstream predates this file, so the
 first entry covers everything the fork has changed so far.
 
-## [Unreleased]
+## [0.3.0] - 2026-09-26
 
 ### Fixed
 
@@ -23,14 +23,17 @@ first entry covers everything the fork has changed so far.
   larger grids incremented one row counter but positioned panels with another,
   stacking every panel in the last rows onto a single column. Each row now uses
   its own counter and range. (Source fix in `ActivePanels.au3` and the same code
-  in `OmnimoApp.au3`; not yet in a shipped executable, see below.)
-- The shipped `OmnimoApp.exe` and `config.exe` were rebuilt from the corrected
-  sources with AutoIt 3.3.8.1 (`Aut2Exe`, x86, no UPX, the sources' own icons),
-  the interpreter version embedded in the originals, so the 0.2.0 source-only
-  fixes to the folder/app picker and the border-color branch reach the binaries
-  users run. The hardening under Security and Changed below post-dates that
-  rebuild, so no shipped executable contains it yet; rebuilding the affected
-  tools is deferred to the next release.
+  in `OmnimoApp.au3`.)
+- All seven shipped executables were rebuilt from the corrected sources with
+  AutoIt 3.3.18.0 (`Aut2Exe`, x86, `/nopack`, the sources' own icons), so the
+  fixes listed above, the 0.2.0 fixes that had stayed source-only, and the
+  hardening under Security and Changed all reach the binaries users run. 3.3.18.0
+  is the oldest interpreter that parses every source: the current
+  `WinAPIConv`/`WinAPIFiles` includes used by `ActivePanels.au3` and
+  `MultiManager.au3` contain ternary expressions that 3.3.8.1 rejects. Plain
+  `Aut2Exe` writes no version resource, so each executable's `VS_VERSIONINFO`
+  was injected directly and set to the release version `0.3.0.0`, keeping the
+  tools' reported version in step with the skin release.
 
 ### Changed
 
@@ -64,7 +67,7 @@ first entry covers everything the fork has changed so far.
 ### Security
 
 - Hardened the AutoIt helper sources against malformed input and unsafe paths
-  (source-only for now; not yet in a shipped executable, see Fixed). Argument
+  (rebuilt into all seven executables, see Fixed). Argument
   counts are validated so the tools exit with a message instead of indexing past
   the arguments they were given, and the config and panel arrays are bounded
   before writing. `config.exe`'s source no longer passes the `WindowX`/`WindowY`

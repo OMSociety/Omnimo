@@ -62,7 +62,7 @@ carry a declaration or do not have one anywhere in the tree:
 
 ## 2. This fork's own changes
 
-Measured with `git diff --name-status upstream/master`: **14 files added, 54 modified, 16 deleted.**
+Measured with `git diff --name-status upstream/master`: **14 files added, 59 modified, 16 deleted.**
 
 Added:
 
@@ -96,13 +96,12 @@ DigitalClock4, a byte/bit suffix and a dropped `AutoScale` in the Network panel,
 sources, where `AutoIT/OmnimoApp.au3`'s folder/app pickers passed `StringReplace`'s arguments
 in the wrong order so the choice went to a stray file and the panel config was never updated,
 and `AutoIT/Config.au3`'s border-color branch read an undeclared variable instead of the color
-picker's result, both fixed and the two shipped executables they build, `OmnimoApp.exe` and
-`config.exe`, rebuilt with AutoIt 3.3.8.1 so those fixes reach the binaries users run; a later
-hardening pass then touched every AutoIt source (argument-count guards, array-bounds checks,
-path-traversal rejection on panel delete, an `Execute()` restriction, a panel-layout counter
-fix, `@ScriptDir` path anchoring, and dropping the `wmic` dependency from the build script),
-which is source-only for now and not yet in any shipped executable (see section 3); and
-`readme.md`.
+picker's result, both fixed; a later hardening pass then touched every AutoIt source
+(argument-count guards, array-bounds checks, path-traversal rejection on panel delete, an
+`Execute()` restriction, a panel-layout counter fix, `@ScriptDir` path anchoring, and dropping
+the `wmic` dependency from the build script). All seven shipped executables are rebuilt from
+these corrected sources (see section 3), so both the fixes and the hardening reach the binaries
+users run; and `readme.md`.
 
 Deleted: the Corona panel — four files under `WP7/Panels/Corona/` and six under
 `WP7/@Resources/Config/Panels/Corona/`, removed at the user's request, with the gallery row
@@ -120,28 +119,36 @@ Seven executables ship inside the repository. They are upstream's own AutoIt hel
 the sources in `AutoIT/`; the binaries themselves carry no source and no declared licence.
 
 ```
-WP7/@Resources/Common/ColorChanger.exe                       786961 bytes
-WP7/@Resources/Common/OmnimoApp.exe                          775247 bytes
-WP7/@Resources/Common/Background/ConfigBackground.exe        788363 bytes
-WP7/@Resources/Common/Config/ActivePanels.exe                938496 bytes
-WP7/@Resources/Common/Config/config.exe                      757151 bytes
-WP7/@Resources/Common/MultiManager/MultiManager.exe          1022976 bytes
-WP7/@Resources/Common/PanelCreator/PanelCreator.exe          1051419 bytes
+WP7/@Resources/Common/ColorChanger.exe                       1356800 bytes
+WP7/@Resources/Common/OmnimoApp.exe                          1187328 bytes
+WP7/@Resources/Common/Background/ConfigBackground.exe        1353728 bytes
+WP7/@Resources/Common/Config/ActivePanels.exe                1030656 bytes
+WP7/@Resources/Common/Config/config.exe                      1133056 bytes
+WP7/@Resources/Common/MultiManager/MultiManager.exe          1106944 bytes
+WP7/@Resources/Common/PanelCreator/PanelCreator.exe          1604096 bytes
 ```
 
 Upstream let `config.exe` drift from its source: the binary was committed on 2020-05-18, while
 `AutoIT/Config.au3` was changed again on 2020-05-26 without a rebuild, and the released `.rmskin`
-ships a newer `Config.exe` that is not in upstream's git history at all. This fork rebuilds the two
-executables whose sources it modified — `OmnimoApp.exe` and `config.exe` — with AutoIt 3.3.8.1
-(`Aut2Exe`, x86, no UPX, the sources' own icons), matching the interpreter version embedded in the
-originals; the other five remain upstream's builds.
+ships a newer `Config.exe` that is not in upstream's git history at all. Upstream's own builds are
+not uniform: `ColorChanger.exe` carries `FileVersion 6.0` and a description, so it went through
+`AutoIt3Wrapper` with the source's `Res_*` directives; `config.exe`, `ConfigBackground.exe`,
+`OmnimoApp.exe` and `PanelCreator.exe` embed the interpreter version `3.3.8.1`; `ActivePanels.exe`
+and `MultiManager.exe` carry no version resource at all. Those last two cannot have been built with
+3.3.8.1 — they include the split WinAPI UDFs (`WinAPIFiles.au3`, `GDIPlus.au3`,
+`ScreenCapture.au3`) whose ternary operators 3.3.8.1 rejects with `Unable to parse line` — so
+upstream compiled them against AutoIt 3.3.10 or newer. As of release 0.3.0 this fork rebuilds all
+seven from the corrected sources with AutoIt 3.3.18.0 (plain `Aut2Exe`, `/x86`, `/nopack`, each
+source's own icon), which parses every source, so the section 2 fixes and hardening reach the
+binaries users run; the byte sizes above are this fork's builds.
 
-The hardening pass described in section 2 post-dates that rebuild and touches all seven AutoIt
-sources, so no shipped executable currently contains it — not even the two this fork rebuilt.
-Rebuilding the affected executables is deferred to the next release. Only plain `Aut2Exe` 3.3.8.1
-is installed (no `AutoIt3Wrapper`), so a rebuild stamps a uniform `FileVersion 3.3.8.1` and would
-replace `ColorChanger.exe`'s distinct `6.0` marker; the byte sizes listed above are unchanged until
-then.
+Plain `Aut2Exe` writes no version resource, so each rebuild is stamped afterwards with a
+`VS_VERSIONINFO` whose `FileVersion` and `ProductVersion` equal the fork release (`0.3.0.0`),
+keeping every executable's reported version in step with the release it ships in. The
+`FileDescription`, `LegalCopyright` and `OriginalFilename` strings reproduce the sources'
+`#AutoIt3Wrapper_Res_*` directives, except `ActivePanels.au3`, which declares none and is stamped
+with its own tool name; no `AutoIt3Wrapper` is installed, so those directives are not
+honoured at compile time and the stamping supplies them instead.
 
 ## 4. Bundled fonts
 

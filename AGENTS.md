@@ -8,7 +8,7 @@ Omnimo 是 Rainmeter 桌面皮肤（磁贴式面板集合）；本仓库是它�
 |---|---|
 | 本地路径 | `D:\WorkSpace\Omnimo` |
 | `origin` / `upstream` | `OMSociety/Omnimo` / `fediaFedia/Omnimo` |
-| 分支 / 已发布 | `master`（唯一分支）；annotated tag `v0.2.0` + 同名 GitHub Release |
+| 分支 / 已发布 | `master`（唯一分支）；annotated tag `v0.3.0` + 同名 GitHub Release（`v0.2.0` 仍在） |
 | 桌面映射 | `C:\Users\<用户>\Documents\Rainmeter\Skins\WP7` 是指向本仓库 `WP7\` 的目录联接（junction） |
 
 **只做四件小事**：① 设置面板 / 保存面板中文化（界面中文，磁贴表面英文）；② 日程同步（只做公开 ICS 订阅，见 §5 第 4 条）；③ 修既有 bug；④ 一点微小的工作。
@@ -214,12 +214,12 @@ WP7/Gallery/MultiManager/Saved/2/screenshot.png                # 布局保存时
 
 ## 10. 当前状态与未决项
 
-**相对 `upstream/master`（已提交，实测）：新增 14 / 修改 54 / 删除 16**
+**相对 `upstream/master`（已提交，实测）：新增 14 / 修改 59 / 删除 16**
 
 | 类别 | 内容 |
 |---|---|
 | 新增 | `LICENSE`、`THIRD-PARTY.md`、`AGENTS.md`、`CHANGELOG.md`、`Languages\Chinese.inc`、皮肤侧与源码侧两份 `Chinese.cfg`、`Panels\Agenda\`（`Item/Item2/Item3.ini` + `agenda.lua` + `Agenda.png`）、`Config\Panels\Agenda\`（`UserVariables.inc` + `RainConfigure.cfg`） |
-| 修改 | 27 个面板文件（缺陷修复：13 处删去悬挂的 `!CommandMeasure GetMhz "Run"`、Slideshow/DigitalClock 各尺寸档 `Height` 对齐、Volume 进度条居中、Network/DigitalClock4 若干表达式与 `Hidden`）、7 份语言包（补 `PanelAgenda` 键；第 8 份中文包是新增文件）、`Gallery\cat1.inc`（Agenda 磁贴落在时间与日期第 2 行；Corona 移除后整段回流）、`Gallery\cat7.inc`（语言列表「简体中文」取代 `[Help Translate]`）、`Gallery\Intro\intro.ini`、`Graphics\Gallery\mask-essential.png`（图标层）、`Common\Variables\UserVariables.inc`（`MainLanguage` 与 `SubstituteFeed` 编码修复）、`Config\Panels\Network\UserVariables.inc`（默认 ping 改字面 IP）、`Common\Color\color.inc`（默认主题改为桌面所依据的那套值）、`AutoIT\` 下 10 个源码文件（`OmnimoApp.au3`/`Config.au3` 各一处行为缺陷修复已重编译进 `OmnimoApp.exe`/`config.exe`；另有覆盖全部工具的加固 pass——参数个数检查、数组上限、面板删除路径校验、`Execute()` 限制、5x5–9x9 布局计数器、`@ScriptDir` 路径锚定、`build.bat` 去 wmic、卸载器 `WP7` 标记校验——仅改源码，尚未进任何 exe，见第 12 项）、`OmnimoApp.exe` 与 `config.exe`（重编译产物）、`readme.md` |
+| 修改 | 27 个面板文件（缺陷修复：13 处删去悬挂的 `!CommandMeasure GetMhz "Run"`、Slideshow/DigitalClock 各尺寸档 `Height` 对齐、Volume 进度条居中、Network/DigitalClock4 若干表达式与 `Hidden`）、7 份语言包（补 `PanelAgenda` 键；第 8 份中文包是新增文件）、`Gallery\cat1.inc`（Agenda 磁贴落在时间与日期第 2 行；Corona 移除后整段回流）、`Gallery\cat7.inc`（语言列表「简体中文」取代 `[Help Translate]`）、`Gallery\Intro\intro.ini`、`Graphics\Gallery\mask-essential.png`（图标层）、`Common\Variables\UserVariables.inc`（`MainLanguage` 与 `SubstituteFeed` 编码修复）、`Config\Panels\Network\UserVariables.inc`（默认 ping 改字面 IP）、`Common\Color\color.inc`（默认主题改为桌面所依据的那套值）、`AutoIT\` 下 10 个源码文件（`OmnimoApp.au3`/`Config.au3` 各一处行为缺陷修复，加上覆盖全部工具的加固 pass——参数个数检查、数组上限、面板删除路径校验、`Execute()` 限制、5x5–9x9 布局计数器、`@ScriptDir` 路径锚定、`build.bat` 去 wmic、卸载器 `WP7` 标记校验——已全部编译进分发二进制，见第 8、12 项）、7 个 exe（`OmnimoApp.exe`、`config.exe`、`ColorChanger.exe`、`ConfigBackground.exe`、`PanelCreator.exe`、`ActivePanels.exe`、`MultiManager.exe`；AutoIt 3.3.18.0 重编译产物，FileVersion/ProductVersion 盖为 `0.3.0.0`）、`readme.md` |
 | 删除 | `Panels\Corona\`、`Config\Panels\Corona\`（共 10 个文件，用户要求删；`cat1.inc` 与图标层已同步回流）、`@Resources\Fonts\` 下 6 个 Microsoft Segoe `.ttf`（不可再分发、皮肤从不加载，见第 6 项与 `THIRD-PARTY.md` §4）——合计 16 |
 
 **已实机验证**：设置界面 7 页中文且无溢出；语言列表出现「简体中文」；面板右键菜单全中文；Agenda 面板在面板库可见可加、卡片裁剪正确、订阅抓取成功（日志无 12006）、真实滚轮滚动生效（差异像素占比 14.2%）且静置回顶成立（0.04%）；网络面板显示真实延迟；桌面布置与备份逐面板对齐（含尺寸）；被修表达式在日志中的报错消失。
@@ -228,13 +228,13 @@ WP7/Gallery/MultiManager/Saved/2/screenshot.png                # 布局保存时
 |---|---|---|
 | 1 | ~~`Panels\Agenda` 缺滚轮动作~~ | **已修复并验证**：三个 ini 的 `[Rainmeter]` 段已补 `MouseScrollUp/DownAction`（照 `Volume` 的写法）；差异像素占比判据实测 滚动 14.2% / 静置回顶 0.04% |
 | 2 | ~~滚动 / 静置回顶复核~~ | **已完成**（判据见 §7 第 5 条） |
-| 3 | ~~是否发新版~~ | **已发布 v0.2.0**；`v0.1.0`、`v0.1.1` 的 Release 与 tag 已按用户要求删除 |
+| 3 | ~~是否发新版~~ | **已发布 v0.2.0、v0.3.0**；`v0.1.0`、`v0.1.1` 的 Release 与 tag 已按用户要求删除 |
 | 4 | AutoIt 工具默认语言 | 保持英文（运行时值），用户需在设置界面选一次「简体中文」 |
 | 5 | 7 个表面键保持英文 | 见 §4；设置界面里对应 7 格也随之显示英文 |
 | 6 | ~~6 个 Microsoft Segoe 字体~~ | **已移除**：`WP7/@Resources/Fonts/` 下 6 个 Segoe `.ttf` 已删，仅留非微软字面 `OptimusPrinceps.ttf`。皮肤按系统字体名解析 `FontFace`、从不加载这些文件（全仓无任何 `.ini`/脚本/安装器引用 `Fonts/` 或这些文件名），故删除不改变渲染；Segoe UI 本就是 Windows 系统字体，Segoe WP 非默认装、缺失时回退到系统替代字面（与删除前一致）。见 `THIRD-PARTY.md` §4 与 §8 第 4 条 |
 | 7 | 提交前要还原的运行时文件 | `WP7\Gallery\main.ini`、`scroll.inc`、`MultiManager\TimeSettings.inc`、`MultiManager\Saved\*\screenshot.png` 会被 Rainmeter 运行时改写；`git checkout --` 还原或按 §8 第 5 条标记。（`.git/info/exclude` 里陈旧的 `WP7/_agenda/` 条目已清） |
-| 8 | ~~AutoIT 源码修了 2 处但 exe 未重编译~~ | **已重编译**：`OmnimoApp.au3`（StringReplace 参数顺序）与 `Config.au3`（边框色分支读了未声明变量）已修源码，并用 AutoIt 3.3.8.1（`Aut2Exe`、x86、no UPX、源码自带图标）重编译 `OmnimoApp.exe` 与 `config.exe`（对照编译验证源码修复已嵌入）；`build.bat` 依赖 wmic 且经 AutoIt3Wrapper，本机均不可用，故直接调 `Aut2Exe`。其余 5 个 exe 仍是上游构建，见 `THIRD-PARTY.md` §3 |
+| 8 | ~~AutoIT 源码修了 2 处但 exe 未重编译~~ | **7 个 exe 已全部重编译**（0.3.0）：用 AutoIt **3.3.18.0** 的 `Aut2Exe`（`/x86 /nopack`、源码自带图标）重建 `OmnimoApp.exe`、`config.exe`、`ColorChanger.exe`、`ConfigBackground.exe`、`PanelCreator.exe`、`ActivePanels.exe`、`MultiManager.exe`，源码里的两处行为缺陷修复与第 12 项的全部加固都在二进制里。**选 3.3.18.0 的原因（实测）**：`ActivePanels.au3`/`MultiManager.au3` 依赖的现行 Include（`WinAPIConv.au3`、`WinAPIFiles.au3` 等）已用三元运算符，3.3.8.1 解析不了（`WinAPIConv.au3:353 … Error: Unable to parse line`）；本机既无 `AutoIt3Wrapper`（`build.bat` 走 wrapper 且依赖已下线的 wmic），只能用裸 `Aut2Exe`，而裸 `Aut2Exe` **忽略** `#AutoIt3Wrapper_Res_*` 指令、且 3.3.18 下**完全不写版本资源**，故 7 个 exe 的 VS_VERSIONINFO 由 `UpdateResource` 另行注入并盖成发布号 `0.3.0.0`（FileVersion/ProductVersion 纯 PE 元数据，运行时不读）。重编译命令必须 `MSYS_NO_PATHCONV=1 MSYS2_ARG_CONV_EXCL='*'`（否则 Git-Bash 把 `/in /out` 改写成路径 → 弹 GUI 挂住 shell），且 **3.3.18 下不能重定向其 stdout/stderr**（重定向后静默 exit 0 且不产出 exe）；细节见 `THIRD-PARTY.md` §3 |
 | 9 | ~~`Chinese.inc` 约半数键未译~~ | **已按产品决策收敛**：磁贴表面短标签与 Donate 面板作者留言保持英文（可视面要"酷"）；设置界面 / 功能提示类 21 键已补中文（含 `24HourTime`、`Missing1`）。现 284 键中 143 个值含中文；剩余未译＝刻意英文的表面键 ∪ 全库无消费方的上游死键（`ChangeColors`/`RefreshAll`/`SidebarColors` 等），不算遗漏 |
 | 10 | ~~Agenda 死源提示的残余边界~~ | **已修**：`agenda.lua` 加 `LOAD_TIMEOUT=45` 超时启发——从未取到有效 ICS 且超阈值则显示 "feed unavailable"，此前停在 "loading feed..."；已显示过事件的源之后失效则保留最后内容（`hasData` 为真时不进该分支） |
 | 11 | `agenda.lua:303` 夏令时 | 用定长 86400 秒推窗口末日，夏令时回拨那周末一天会被少算（`buildRows` 用 `hour=12` 规避了同类问题，此处没有）；本机时区无夏令时，实际影响为零 |
-| 12 | ~~AutoIT 其余 9 项加固项~~ | **已在源码层完成**（AU-3…AU-11，逐项单独提交）：参数个数检查缺/错 4 处、`Execute()` 求值 ini 坐标（改为仅算术后 `Number()` 回退）、`DirRemove` 无路径校验 3 处（拒绝含 `..`）、数组上限 2 处、5x5–9x9 布局计数器复制粘贴缺陷、`build.bat` 去 wmic、多处 CWD 相对路径改 `@ScriptDir` 锚定、卸载器加 `WP7` 标记校验。**均为源码级**：本机只有 `Aut2Exe` 3.3.8.1（无 `AutoIt3Wrapper`），且改分发二进制属另一决策点，故未重编译——当前无任何 exe 含这些加固（含第 8 项已重编译的两个），重编译推迟到下次发版；明细见仓库外 `D:\WorkSpace\Omnimo-代码质量复审报告.md` |
+| 12 | ~~AutoIT 其余 9 项加固项~~ | **已在源码层完成（AU-3…AU-11，逐项单独提交）**：参数个数检查缺/错 4 处、`Execute()` 求值 ini 坐标（改为仅算术后 `Number()` 回退）、`DirRemove` 无路径校验 3 处（拒绝含 `..`）、数组上限 2 处、5x5–9x9 布局计数器复制粘贴缺陷、`build.bat` 去 wmic、多处 CWD 相对路径改 `@ScriptDir` 锚定、卸载器加 `WP7` 标记校验。**已随 0.3.0 全量重编译进入全部 7 个分发 exe**（见第 8 项）；明细见仓库外 `D:\WorkSpace\Omnimo-代码质量复审报告.md` |
