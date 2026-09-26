@@ -1,7 +1,11 @@
 # Changelog
 
 Notable changes to this fork of Omnimo. Upstream predates this file, so the
-first entry covers everything the fork has changed so far.
+earliest entry covers everything the fork had changed up to that point.
+
+Only 0.3.0 is published as a tag and GitHub Release. The 0.1.0, 0.1.1 and
+0.2.0 entries are kept as the record of work whose tags and releases were later
+withdrawn; all of it ships in 0.3.0.
 
 ## [0.3.0] - 2026-09-26
 
