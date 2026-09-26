@@ -214,13 +214,13 @@ WP7/Gallery/MultiManager/Saved/2/screenshot.png                # 布局保存时
 
 ## 10. 当前状态与未决项
 
-**相对 `upstream/master`（已提交，实测）：新增 14 / 修改 35 / 删除 10**
+**相对 `upstream/master`（已提交，实测）：新增 14 / 修改 54 / 删除 16**
 
 | 类别 | 内容 |
 |---|---|
 | 新增 | `LICENSE`、`THIRD-PARTY.md`、`AGENTS.md`、`CHANGELOG.md`、`Languages\Chinese.inc`、皮肤侧与源码侧两份 `Chinese.cfg`、`Panels\Agenda\`（`Item/Item2/Item3.ini` + `agenda.lua` + `Agenda.png`）、`Config\Panels\Agenda\`（`UserVariables.inc` + `RainConfigure.cfg`） |
-| 修改 | 16 个面板文件（缺陷修复）、7 份语言包（补 `PanelAgenda` 键；第 8 份中文包是新增文件）、`Gallery\cat1.inc`（Agenda 磁贴落在时间与日期第 2 行；Corona 移除后整段回流）、`Gallery\cat7.inc`（语言列表「简体中文」取代 `[Help Translate]`）、`Gallery\Intro\intro.ini`、`Graphics\Gallery\mask-essential.png`（图标层）、`Common\Variables\UserVariables.inc`（`MainLanguage` 与 `SubstituteFeed` 编码修复）、`Config\Panels\Network\UserVariables.inc`（默认 ping 改字面 IP）、`Common\Color\color.inc`（默认主题改为桌面所依据的那套值）、`Panels\Slideshow\Item.ini` 与 `Panels\DigitalClock\Item.ini`（`Height` 对齐到桌面所依据的版本）、`AutoIT\OmnimoApp.au3` 与 `AutoIT\Config.au3`（各一处源码级缺陷修复：StringReplace 参数顺序、边框色分支读了未声明变量；只改源码，未重编译分发 exe）、`readme.md` |
-| 删除 | `Panels\Corona\`、`Config\Panels\Corona\`（共 10 个文件，用户要求删；`cat1.inc` 与图标层已同步回流） |
+| 修改 | 27 个面板文件（缺陷修复：13 处删去悬挂的 `!CommandMeasure GetMhz "Run"`、Slideshow/DigitalClock 各尺寸档 `Height` 对齐、Volume 进度条居中、Network/DigitalClock4 若干表达式与 `Hidden`）、7 份语言包（补 `PanelAgenda` 键；第 8 份中文包是新增文件）、`Gallery\cat1.inc`（Agenda 磁贴落在时间与日期第 2 行；Corona 移除后整段回流）、`Gallery\cat7.inc`（语言列表「简体中文」取代 `[Help Translate]`）、`Gallery\Intro\intro.ini`、`Graphics\Gallery\mask-essential.png`（图标层）、`Common\Variables\UserVariables.inc`（`MainLanguage` 与 `SubstituteFeed` 编码修复）、`Config\Panels\Network\UserVariables.inc`（默认 ping 改字面 IP）、`Common\Color\color.inc`（默认主题改为桌面所依据的那套值）、`AutoIT\` 下 10 个源码文件（`OmnimoApp.au3`/`Config.au3` 各一处行为缺陷修复已重编译进 `OmnimoApp.exe`/`config.exe`；另有覆盖全部工具的加固 pass——参数个数检查、数组上限、面板删除路径校验、`Execute()` 限制、5x5–9x9 布局计数器、`@ScriptDir` 路径锚定、`build.bat` 去 wmic、卸载器 `WP7` 标记校验——仅改源码，尚未进任何 exe，见第 12 项）、`OmnimoApp.exe` 与 `config.exe`（重编译产物）、`readme.md` |
+| 删除 | `Panels\Corona\`、`Config\Panels\Corona\`（共 10 个文件，用户要求删；`cat1.inc` 与图标层已同步回流）、`@Resources\Fonts\` 下 6 个 Microsoft Segoe `.ttf`（不可再分发、皮肤从不加载，见第 6 项与 `THIRD-PARTY.md` §4）——合计 16 |
 
 **已实机验证**：设置界面 7 页中文且无溢出；语言列表出现「简体中文」；面板右键菜单全中文；Agenda 面板在面板库可见可加、卡片裁剪正确、订阅抓取成功（日志无 12006）、真实滚轮滚动生效（差异像素占比 14.2%）且静置回顶成立（0.04%）；网络面板显示真实延迟；桌面布置与备份逐面板对齐（含尺寸）；被修表达式在日志中的报错消失。
 
@@ -237,4 +237,4 @@ WP7/Gallery/MultiManager/Saved/2/screenshot.png                # 布局保存时
 | 9 | ~~`Chinese.inc` 约半数键未译~~ | **已按产品决策收敛**：磁贴表面短标签与 Donate 面板作者留言保持英文（可视面要"酷"）；设置界面 / 功能提示类 21 键已补中文（含 `24HourTime`、`Missing1`）。现 284 键中 143 个值含中文；剩余未译＝刻意英文的表面键 ∪ 全库无消费方的上游死键（`ChangeColors`/`RefreshAll`/`SidebarColors` 等），不算遗漏 |
 | 10 | ~~Agenda 死源提示的残余边界~~ | **已修**：`agenda.lua` 加 `LOAD_TIMEOUT=45` 超时启发——从未取到有效 ICS 且超阈值则显示 "feed unavailable"，此前停在 "loading feed..."；已显示过事件的源之后失效则保留最后内容（`hasData` 为真时不进该分支） |
 | 11 | `agenda.lua:303` 夏令时 | 用定长 86400 秒推窗口末日，夏令时回拨那周末一天会被少算（`buildRows` 用 `hour=12` 规避了同类问题，此处没有）；本机时区无夏令时，实际影响为零 |
-| 12 | AutoIT 其余 9 项加固项 | 参数个数检查缺/错 4 处、`Execute()` 求值 ini 坐标、`DirRemove` 无路径校验 3 处、数组上限 2 处、`build.bat` 依赖 wmic、多处 CWD 相对路径——均为上游既有债或需本机权限前置，未动；明细见仓库外 `D:\WorkSpace\Omnimo-代码质量复审报告.md` |
+| 12 | ~~AutoIT 其余 9 项加固项~~ | **已在源码层完成**（AU-3…AU-11，逐项单独提交）：参数个数检查缺/错 4 处、`Execute()` 求值 ini 坐标（改为仅算术后 `Number()` 回退）、`DirRemove` 无路径校验 3 处（拒绝含 `..`）、数组上限 2 处、5x5–9x9 布局计数器复制粘贴缺陷、`build.bat` 去 wmic、多处 CWD 相对路径改 `@ScriptDir` 锚定、卸载器加 `WP7` 标记校验。**均为源码级**：本机只有 `Aut2Exe` 3.3.8.1（无 `AutoIt3Wrapper`），且改分发二进制属另一决策点，故未重编译——当前无任何 exe 含这些加固（含第 8 项已重编译的两个），重编译推迟到下次发版；明细见仓库外 `D:\WorkSpace\Omnimo-代码质量复审报告.md` |

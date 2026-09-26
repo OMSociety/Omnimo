@@ -62,7 +62,7 @@ carry a declaration or do not have one anywhere in the tree:
 
 ## 2. This fork's own changes
 
-Measured with `git diff --name-status upstream/master`: **14 files added, 46 modified, 16 deleted.**
+Measured with `git diff --name-status upstream/master`: **14 files added, 54 modified, 16 deleted.**
 
 Added:
 
@@ -92,13 +92,17 @@ Alternative menu switches tier; the Volume panel's progress bar is recentered in
 and halfsingle tiers, where the tile background adds `#Padding#` on both sides but the bar's
 origin did not add it back; plus a `FontSize` expression with an empty operand in
 DigitalClock4, a byte/bit suffix and a dropped `AutoScale` in the Network panel, and two
-`Hidden` lines in the Network panel that contradicted their settings toggle — the two AutoIt
-tool sources (`AutoIT/OmnimoApp.au3`, whose folder/app pickers passed `StringReplace`'s
-arguments in the wrong order so the choice went to a stray file and the panel config was
-never updated, and `AutoIT/Config.au3`, whose border-color branch read an undeclared
-variable instead of the color picker's result) and the two shipped executables they build,
-`OmnimoApp.exe` and `config.exe`, rebuilt with AutoIt 3.3.8.1 so those fixes reach the
-binaries users run (see section 3), and `readme.md`.
+`Hidden` lines in the Network panel that contradicted their settings toggle — the AutoIt tool
+sources, where `AutoIT/OmnimoApp.au3`'s folder/app pickers passed `StringReplace`'s arguments
+in the wrong order so the choice went to a stray file and the panel config was never updated,
+and `AutoIT/Config.au3`'s border-color branch read an undeclared variable instead of the color
+picker's result, both fixed and the two shipped executables they build, `OmnimoApp.exe` and
+`config.exe`, rebuilt with AutoIt 3.3.8.1 so those fixes reach the binaries users run; a later
+hardening pass then touched every AutoIt source (argument-count guards, array-bounds checks,
+path-traversal rejection on panel delete, an `Execute()` restriction, a panel-layout counter
+fix, `@ScriptDir` path anchoring, and dropping the `wmic` dependency from the build script),
+which is source-only for now and not yet in any shipped executable (see section 3); and
+`readme.md`.
 
 Deleted: the Corona panel — four files under `WP7/Panels/Corona/` and six under
 `WP7/@Resources/Config/Panels/Corona/`, removed at the user's request, with the gallery row
@@ -131,6 +135,13 @@ ships a newer `Config.exe` that is not in upstream's git history at all. This fo
 executables whose sources it modified — `OmnimoApp.exe` and `config.exe` — with AutoIt 3.3.8.1
 (`Aut2Exe`, x86, no UPX, the sources' own icons), matching the interpreter version embedded in the
 originals; the other five remain upstream's builds.
+
+The hardening pass described in section 2 post-dates that rebuild and touches all seven AutoIt
+sources, so no shipped executable currently contains it — not even the two this fork rebuilt.
+Rebuilding the affected executables is deferred to the next release. Only plain `Aut2Exe` 3.3.8.1
+is installed (no `AutoIt3Wrapper`), so a rebuild stamps a uniform `FileVersion 3.3.8.1` and would
+replace `ColorChanger.exe`'s distinct `6.0` marker; the byte sizes listed above are unchanged until
+then.
 
 ## 4. Bundled fonts
 

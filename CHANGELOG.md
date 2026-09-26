@@ -18,11 +18,19 @@ first entry covers everything the fork has changed so far.
   "loading feed..." forever. After a 45-second timeout with no data the panel
   now reports the feed as unavailable; a source that had already shown events
   keeps its last content rather than reverting to the timeout message.
-- The shipped `OmnimoApp.exe` and `config.exe` are now rebuilt from the
-  corrected sources with AutoIt 3.3.8.1 (`Aut2Exe`, x86, no UPX, the sources'
-  own icons), the interpreter version embedded in the originals. The 0.2.0
-  source-only fixes to the folder/app picker and the border-color branch now
-  reach the binaries users actually run.
+- The panel auto-arrange helper mis-tiled the 5x5 through 9x9 layouts: the 5x5
+  branch repeated a count range so its sixth row never placed a panel, and the
+  larger grids incremented one row counter but positioned panels with another,
+  stacking every panel in the last rows onto a single column. Each row now uses
+  its own counter and range. (Source fix in `ActivePanels.au3` and the same code
+  in `OmnimoApp.au3`; not yet in a shipped executable, see below.)
+- The shipped `OmnimoApp.exe` and `config.exe` were rebuilt from the corrected
+  sources with AutoIt 3.3.8.1 (`Aut2Exe`, x86, no UPX, the sources' own icons),
+  the interpreter version embedded in the originals, so the 0.2.0 source-only
+  fixes to the folder/app picker and the border-color branch reach the binaries
+  users run. The hardening under Security and Changed below post-dates that
+  rebuild, so no shipped executable contains it yet; rebuilding the affected
+  tools is deferred to the next release.
 
 ### Changed
 
@@ -45,6 +53,26 @@ first entry covers everything the fork has changed so far.
   The skin resolves font faces by system name and never loaded the files, so
   nothing renders differently; `OptimusPrinceps.ttf`, not a Microsoft face,
   stays.
+- The AutoIt build script no longer depends on `wmic`, which Microsoft has
+  retired; it picks the 32- or 64-bit toolchain path from the
+  `PROCESSOR_ARCHITECTURE` environment variables.
+- The AutoIt helpers resolve their sibling data files (`Config.cfg`, `hue.ini`,
+  `colors.txt`, `defaultcolors.txt`, `Varrar.inc`) against `@ScriptDir` instead
+  of the process working directory, so they load regardless of where the caller
+  launches them from.
+
+### Security
+
+- Hardened the AutoIt helper sources against malformed input and unsafe paths
+  (source-only for now; not yet in a shipped executable, see Fixed). Argument
+  counts are validated so the tools exit with a message instead of indexing past
+  the arguments they were given, and the config and panel arrays are bounded
+  before writing. `config.exe`'s source no longer passes the `WindowX`/`WindowY`
+  values read from `Rainmeter.ini` straight to `Execute()`: only plain arithmetic
+  is evaluated, anything else is parsed as a number. Panel deletion in
+  `OmnimoApp` and `PanelCreator` rejects a configured path containing `..`
+  rather than deleting outside the panels folder, and the uninstaller refuses to
+  recurse into a folder that carries no `WP7` marker.
 
 ## [0.2.0] - 2026-09-26
 
