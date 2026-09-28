@@ -214,7 +214,7 @@ WP7/Gallery/MultiManager/Saved/2/screenshot.png                # 布局保存时
 4. 许可分层：软件 **GPL-2.0**（`LICENSE`），图像/媒体 **CC BY-NC-SA 3.0**（各面板 ini 的 `License=`）；逐文件声明优先，细节与未决项见 `THIRD-PARTY.md`。
 5. 发版看 `CHANGELOG.md` 的体例；无 CI 的仓库发版＝**版本号 + CHANGELOG + tag + Release 一次闭口**：先把改动全部提交，再 `git tag -a vX.Y.Z -m "…"`、`git push origin master vX.Y.Z`、`gh release create vX.Y.Z -R OMSociety/Omnimo --title "vX.Y.Z" -F <说明文件>`。已发布的 tag 不要移动。
    - **`gh` 的仓库级子命令必须显式 `-R OMSociety/Omnimo`**：双 remote 下 `gh` 默认解析到 `upstream`（fediaFedia/Omnimo），会报 "tag exists locally but has not been pushed" 或干脆操作错仓库（实测）。`git push` 走 `origin`，不受影响。
-   - Release 正文的体例＝一句中文摘要 + `CHANGELOG.md` 对应小节的原文（照 v0.3.0）；写完核一下 GitHub 上存的是合法 UTF-8（本地终端是 GBK，直接看输出会是乱码，别据此判断写坏了）。
+   - Release 正文的体例＝一句中文摘要 + `CHANGELOG.md` 对应小节的原文（该小节自带中文段与英文段，**正文即双语，两段照抄、不删英文**；摘要风格照 v0.3.0）；写完核一下 GitHub 上存的是合法 UTF-8（本地终端是 GBK，直接看输出会是乱码，别据此判断写坏了）。
    - 撤下一个版本（用户要求"移除 vX.Y.Z"）＝删 Release + 删远端与本地 tag；删前把 tag message 与 Release 正文备份到仓库外，`CHANGELOG.md` 的历史条目**保留**，并在 §1 的「已发布」行注明。
 6. **重编译分发 exe（改过 `AutoIT\*.au3` 就必须做，否则修复只停在源码）**：工具链是 AutoIt **3.3.18.0** 的裸 `Aut2Exe`，命令形态锁定为
    `MSYS_NO_PATHCONV=1 MSYS2_ARG_CONV_EXCL='*' Aut2exe.exe /in X.au3 /out <win路径> /icon <ico> /x86 /nopack`

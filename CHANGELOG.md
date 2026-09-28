@@ -1,13 +1,42 @@
 # Changelog
 
-Notable changes to this fork of Omnimo. Upstream predates this file, so the
-earliest entry covers everything the fork had changed up to that point.
+本项目的更改记录在此文件。
 
-Only 0.3.0 is published as a tag and GitHub Release. The 0.1.0, 0.1.1 and
-0.2.0 entries are kept as the record of work whose tags and releases were later
-withdrawn; all of it ships in 0.3.0.
+All notable changes to this project are documented in this file.
+
+格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)；
+版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [0.3.0] - 2026-09-26
+
+> **说明：**上游早于本文件，因此最早的条目汇总了 fork 到那时为止的全部改动。只有 0.3.0 发布过 tag 与 GitHub Release；0.1.0、0.1.1、0.2.0 的条目是 tag 与 Release 事后被撤回的那段工作的记录，其内容全部随 0.3.0 发布。
+
+### 修复
+
+- 音量面板：底部进度条在 single 与 halfsingle 两档下不居中。磁贴背景两侧各加了 `#Padding#`，而进度条的起点没有把它补回来，整条因此左偏一个 padding 单位；现在起点把它计入，进度条在磁贴下居中。
+- 日程面板：以 UTC（`Z`）时间戳导出的日程此前按表盘原值放置，而不是本地时间，于是整体偏移一个 UTC 时差。解析器现在把 `Z` 时间换算成本地时间。
+- 日程面板：始终没有返回有效日历的订阅会永远停在「loading feed...」。现在 45 秒超时且无数据时，面板把该订阅报为不可用；已经显示过事件的源保留上一次内容，而不是退回超时提示。
+- 面板自动排布助手把 5x5 到 9x9 的布局排错了：5x5 分支重复了一段计数区间，第六行因此从未放下面板；更大的网格累加的是一个行计数器、定位面板用的是另一个，最后几行的面板全部被叠进同一列。现在每一行各用自己的计数器与区间。（源码修复在 `ActivePanels.au3`，`OmnimoApp.au3` 里的同一段代码同步修。）
+- 随仓库分发的七个可执行文件都用 AutoIt 3.3.18.0（`Aut2Exe`、x86、`/nopack`、各源码自带的图标）从修正后的源码重新编译，于是上面列出的修复、0.2.0 里停留在源码层的修复，以及「安全」与「变更」两节的加固，都真正进入了用户运行的二进制。3.3.18.0 是能解析全部源码的最老解释器：`ActivePanels.au3` 与 `MultiManager.au3` 引用的现行 `WinAPIConv`/`WinAPIFiles` 含三元表达式，3.3.8.1 直接拒绝解析。裸 `Aut2Exe` 不写版本资源，因此逐个注入 `VS_VERSIONINFO` 并设为发布号 `0.3.0.0`，让工具自报版本与皮肤发布保持一致。
+
+### 变更
+
+- 面板尺寸档位：数字时钟与幻灯片的基础 `Height` 在所有档位下取得一致，卡片无论被哪个布局加载都保持同样的比例。
+- 简体中文语言包由 `EnglishChinese.inc` 改名为 `Chinese.inc`，引用同步更新。
+- 设置与配置文案的中文覆盖新增 21 个键（含 `24HourTime`、受限模式的 `Missing` 提示与面板创建器的标签）。磁贴表面与 Donate 面板的作者留言按设计保持英文。
+- 日程面板：私人日历订阅改从被 git 忽略的 `UserVariables.local.inc` 覆盖文件读取，该文件缺失时回落已提交的公开默认源。已发布的日历链接等于该日历的读取凭据，把个人订阅放在本地未提交的文件里，可以保证它永不进入仓库。
+- 从 `@Resources/Fonts/` 移除随包分发的六个 Microsoft Segoe 字体文件——Microsoft 未授权再分发它们。皮肤按系统字体名解析字形、从不加载这些文件，所以渲染结果不变；非 Microsoft 字体的 `OptimusPrinceps.ttf` 保留。
+- AutoIt 构建脚本不再依赖已被 Microsoft 下线的 `wmic`，改为从 `PROCESSOR_ARCHITECTURE` 环境变量选择 32 位或 64 位工具链路径。
+- AutoIt 助手工具改为相对 `@ScriptDir` 解析同级数据文件（`Config.cfg`、`hue.ini`、`colors.txt`、`defaultcolors.txt`、`Varrar.inc`），不再依赖进程工作目录，从任何位置启动都能正确加载。
+
+### 安全
+
+- 加固 AutoIt 助手源码以应对畸形输入与不安全路径（已重编译进全部七个可执行文件，见「修复」）。参数个数经过校验，工具会带提示退出，而不是越界索引入参；配置数组与面板数组在写入前先做上限约束。`config.exe` 的源码不再把从 `Rainmeter.ini` 读到的 `WindowX`/`WindowY` 直接交给 `Execute()`：只求值纯算术，其它一律按数值解析。`OmnimoApp` 与 `PanelCreator` 删除面板时会拒绝含 `..` 的配置路径，而不是删掉面板目录之外的东西；卸载器拒绝递归进不带 `WP7` 标记的目录。
+
+> **Note:** Upstream predates this file, so the earliest entry covers everything this fork had changed up to that point. Only 0.3.0 is published as a tag and GitHub Release; the 0.1.0, 0.1.1 and 0.2.0 entries are kept as the record of work whose tags and releases were later withdrawn, and all of it ships in 0.3.0.
 
 ### Fixed
 
