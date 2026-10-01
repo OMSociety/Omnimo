@@ -1,18 +1,18 @@
-# AGENTS.md — Omnimo(DSH 侧 fork)Agent 宪法
+# AGENTS.md — ReOmnimo(接手 Omnimo 开发)Agent 宪法
 
 适用范围:本仓库全部目录(单文件,无子目录级 AGENTS.md)。
 最后更新:2026-10-02
 
 ## 项目概览
 
-- 一句话定位:Rainmeter 磁贴面板集 Omnimo 的 DSH 侧 fork,保留上游设计,只做四件事:设置/保存面板中文化、公开 ICS 日程订阅、修既有 bug、微小工作。
+- 一句话定位:Rainmeter 磁贴面板集 ReOmnimo,接手 fediaFedia/Omnimo 的开发,保留上游设计,只做四件事:设置/保存面板中文化、公开 ICS 日程订阅、修既有 bug、微小工作。
 - 技术栈:Rainmeter 皮肤(ini/inc/cfg/lua)+ AutoIt 3.3.18.0 配置工具(9 个 .au3,其中 7 个编译为分发 exe;`miniShell.au3`/`Uninstall.au3` 源码保留但当前不产出分发 exe)。无 CI、无测试框架,验收靠本文件的命令与实机判据。
 - 环境前提(本机):Aut2Exe 在 `C:\Program Files (x86)\AutoIt3\Aut2Exe\Aut2exe.exe`;`Rainmeter.exe`/`git`/`gh` 在 PATH;所有 `git` 命令在仓库根执行;构建/验收助手脚本(`_omni_build.ps1`、`_omni_vsver.py`、`_omni_loadcheck.ps1`、`_omni_set_logging2.py` 等)在 `D:\WorkSpace\`(与仓库同级,**不随仓库分发**)。
 - 文档索引:
   - 逐版本变更:`CHANGELOG.md`
   - 许可与来源:`LICENSE`、`THIRD-PARTY.md`(含差异集逐文件清单)
-  - 用户说明:`readme.md`
-- 基准:与 `upstream/master`(fediaFedia/Omnimo)的差异数为 14 增 / 451 改 / 16 删(0.3.0 时为 14/60/16;0.4.0 把 428 处 config.exe 调用点补上了第 6 个参数 `#PROGRAMPATH#`,这是“改”从 61 涨到 451 的主因),勿凭记忆引用旧数字。
+  - 用户说明:`README.md`(英文)、`README.zh.md`(中文)
+- 基准:与 `upstream/master`(fediaFedia/Omnimo)的差异数为 16 增 / 450 改 / 17 删(0.3.0 时为 14/60/16;0.4.0 把 428 处 config.exe 调用点补上了第 6 个参数 `#PROGRAMPATH#`,这是“改”从 61 涨到 450 量级的主因;README 双文档化后上游 `readme.md` 记删、`README.md`/`README.zh.md` 记增),勿凭记忆引用旧数字。
 
 ## 产品边界
 
@@ -71,7 +71,7 @@ AutoIt 工具(AutoIT\*.au3 → 7 个 exe)
 - **改 cat1..7 磁贴**:增删/移动一格必须同步改 `mask-<类>.png` 图标层(复制相邻字形,不要自画);跨行回流靠 `Y=(1*#ScaleDpi#)R` + `x=(360*#ScaleDpi#)` 行锚点交接。
 - **改 agenda.lua**:Rainmeter 公式里 `**` 是幂运算符(如 `7**#TypeH#`),不是畸形表达式,别“修”;Lua `0` 是真值,判断开关用显式比较;含 `"` 的值必须走**三引号** bang 形式 `!SetOption <meter> <opt> """值"""`(`set()` 已如此实现;Rainmeter 只在三引号形式下保留值内引号,写成 `""` 会报 `Skin "X" does not exist` 且值不变),且 bang 值里的 `[SomeSection]` 会被当段变量替换掉(不存在的段名原样保留);**Rainmeter 按 ANSI(本机 CP936)读 .lua 源**,字符串字面量必须纯 ASCII(中文注释无害),要显示中文只能从变量/ini 取。
 - **改 agenda 渲染样式**:0.4.0 起只剩一套排布——style 3/4 死分支与恒为 1 的 `AgendaStyle` 变量已删除;不要再按“未接线分支”去改 ini/RainConfigure,要加样式请单独提案。
-- **改发版**:fork 发布号只活在 tag + CHANGELOG 标题 + GitHub Release 三处(外加 exe 版本资源);仓库内 `Version=` 字段(Rainstaller.cfg 10.0.4、OmnimoVersion 10.0、Settings 6.0.1、RMSKIN.inc 1.0)属上游自有体系,不要动。"本次发布号"= 本轮用户指定的版本(如 `0.4.0.0`),必须与 tag 名(去 `v` 前缀)、CHANGELOG 标题、注入 exe 的 `FileVersion` 三者一致;动手前先向用户确认号码,不要自己编。核对改动面与凭据自检都依赖 `upstream` remote:用 `git remote -v` 确认它指向 `https://github.com/fediaFedia/Omnimo.git`,缺失则 `git remote add upstream <该地址>` 后 `git fetch upstream`。
+- **改发版**:本仓库发布号只活在 tag + CHANGELOG 标题 + GitHub Release 三处(外加 exe 版本资源);仓库内 `Version=` 字段(Rainstaller.cfg 10.0.4、OmnimoVersion 10.0、Settings 6.0.1、RMSKIN.inc 1.0)属上游自有体系,不要动。"本次发布号"= 本轮用户指定的版本(如 `0.4.0.0`),必须与 tag 名(去 `v` 前缀)、CHANGELOG 标题、注入 exe 的 `FileVersion` 三者一致;动手前先向用户确认号码,不要自己编。核对改动面与凭据自检都依赖 `upstream` remote:用 `git remote -v` 确认它指向 `https://github.com/fediaFedia/Omnimo.git`,缺失则 `git remote add upstream <该地址>` 后 `git fetch upstream`。
 
 ## 禁止操作
 

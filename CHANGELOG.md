@@ -42,6 +42,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `AGENTS.md` 更正三处事实：语言包是 288 键定义/283 唯一键（原写 287/280）、`Config.au3` 的写盘与显示态在 519/568 行（原写 528/553）、以及「注入后每个 exe 比上游多 1024 字节」的说法（上游二进制是 UPX 加壳的，体积差来自 `/nopack`，版本资源本身只占 1024 字节）。
 - `THIRD-PARTY.md` 第 3 节的可执行文件体积表与版本号更新为本轮 0.4.0 重编译的结果。
 - 本轮改动后七个可执行文件再次重编译（同上参数集），版本资源保持 `0.4.0.0`。
+- README：项目名改为 ReOmnimo，叙述口吻只说「接手 Omnimo 的开发」；拆为英文主文档 `README.md` 与中文独立文档 `README.zh.md`，上游 `readme.md` 删除。
+- `AGENTS.md`、`THIRD-PARTY.md`：同步 ReOmnimo 命名与最新差异计数（16 增 / 450 改 / 17 删）。
 
 ### Fixed
 
@@ -151,6 +153,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   match this round's 0.4.0 rebuild.
 - All seven executables were rebuilt again after this round's changes (same argument
   set), their version resource staying at `0.4.0.0`.
+- README: the project name is now ReOmnimo and the wording only says that it
+  takes over development of Omnimo; the file is split into `README.md` (English,
+  primary) and `README.zh.md` (Chinese, standalone), and upstream's `readme.md` is
+  deleted.
+- `AGENTS.md`, `THIRD-PARTY.md`: ReOmnimo naming and the current diff counts
+  (16 added / 450 modified / 17 deleted) synced.
 
 ## [0.3.0] - 2026-09-26
 

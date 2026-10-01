@@ -62,7 +62,7 @@ carry a declaration or do not have one anywhere in the tree:
 
 ## 2. This fork's own changes
 
-Measured with `git diff --name-status upstream/master`: **14 files added, 60 modified, 16 deleted.**
+Measured with `git diff --name-status upstream/master`: **16 files added, 450 modified, 17 deleted.**
 
 Added:
 
@@ -72,6 +72,8 @@ Added:
 | `AGENTS.md` | A working guide to this fork: encodings, Rainmeter pitfalls, credential rules |
 | `CHANGELOG.md` | Per-release notes for the fork |
 | `THIRD-PARTY.md` | This file |
+| `README.md` | The repository's own README, English primary, under the name ReOmnimo |
+| `README.zh.md` | The same README in Chinese, standalone |
 | `WP7/@Resources/Common/Variables/Languages/Chinese.inc` | Simplified Chinese UI language pack, 284 keys, mirroring `English.inc` |
 | `WP7/@Resources/Common/Background/Language/Chinese.cfg` | Simplified Chinese strings for the AutoIt tools, 33 keys |
 | `AutoIT/Language/Chinese.cfg` | The same pack kept beside the AutoIt sources |
@@ -102,13 +104,13 @@ picker's result, both fixed; a later hardening pass then touched every AutoIt so
 the `wmic` dependency from the build script). All seven shipped executables are rebuilt from
 these corrected sources (see section 3), so both the fixes and the hardening reach the binaries
 users run; `.gitignore`, which now excludes the Agenda panel's per-machine feed override so a
-private calendar URL can never be committed; and `readme.md`.
+private calendar URL can never be committed.
 
 Deleted: the Corona panel — four files under `WP7/Panels/Corona/` and six under
 `WP7/@Resources/Config/Panels/Corona/`, removed at the user's request, with the gallery row
 and the icon layer reflowed to match; and the six Microsoft Segoe `.ttf` files under
 `WP7/@Resources/Fonts/`, not licensed for redistribution and never loaded by the skin (see
-section 4).
+section 4); and upstream's `readme.md`, which this repository replaces with its own `README.md` (English) and `README.zh.md` (Chinese).
 
 Our changes inherit the terms of the file they touch: GPL-2.0 where upstream puts that file under
 GPL-2.0, CC BY-NC-SA 3.0 where the file self-declares it. No rights are claimed over upstream
@@ -211,7 +213,7 @@ licensing is not determined by Rainmeter's.
 | 2 | 22 `.ini` plus 960 `.inc`/`.lua`/`.cfg`/`.js` and 1670 images with no declaration | Carried as-is with provenance traceable through the retained git history. No rights claimed. |
 | 3 | 7 upstream `.exe` with no source and no declared licence | Repository-only. Closes if the binaries are dropped and users build from `AutoIT/`. |
 | 4 | ~~6 Microsoft Segoe `.ttf` in `WP7/@Resources/Fonts/`~~ | Resolved: the six files are removed. The skin resolved those faces by system name and never loaded the files, so nothing renders differently; the Segoe WP fallback on systems without that face is unchanged. |
-| 5 | The repository has no README of its own. Upstream's `readme.md` is brought forward but **not** left unchanged: a 25-line fork header was added to it | The header explains what this fork changes and points at `AGENTS.md`; a proper standalone README is not yet written. |
+| 5 | ~~The repository has no README of its own. Upstream's `readme.md` is brought forward but **not** left unchanged: a 25-line fork header was added to it~~ | Resolved: the repository now has its own `README.md` (English) and `README.zh.md` (Chinese) under the name ReOmnimo, and upstream's `readme.md` is deleted. |
 
 ---
 
