@@ -118,7 +118,8 @@ AutoIt 工具(AutoIT\*.au3 → 7 个 exe)
 | Aut2Exe 弹 "Command Line Parameters" 帮助框 | 传了 `/fileversion 6.0.0.0` 这类点分写法;去掉版本参数,版本号编译后注入。`Start-Process -ArgumentList` 传数组也会报类型错,必须传单个拼接字符串 |
 | `tag exists locally but has not been pushed` | `gh` 解析到了 upstream;命令补 `-R OMSociety/Omnimo` |
 | 截图每张都不同 | 半透明面板透出动态壁纸/亚像素抖动;关动态壁纸,用差异像素占比判据,别要求逐字节相同 |
-\1| 重启后 `Rainmeter.ini` 只剩一百多字节、桌面皮肤全没了 | 文件头真 BOM 被写坏(残迹 `EF BF BD EF BF BD`),Rainmeter 按 CP936 读成空配置后写回默认值;从备份恢复,按 `FF FE` + UTF-16LE + CRLF 写回(`_omni_rm_ini_repair.py`),别在缺 BOM 的文件上做字节级替换 |
+| Python 写回后文件行尾全乱 | `\r\n` 被写成 `\r\r\n`;补丁脚本加 `newline=""` 重写 |
+| 重启后 `Rainmeter.ini` 只剩一百多字节、桌面皮肤全没了 | 文件头真 BOM 被写坏(残迹 `EF BF BD EF BF BD`),Rainmeter 按 CP936 读成空配置后写回默认值;从备份恢复,按 `FF FE` + UTF-16LE + CRLF 写回(`_omni_rm_ini_repair.py`),别在缺 BOM 的文件上做字节级替换 |
 
 ## 维护
 
