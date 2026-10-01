@@ -69,6 +69,33 @@ If FileExists($VarOverrideFile) Then
 	$VarFile = $VarOverrideFile
 EndIf
 
+; Rainmeter.exe is located without guessing: current callers pass #PROGRAMPATH# as the
+; 6th argument (every Config\config.exe call site in WP7 does). Older or third-party
+; call sites do not, so fall back to the usual install locations and then to PATH.
+Func _RainmeterExe()
+	If $CmdLine[0] >= 6 Then
+		Local $p = $CmdLine[6]
+		If $p <> "" Then
+			If StringRight($p, 1) <> "\" Then $p &= "\"
+			If FileExists($p & "Rainmeter.exe") Then Return $p & "Rainmeter.exe"
+		EndIf
+	EndIf
+	Local $cand[3] = [EnvGet("ProgramW6432") & "\Rainmeter\Rainmeter.exe", @ProgramFilesDir & "\Rainmeter\Rainmeter.exe", EnvGet("ProgramFiles(x86)") & "\Rainmeter\Rainmeter.exe"]
+	For $i = 0 To UBound($cand) - 1
+		If FileExists($cand[$i]) Then Return $cand[$i]
+	Next
+	Return "Rainmeter.exe"
+EndFunc
+
+; Read a panel variable the way the skin does: the local override file first, then the
+; base file for keys it does not define (the @includes merge the two files).
+Func _ReadVar($name, $default = "")
+	Local $v = IniRead($VarFile, "Variables", $name, "")
+	If $v = "" And $VarLocal = 1 Then $v = IniRead($VarBaseFile, "Variables", $name, "")
+	If $v = "" Then $v = $default
+	Return $v
+EndFunc
+
 
 
 
@@ -339,7 +366,7 @@ GUICtrlSetLimit($sliderE, 300, 70)
 GUICtrlSetData($sliderE, $Size)
 
 ; Tell the user when this panel keeps its settings in the local override file
-If $VarLocal = 1 And $Colorizable <> 1 And $Comments == "" Then
+If $VarLocal = 1 And $Comments == "" Then
 	GUICtrlCreateLabel($Language.Item("VariablesFromLocalFile"), 10, $height - $Size / 3.125 - $Size / 15, $width - 20, $Size / 24)
 	GUICtrlSetBkColor(-1, $GUI_BKCOLOR_TRANSPARENT)
 	GUICtrlSetColor(-1, $TextColor)
@@ -461,7 +488,7 @@ While 1
 			Sleep(100)
 
 
-Run('"' & $CmdLine[6] & 'Rainmeter.exe" [!Refresh "' & $CmdLine[2] & '"]')
+Run('"' & _RainmeterExe() & '" [!Refresh "' & $CmdLine[2] & '"]')
 
 ;Run('"C:\Program Files\Rainmeter\Rainmeter.exe" [!Refresh "' & $CmdLine[2] & '"]')
 
@@ -644,19 +671,19 @@ Const $FooterBG = $ColorVariables[5][1]
 
 
 
-$Color1Value = IniRead($VarFile, "Variables", "Color1", "0,0,0")
-$Color2Value = IniRead($VarFile, "Variables", "Color2", "0,0,0")
-$Color3Value = IniRead($VarFile, "Variables", "ColorBorder", "0,0,0")
-$GradientAngleValue = IniRead($VarFile, "Variables", "gradientangle", "0")
-$ColorBorderValue = IniRead($VarFile, "Variables", "ColorBorder", "0,0,0")
-$BorderWidthValue = IniRead($VarFile, "Variables", "borderwidth", "0")
-$WidthValue = IniRead($VarFile, "Variables", "Width", @DesktopWidth)
-$HeightValue = IniRead($VarFile, "Variables", "Height", @DesktopHeight)
-$AeroGlassValue = IniRead($VarFile, "Variables", "EnableAero", "0")
+$Color1Value = _ReadVar("Color1", "0,0,0")
+$Color2Value = _ReadVar("Color2", "0,0,0")
+$Color3Value = _ReadVar("ColorBorder", "0,0,0")
+$GradientAngleValue = _ReadVar("gradientangle", "0")
+$ColorBorderValue = _ReadVar("ColorBorder", "0,0,0")
+$BorderWidthValue = _ReadVar("borderwidth", "0")
+$WidthValue = _ReadVar("Width", @DesktopWidth)
+$HeightValue = _ReadVar("Height", @DesktopHeight)
+$AeroGlassValue = _ReadVar("EnableAero", "0")
 
-$TopBottomBorderValue = IniRead($VarFile, "Variables", "showbordertopbottom", "0")
-$LeftRightBorderValue = IniRead($VarFile, "Variables", "showborderleftright", "0")
-$ImageValue = IniRead($VarFile, "Variables", "BackgroundImage", "")
+$TopBottomBorderValue = _ReadVar("showbordertopbottom", "0")
+$LeftRightBorderValue = _ReadVar("showborderleftright", "0")
+$ImageValue = _ReadVar("BackgroundImage", "")
 
 $Color1Split = StringSplit($Color1Value, ",")
 If $Color1Split[0] < 4 Then
@@ -982,6 +1009,6 @@ Func RGBToHex($Color)
 
 Func SendBang($szBang)
 
-Run('"' & $CmdLine[4] & 'Rainmeter.exe" [' & $szBang & ']')
+Run('"' & _RainmeterExe() & '" [' & $szBang & ']')
 
 EndFunc
