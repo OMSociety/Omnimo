@@ -10,6 +10,106 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+> **说明：**随仓库分发的七个可执行文件已按下一个发布号 `0.4.0.0` 加盖版本资源；本节尚未打 tag、也未发布 Release。
+
+### 修复
+
+- 日程面板：重复事件（`RRULE`）此前整条被忽略，只画 `DTSTART` 那一条。现在支持 `DAILY`/`WEEKLY`/`MONTHLY`/`YEARLY` 加 `INTERVAL`/`COUNT`/`UNTIL`/`BYDAY`/`BYMONTHDAY`/`BYMONTH` 的有界子集，并且只在面板窗口内展开实例；带其它参数（`WKST`/`BYSETPOS`/`BYHOUR` 等）或参数组合不支持的规则整条不认，退回只画 `DTSTART`——宁可少画也不画错。`RDATE`/`EXDATE`/`RECURRENCE-ID` 一律忽略。
+- 日程面板：`DTSTART` 的 `TZID=` 参数此前被属性正则连同参数串一起丢弃，非本机时区的事件按表盘原值放置，整体偏移一个时差。现在按内置的固定偏移表（约 60 条 IANA 区域名与 Windows 时区名）换算到本机时间；表里没有的时区按本机墙上时间显示，并在日志里提示一次。固定偏移不跟夏令时走，欧洲与北美部分区域在夏令时期间可能差一小时，这是刻意取舍：一个日历面板不值得内置 tzdata。
+- 日程面板：`SUMMARY` 含双引号的标题经 `!SetOption` 传值会被截断或吞掉引号。现在按 Rainmeter 的三引号参数形式传值，标题原样保留。
+- 日程面板：`Update=1000` 是为「静置回顶」而设的（见 `Item.ini`），但每秒的 tick 都会重解析全部订阅并重推上百条 `!SetOption`（三个订阅满载时约 180-200 条 bang/秒）。现在订阅正文、日期窗口与滚动偏移都没变时直接返回，既不再解析 ICS 也不再重推；实测 23 次 tick 只解析 1 次、渲染 1 次。
+- 日程面板：滚动偏移夹取后没有写回皮肤变量，变量会停在过期值，下一次滚动以它为基准。现在只在值确实变化时写回。
+- 日程面板：日期标题槽位不清理时间文案，上一帧事件行的时间会残留在隐藏的 meter 里。现在清空。
+- 日程面板：`AgendaStyle` 变量恒为 1，`style` 3/4 两套排布分支（约 70 行）永不执行，删除。
+- 语言切换磁贴：`WP7/Gallery/cat7.inc` 的 8 个语言切换（含本 fork 新增的简体中文）只写 `MainLanguage` 与两处 `Language`，不写 `DateLayout`，切完语言后日期仍是旧语言的格式。现在与 `WP7/Gallery/Intro/intro.ini` 一样按语言写入对应的 `DateLayout`。
+- 网络面板：`Item2.ini` 的位数单位写成 `%1B`，Rainmeter 的自动换算认的是小写 `%1b`，单位没有跟随缩放（同一目录的 `Item.ini` 早已是小写）。
+- 配置工具：面板存在 `UserVariables.local.inc` 覆盖文件时，设置界面读写的是被该文件遮蔽的 `UserVariables.inc`，改动不生效（此前记为已接受的交互缺陷）。现在检测到同目录的覆盖文件就直接读写它，界面加一行说明；覆盖文件里没写的键仍回落到 `UserVariables.inc`——两个 include 是合并关系，不是遮蔽，所以不需要为本地文件补齐任何键。
+- 日程面板：四种状态提示（`loading feed...`/`feed unavailable`/`no feed configured`/`no events in the next N days`）此前硬编码英文，现在走语言包新增的 `AgendaLoading`/`AgendaUnavailable`/`AgendaNoFeed`/`AgendaNoEvents` 四个键，未翻译的语言回落英文。`AgendaNoEvents` 的 `%1` 替换成天数——这是本仓库语言文件里唯一的占位符约定。星期缩写与 `all day` 按设计保持英文。
+
+### 变更
+
+- 日程面板：`RangeDays` 此前是闭区间（填 6 会显示 7 个日历日），配置标签「显示天数（今天起）」因此差一天。现在窗口正好等于 `RangeDays` 天。升级后同一配置会少显示一天，这是有意的行为变更。
+- `THIRD-PARTY.md` 更正两处与事实不符的说明：中文语言包并非本 fork 翻译（`Translated=` 记的是上游作者），以及 `readme.md` 并非未改动（加了 25 行的 fork 说明）。
+- 七个可执行文件用 AutoIt 3.3.18.0（`Aut2Exe`、x86、`/nopack`）从修正后的源码重新编译，为「配置工具」的覆盖感知补上新的界面文案，并把版本资源盖为下一个发布号 `0.4.0.0`。
+
+> **Note:** the seven shipped executables already carry the next release number `0.4.0.0` in their version resource; nothing under this heading is tagged or released yet.
+
+### Fixed
+
+- Agenda panel: recurring events (`RRULE`) were ignored outright and only the
+  `DTSTART` instance was drawn. The parser now handles a bounded subset —
+  `DAILY`/`WEEKLY`/`MONTHLY`/`YEARLY` with `INTERVAL`/`COUNT`/`UNTIL`/`BYDAY`/
+  `BYMONTHDAY`/`BYMONTH` — and expands only the instances inside the panel
+  window. A rule carrying anything else (`WKST`/`BYSETPOS`/`BYHOUR`, or an
+  unsupported combination) is rejected as a whole and falls back to drawing the
+  single `DTSTART` instance: better to draw less than to draw wrong.
+  `RDATE`/`EXDATE`/`RECURRENCE-ID` are ignored.
+- Agenda panel: the `TZID=` parameter of `DTSTART` was swallowed by the property
+  pattern along with the rest of the parameter string, so events in another zone
+  were placed at the raw clock time and shifted by a whole offset. Times are now
+  converted through a built-in fixed-offset table (about 60 IANA region names
+  plus the Windows zone names); a zone missing from the table is shown at this
+  machine's wall time and reported once in the log. The offsets do not follow
+  daylight saving, so parts of Europe and North America can be an hour off
+  during DST — a deliberate trade-off, since a calendar panel is not worth
+  shipping tzdata for.
+- Agenda panel: a `SUMMARY` containing a double quote was truncated, or lost the
+  quote, when passed through `!SetOption`. Values are now passed in Rainmeter's
+  triple-quoted form and the title arrives intact.
+- Agenda panel: `Update=1000` exists so the list can snap back to the top when
+  scrolling stops (see `Item.ini`), but every per-second tick re-parsed all
+  subscriptions and pushed over a hundred `!SetOption` bangs (roughly 180-200
+  bangs per second with three subscriptions). The tick now returns immediately
+  when the feed bodies, the date window and the scroll offset are all unchanged,
+  parsing no ICS and pushing no bangs; measured over 23 ticks it parsed once and
+  rendered once.
+- Agenda panel: the clamped scroll offset was never written back to the skin
+  variable, so the variable stayed on a stale value and the next scroll used it
+  as its base. It is now written only when the value really changes.
+- Agenda panel: the date-header slot did not clear the time text, so an event
+  line's time stayed behind in a hidden meter. It is now cleared.
+- Agenda panel: the `AgendaStyle` variable is always 1 and the style 3/4 layout
+  branches (about 70 lines) can never run; they are removed.
+- Language picker tile: the eight language switchers in `WP7/Gallery/cat7.inc`
+  (including the Simplified Chinese one this fork added) wrote `MainLanguage`
+  and the two `Language` values but not `DateLayout`, so the date kept the
+  previous language's format after a switch. They now write the matching
+  `DateLayout`, exactly like `WP7/Gallery/Intro/intro.ini` already did.
+- Network panel: `Item2.ini` wrote the bit-rate unit as `%1B`; Rainmeter's
+  auto-scale recognises the lowercase `%1b`, so the unit did not follow the
+  scale (the neighbouring `Item.ini` already used the lowercase form).
+- Config tool: when a panel has a `UserVariables.local.inc` override, the
+  settings window read and wrote the `UserVariables.inc` that file shadows, so
+  edits were discarded (previously recorded as an accepted interaction defect).
+  It now detects the sibling override and reads and writes that file, and shows
+  a line of explanation in the window; keys the override does not set still fall
+  back to `UserVariables.inc`, since the two includes merge rather than shadow,
+  so nothing ever needs to be seeded into the local file.
+- Agenda panel: the four status messages (`loading feed...`,
+  `feed unavailable`, `no feed configured`, `no events in the next N days`) were
+  hard-coded English. They now come from four new language keys —
+  `AgendaLoading`/`AgendaUnavailable`/`AgendaNoFeed`/`AgendaNoEvents` — falling
+  back to English in untranslated packs. The `%1` in `AgendaNoEvents` is
+  replaced with the day count; it is the only placeholder convention in this
+  repository's language files. Weekday abbreviations and `all day` stay English
+  by design.
+
+### Changed
+
+- Agenda panel: `RangeDays` was a closed interval (6 meant 7 calendar days), so
+  the "显示天数（今天起）" label was off by one. The window now spans exactly
+  `RangeDays` days. An existing configuration therefore shows one day less after
+  the upgrade, which is the intended behaviour change.
+- `THIRD-PARTY.md`: two claims corrected. The Chinese language pack is not this
+  fork's translation (`Translated=` credits the upstream author), and
+  `readme.md` is not unchanged (a 25-line fork header was added to it).
+- All seven executables were rebuilt from the corrected sources with AutoIt
+  3.3.18.0 (`Aut2Exe`, x86, `/nopack`), including the new window text for the
+  Config tool's override awareness, and their version resource is stamped with
+  the next release number `0.4.0.0`.
+
 ## [0.3.0] - 2026-09-26
 
 > **说明：**上游早于本文件，因此最早的条目汇总了 fork 到那时为止的全部改动。只有 0.3.0 发布过 tag 与 GitHub Release；0.1.0、0.1.1、0.2.0 的条目是 tag 与 Release 事后被撤回的那段工作的记录，其内容全部随 0.3.0 发布。

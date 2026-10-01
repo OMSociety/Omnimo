@@ -1,251 +1,127 @@
-# Omnimo（DSH 侧 fork）改造手册
+# AGENTS.md — Omnimo(DSH 侧 fork)Agent 宪法
 
-Omnimo 是 Rainmeter 桌面皮肤（磁贴式面板集合）；本仓库是它的 DSH 侧 fork，保留上游设计与面板集。本文面向下一个接手的人或 AI；动手前先读 §1 的边界与 §10 的未决项。标注**（实测）**的结论已在本仓库验证；标注**（推论）**的只有结构依据，动手前自行确认。
+适用范围:本仓库全部目录(单文件,无子目录级 AGENTS.md)。
+最后更新:2026-10-01
 
-## 1. 项目定位与边界
+## 项目概览
 
-| 项 | 值（实测） |
+- 一句话定位:Rainmeter 磁贴面板集 Omnimo 的 DSH 侧 fork,保留上游设计,只做四件事:设置/保存面板中文化、公开 ICS 日程订阅、修既有 bug、微小工作。
+- 技术栈:Rainmeter 皮肤(ini/inc/cfg/lua)+ AutoIt 3.3.18.0 配置工具(9 个 .au3 编译为 7 个分发 exe)。无 CI、无测试框架,验收靠本文件的命令与实机判据。
+- 文档索引:
+  - 逐版本变更:`CHANGELOG.md`
+  - 许可与来源:`LICENSE`、`THIRD-PARTY.md`(含差异集逐文件清单)
+  - 用户说明:`readme.md`
+- 基准:与 `upstream/master`(fediaFedia/Omnimo)的差异数为 14 增 / 61 改 / 16 删(0.3.0 时为 14/60/16;0.4.0 新增的一处是 `Background\Language\English.cfg` 的本地覆盖提示键),勿凭记忆引用旧数字。
+
+## 产品边界
+
+- 接到需求先归类:属于四件事之一才做;"待办同步"用户已决定不做,不要实现。
+- 明确不做:重画视觉、复刻面板、自建控件层、改设计语言、换字体。磁贴表面保持英文(按英文宽度排版)。
+- 已发布 Release 仅 v0.3.0(v0.1.0-0.2.0 的 tag 与 Release 已按要求删除,CHANGELOG 历史条目保留);已发布的 tag 不移动。
+- 桌面映射:`Documents\Rainmeter\Skins\WP7` 是指向本仓库 `WP7\` 的 junction,改仓库即改桌面。
+
+## 常用命令
+
+| 目的 | 命令 |
 |---|---|
-| 本地路径 | `D:\WorkSpace\Omnimo` |
-| `origin` / `upstream` | `OMSociety/Omnimo` / `fediaFedia/Omnimo` |
-| 分支 / 已发布 | `master`（唯一分支）；annotated tag `v0.3.0` + 同名 GitHub Release，是**唯一公开的 Release**（`v0.1.0`、`v0.1.1`、`v0.2.0` 的 Release 与 tag 均已按用户要求删除；`CHANGELOG.md` 里对应的历史条目保留） |
-| 桌面映射 | `C:\Users\<用户>\Documents\Rainmeter\Skins\WP7` 是指向本仓库 `WP7\` 的目录联接（junction） |
+| 核对改动面(提交前必跑) | `git diff --name-status upstream/master -- .` |
+| 查 skip-worktree 标记 | `git ls-files -v` 中找行首 `S` 的条目 |
+| 凭据入库自检(指纹法) | 对 `git rev-list --all -- "WP7/@Resources/Config/Panels/Agenda/UserVariables.inc"` 的每个 blob,比对 Feed 行的"长度 + sha256 前 16 位" |
+| 刷新 Rainmeter 并重发现 | `Rainmeter.exe !RefreshApp`(等约 9 秒) |
+| 激活单个面板 | `Rainmeter.exe !ActivateConfig "WP7\Panels\<Name>" "Item.ini"` |
+| 开日志 | `%APPDATA%\Rainmeter\Rainmeter.ini` 置 `Logging=1`(该文件是 UTF-16LE 且开头 4 字节是坏 BOM;`Logging=0` 与 `Logging=1` 在 utf-16 下等长,直接在字节层替换,别整文件重编码;**验完改回 0**),读 `Rainmeter.log` 抓 `ERRO` |
+| 还原被运行时写脏的文件 | `git checkout -- WP7\Gallery\main.ini WP7\Gallery\scroll.inc` |
 
-**只做四件小事**：① 设置面板 / 保存面板中文化（界面中文，磁贴表面英文）；② 日程同步（只做公开 ICS 订阅，见 §5 第 4 条）；③ 修既有 bug；④ 一点微小的工作。
-**待办同步已由用户决定不做**（不要再实现）。
+改皮肤文件必须用 Python 补丁脚本:二进制读入 → 按嗅探编码解码 → 替换 → 按同一编码写回且 `newline=""`。直接用文本工具写会把 `\r\n` 写成 `\r\r\n`(实测过);控制台是 GBK,`print` 中文会抛 UnicodeEncodeError,结果写 UTF-8 文件再看。编码嗅探顺序:UTF-16LE+BOM → UTF-8+BOM → UTF-8 → cp936 → cp1252;纯 ASCII 文件会同时通过多种编码,另看"是否含 >=0x80 字节"。
 
-**明确不做**：重画视觉；复刻全部面板（`WP7\Panels\` 现有 62 个面板目录）；自建公共控件层；改设计语言；换字体。
+## 架构边界
 
-## 2. 目录解剖与关键文件职责
-
-| 路径 | 作用 | 实测要点 |
-|---|---|---|
-| `WP7\` | 皮肤根 | 子目录 `@Resources` `Background` `Gallery` `Hubs` `Panels` `TextItems`；根下 `Launcher.ini` `LauncherDark.ini` |
-| `WP7\@Resources\Common\Variables\UserVariables.inc` | 全局变量 | ANSI(cp1252)、无 BOM、1239 字节、纯 CRLF；含 `MainLanguage=Chinese`；`SubstituteFeed` 尾部三个替换目标是 cp1252 单字节字符（`ä`=0xE4、`ö`=0xF6、`–`=0x96），故本文件不是纯 ASCII |
-| `WP7\@Resources\Common\Variables\Languages\` | 语言包 | 8 个语言（`English` `Chinese` `German` `Spanish` `Russian` `Dutch` `French` `Portuguese`）+ `lang.inc`（`langcode`、`DominantRSS`） |
-| `WP7\@Resources\Common\Color\color.inc` | 当前主题色 | 纯 ASCII、纯 CRLF；被 523 个配置 include（在语言包之后，故覆盖语言包同名键）。**全库唯一定义 `Padding`/`Opacity`/`Opacity2`/`Globalblurenable`/`Xposition` 的文件**，卡片尺寸由 `Padding` 决定（见 §5 第 15 条） |
-| `WP7\@Resources\Common\Background\Language\` | AutoIt 工具语言 | 每份 33 键 34 行，UTF-16LE+BOM |
-| `WP7\@Resources\Structure\<档位>\Main.inc` | 面板档位底板 | **13 档**：`Circle Double DoubleV HalfDouble HalfSingle Huge HugeV Mini miniCircle Single Square win10 win7`；提供 `[bg]` `[overlay]` `[TextStyle]` `[FullTextStyle]` `[IconStyle]` 与 `TypeW/TypeH/PaddingW/PaddingH` |
-| `WP7\@Resources\Config\Panels\<Name>\` | 每面板配置 | **85 个目录**，各含 `UserVariables.inc`（用户参数）+ `RainConfigure.cfg`（设置界面 schema） |
-| `WP7\Gallery\` | 设置界面（面板库） | `main.ini`、`scroll.inc`（运行时状态）、`panels.inc`（自定义面板清单）、`cat1.inc`…`cat7.inc`（分类登记表）、`Settings\`；5 个子目录 |
-| `WP7\Panels\` | 面板本体 | **62 个目录**，**一档一个文件**（如 `RAM\Item.ini`…`Item4.ini`） |
-| `WP7\@Resources\Graphics\Gallery\mask-*.png` | 面板库图标层 | 4 张：`mask-essential` `mask-shortcut` `mask-textitems` `mask-contrib`，与分类表一一对应 |
-| `AutoIT\` | 配置工具源码 | 9 个 `.au3`（`Config.au3` `ConfigBackground.au3` `PanelCreator.au3`…）+ `build.bat` + `Language\*.cfg` + `Includes\` |
-
-**面板库的三个样式**（定义在 `@Resources\Common\Gallery\Color\Modern\<Dark|Light>\tt.inc`）：`[EssentialPanel]`（常用面板磁贴，`tt.inc:232`）、`[EssentialPanelText]`（`tt.inc:252`）、`[EssentialPanelBlank]`（自定义面板格子，`tt.inc:268`）。
-`[EssentialPanel]` 的动作是 `!ToggleConfig "WP7\Panels\#CURRENTSECTION#" "Item.ini"`，即**磁贴表名 = 面板目录名**（实测）。
-
-## 3. 编码与行尾（最容易翻车）
-
-**实测分布**（`WP7\` 下 `.ini/.inc/.cfg` 共 1562 个）：ASCII 1436；UTF-16LE+BOM 92；ANSI(cp1252) 28；UTF-8 无 BOM 4；UTF-8+BOM 2。
-**行尾**：纯 CRLF 1533；混合 16；单行无换行 9；纯裸 LF 4（均为 UTF-16 的上游文件）。
-**口径**：以上两个分布都是**检出层**（本机 `core.autocrlf=true`）的量；存储层除被 git 判为二进制的文件外全是 LF。`.lua` 不在 `.gitattributes` 覆盖内（该文件只给 `*.ini`/`*.inc` 配了 diff 驱动），所以 `agenda.lua` 在工作树里就是纯裸 LF。
-
-| 抽检文件 | 编码 | 行尾 |
-|---|---|---|
-| `WP7\Gallery\main.ini` | UTF-16LE+BOM（9976 字节） | **裸 CR × 224 + CRLF × 2** |
-| `WP7\Panels\Network\Item.ini` | UTF-16LE+BOM | 混合：CRLF 59 + 裸 LF 164 |
-| `WP7\Gallery\cat7.inc` | UTF-16LE+BOM | 纯 CRLF |
-| `WP7\@Resources\Common\Variables\Languages\Chinese.inc` | UTF-16LE+BOM | 纯 CRLF |
-| `WP7\Gallery\cat1.inc` / `Panels\Volume\Item.ini` | **纯 ASCII** | 纯 CRLF |
-| `WP7\Panels\Agenda\Item.ini` | UTF-8 无 BOM | 纯 CRLF |
-| `WP7\Panels\Agenda\agenda.lua` | UTF-8 无 BOM | 纯裸 LF |
-| `WP7\@Resources\Config\Panels\Agenda\RainConfigure.cfg` | UTF-16LE+BOM | 纯 CRLF |
-
-1. `read` / `edit` / `write` 工具只处理 UTF-8。改皮肤文件**必须**用 Python 补丁脚本：二进制读入 → 按嗅探到的编码解码 → 替换 → 按**同一编码**写回，且写文件时带 `newline=""`；否则 Python 会把 `\r\n` 写成 `\r\r\n`（实测过）。
-2. 控制台是 GBK，`print` 中文会抛 `UnicodeEncodeError`；把结果写进 UTF-8 文件再 `Get-Content -Encoding utf8` 读，或只打印 ASCII。
-3. 嗅探顺序：`UTF-16LE+BOM` → `UTF-8+BOM` → 无 BOM 时试 `utf-8` → `cp936` → `cp1252`。**纯 ASCII 文件会同时通过多种编码**（实测 `UserVariables.inc`、`color.inc`、`cat1.inc`、`Volume\Item.ini`），要另判"是否含 ≥0x80 字节"。
-4. 行尾别用 `$` 锚定的正则（CRLF 下会留下 `\r`，裸 CR 文件更糟），改用 `(?=\r|\n|$)`；用整行匹配时记住行尾可能带 `\r`。
-5. PowerShell 里 `,` 比 `+` 绑得紧（数组字面量要加括号）、反引号是转义符（写 Markdown 反引号会被吃掉）、`|` 在双引号内仍是管道；**复杂替换一律写成 `.py` 文件**，别用 `python -c`。
-
-## 4. i18n 架构
-
-链路（实测）：`Common\Variables\UserVariables.inc` 定义 `MainLanguage` → 各配置用
-`@include1=#@#Common\Variables\Languages\#MainLanguage#.inc` 引入（538 个 `.ini` 这么写）。
-Rainmeter 变量**后写者胜**，include 编号顺序即优先级。
-
-面板的 include 五连（实测 `WP7\Panels\Network\Item.ini`，Agenda 同构）：
-
-```
-@include  = #@#Common\Variables\UserVariables.inc             ; 全局变量
-@include1 = #@#Common\Variables\Languages\#MainLanguage#.inc  ; 语言包
-@include2 = #@#Common\color\color.inc                         ; 主题色
-@include3 = #@#Config\Panels\<Name>\UserVariables.inc         ; 本面板用户参数
-@include4 = #@#Structure\#PanelType#\Main.inc                 ; 档位底板
+```text
+面板 ini(WP7\Panels, 62 目录, 一档一文件)
+  ├─ @include   Common\Variables\UserVariables.inc          全局变量(MainLanguage 在此)
+  ├─ @include1  Common\Variables\Languages\#MainLanguage#.inc   界面语言包
+  ├─ @include2  Common\color\color.inc                主题(Padding/Opacity 唯一定义处)
+  ├─ @include3  Config\Panels\<Name>\UserVariables.inc    面板用户参数
+  ├─ @include4  Structure\#PanelType#\Main.inc        档位底板(13 档)
+  └─ @include5  Agenda 专属:UserVariables.local.inc   私人订阅覆盖(未跟踪)
+AutoIt 工具(AutoIT\*.au3 → 7 个 exe)
+  └─ 读 Common\Background\Varrar.inc 的 Language
+     → 读 Common\Background\Language\<Language>.cfg
 ```
 
-`Gallery\main.ini`：`UserVariables` → `Languages` → `color` → `Common\Gallery\Color\Modern\<Dark|Light>\tt.inc` → `scroll.inc` → `panels.inc` → `<LastCat>.inc`。
+- include 按编号升序生效,变量**后写者胜**;让覆盖生效就放进编号更大的 include。config.exe 在 `UserVariables.local.inc` 存在时把读写都指向该文件(面板缺的键仍回落到 `UserVariables.inc`),见“修改契约”。
+- 界面文案只走 `Languages\*.inc`;AutoIt 工具文案只走 `Background\Language\*.cfg`。`AutoIT\Language\*.cfg` 是源码侧镜像,**运行时无任何读取点**——只改它不会改变任何界面。
+- `Padding`/`Opacity`/`Opacity2`/`Globalblurenable`/`Xposition` 只由 `Common\Color\*.inc` 定义;面板库换主题会用主题文件**整体覆盖** color.inc(OmnimoApp.au3 的 FileCopy),本仓库提交的默认值(Padding=5 等)会被改回该主题自带值——这是有意保留的边界。
+- 磁贴表名 = 面板目录名(`[EssentialPanel]` 定义于 `Gallery\Color\Modern\<Dark|Light>\tt.inc:232`,动作是 `!ToggleConfig "WP7\Panels\#CURRENTSECTION#" "Item.ini"`)。
+- 面板库图标层是 `mask-<类>.png` 按格烤好的 2 倍图,与 cat1..7 磁贴一一对应;列中心 `57,178,300,421,543,664,786,907`,格距 121.43 图内像素 = 磁贴间距 61。
 
-**本 fork 的中文资产**
+## 修改契约(按改动类型)
 
-| 文件 | 内容 |
+- **改 AutoIt 源码**:必须用 `Aut2Exe`(AutoIt 3.3.18.0)重编译**全部 7 个分发 exe**,再注入版本资源;否则修复只停在源码。禁止用 `build.bat`(依赖已下线的 wmic)。Git-Bash 调 Aut2Exe 必须带 `MSYS_NO_PATHCONV=1` `MSYS2_ARG_CONV_EXCL='*'`,且 3.3.18 下不能重定向其 stdout/stderr(会静默 exit 0 不产出);`/nopack` 不能省(默认 UPX 加壳)。
+  - 已验证的参数集:`/in <Src>.au3 /out <绝对路径> /icon <Icons\X.ico> /x86 /nopack /companyname Omnimo /filedescription "<desc>" /internalname <Name>.exe /legalcopyright "Xyrfo 2013" /originalfilename <Name>.exe /comments "Made for Omnimo UI"`。**不要传 `/fileversion` / `/productversion`**:点分写法会弹 "Command Line Parameters" 帮助框,逗号写法只写出 `0,0,0`。
+  - PowerShell 侧必须 `Start-Process -ArgumentList <单个拼接好的字符串>`(传数组报“无法将 System.Object[] 转换为参数 FilePath 所需的类型”);`-WorkingDirectory` 指到 `AutoIT\`,等约 7 秒看 `HasExited`:还活着说明弹了模态框,`Stop-Process` 并判失败。
+  - **版本资源要编译后自己注入**(裸 Aut2Exe 产物没有可读版本号):重建 `VS_VERSIONINFO` 叶(8 个 string entry + `VarFileInfo\Translation`;`wLength`/`wValueLength`/`wType` 在偏移 0/2/4,key 结束补到 4 字节对齐处才是 value 起点——少这一步 Windows 读不出),**放进节表末尾新增的节**。不要搬动已有节:节表按 VirtualAddress 必须单调递增,顺序被打乱会得到 `ERROR_BAD_EXE_FORMAT` 193;改完镜像还必须重算 `OptionalHeader.CheckSum`(不重算同样 193)。注入后每个 exe 比上游多 1024 字节,属预期形态。
+  - 自检:PowerShell 读 `VersionInfo.FileVersion` 应等于本次发布号;再用 `CreateProcess` 带 `CREATE_SUSPENDED` 映射镜像后立刻 `TerminateProcess`——与真实启动同一套校验、零副作用,能区分“资源读得出但加载器拒绝”。本机三个助手脚本(`_omni_build.ps1` / `_omni_vsver.py` / `_omni_loadcheck.ps1`)在仓库外,不随仓库分发。
+- **改面板用户参数**:`Config\Panels\<Name>\UserVariables.inc` 第一行必须是 `[Variables]`——缺段头整文件键被静默忽略,日志只有下游异常。这些文件被跟踪,改完会显示脏,提交前逐个确认。
+- **改私人订阅**:只写 `Config\Panels\Agenda\UserVariables.local.inc`(未跟踪,.gitignore 已覆盖);它经 @include5 与 `UserVariables.inc` **合并**,同名键以后者为准。0.4.0 起 config.exe 自动跟随:同目录存在该文件时 `$VarFile` 指向它,界面另显示一行本地覆盖提示,面板缺的键回落到 `UserVariables.inc`(见 `Config.au3:60-70`、`:407`)——不要再按“设置界面改动不生效”的旧交互缺陷描述它。
+- **改语言文案**:改 `Chinese.inc` 时与 `English.inc` 键集逐键对照(现均 287 键定义/280 唯一键,双向零差);**全库唯一的占位符约定是 `AgendaNoEvents` 的 `%1`(=显示天数),agenda.lua 用 `gsub('%%1', …)` 替换**——不要发明第二种写法;7 个表面键 `Folders` `weather` `Humidity` `Pressure` `Wind` `brightness` `start` 保持英文;右键菜单键跟随语言包,面板名本地化在 cat1..7 的磁贴表覆盖 `Text="#<语言键>#"`。
+- **改面板设置 schema**:`RainConfigure.cfg` 4 行一组(参数名/标题/控件类型/空行),编码 UTF-16LE+BOM;`Checkbox:a:b` 的契约是**未勾选写 a、勾选写 b**(Config.au3:528 写、:553 显示态)——把 `Checkbox:1:0` 读成“勾选=1”会把 `Hidden=#X#` 判反,本仓库曾因此误修过 DigitalClock 两处后回退。
+- **改 cat1..7 磁贴**:增删/移动一格必须同步改 `mask-<类>.png` 图标层(复制相邻字形,不要自画);跨行回流靠 `Y=(1*#ScaleDpi#)R` + `x=(360*#ScaleDpi#)` 行锚点交接。
+- **改 agenda.lua**:Rainmeter 公式里 `**` 是幂运算符(如 `7**#TypeH#`),不是畸形表达式,别“修”;Lua `0` 是真值,判断开关用显式比较;含 `"` 的值必须走**三引号** bang 形式 `!SetOption <meter> <opt> """值"""`(`set()` 已如此实现;Rainmeter 只在三引号形式下保留值内引号,写成 `""` 会报 `Skin "X" does not exist` 且值不变),且 bang 值里的 `[SomeSection]` 会被当段变量替换掉(不存在的段名原样保留);**Rainmeter 按 ANSI(本机 CP936)读 .lua 源**,字符串字面量必须纯 ASCII(中文注释无害),要显示中文只能从变量/ini 取。
+- **改 agenda 渲染样式**:0.4.0 起只剩一套排布——style 3/4 死分支与恒为 1 的 `AgendaStyle` 变量已删除;不要再按“未接线分支”去改 ini/RainConfigure,要加样式请单独提案。
+- **改发版**:fork 发布号只活在 tag + CHANGELOG 标题 + GitHub Release 三处(外加 exe 版本资源);仓库内 `Version=` 字段(Rainstaller.cfg 10.0.4、OmnimoVersion 10.0、Settings 6.0.1、RMSKIN.inc 1.0)属上游自有体系,不要动。
+
+## 禁止操作
+
+- 禁止把私人日历订阅 URL 写进任何被跟踪文件、脚本或文档——公开订阅链接本身就是凭据。自检用 `git rev-list --all -- <路径>` 逐 blob 以"长度 + sha256 前 16 位"指纹比对;**不要**用 `git log -S'<关键词>'` 做这条自检——关键词随本文档入库后必然自匹配,永远失败(实测命中 8853d7bb)。
+- 禁止提交被运行时改写的文件:`WP7\Gallery\main.ini`、`scroll.inc`、`Intro\save.inc`、`MultiManager\TimeSettings.inc`、`MultiManager\Saved\*\`。原因:Rainmeter 运行时改写,提交进去是本机状态。误改用 `git checkout --` 还原。
+- 禁止手改 7 个 exe,或只改 .au3 不重编译就发版。原因:用户运行的是二进制,源码修复不重编译等于没修(上游 config.exe 曾与源码漂移两年)。
+- 禁止为"修语义反转"改 `Hidden=#ShowSeconds#` / `Hidden=#ShowExternalIP#` 一类写法。原因:前者配 `Checkbox:1:0`(勾选写 0,启用即显示,正确);后者是外网/内网 IP 同位互换设计(靠 `Formula=-1*#ShowExternalIP#+1` 反转配合)。改前先读该面板 RainConfigure.cfg 的 Checkbox 规约与相邻 Calc 公式。
+- 禁止"顺手修复"上游遗留死文件:`Languages\Backup\`、`lang.inc`、`Common\Settings\UserVariables.inc`(只有写入者无读取者)、`Config\Panels\Radio\`(上下游都无 Radio 面板)。原因:属上游历史形态,清理需单独提案,混进功能改动会污染 diff。
+- 禁止在文档与提交里放凭据、真实邮箱;对外文档零 emoji,提示块用 `> **注意:**`;commit message 用英文说清 Why,一个提交只做一件事。
+- 面板 ini 的 `License=` 统一写 `Creative Commons Attribution-Noncommercial-Share Alike 3.0 License`;不许改动 `TextItems/Search/` 三份 NoDerivs 文件的许可声明。
+
+## 验收标准
+
+改动完成 = 下列全部通过(无 CI,以本清单为准):
+
+1. `git diff --name-status upstream/master -- .` 改动面与意图一致,不含运行时文件与 exclude 列出的被跟踪文件。
+2. 改过 `.au3`:7 个 exe 重编译并重新注入版本资源,PowerShell 读 `VersionInfo.FileVersion` 全部等于本次发布号,且 7 个都通过 `CREATE_SUSPENDED` 可加载性自检。
+3. 动过皮肤行为:开日志实机验证,无新增 `ERRO`(基线噪声:`OverlayBorder\none0.png` 缺图、变量为空时的 `ImageName: Unable to open: …\OverlayBorder\`、`FrostedGlass.dll` 缺失);**验完把 `Rainmeter.ini` 的 `Logging` 改回**;视觉对比用差异像素占比给阈值(本仓库实测参考:滚动生效 14.2%,静置回顶 0.04%),截图前把光标移离面板(底板 MouseOverAction 会改 tint)、等 WebParser 完成。
+4. 发版一次闭口:改动全提交 → `git tag -a vX.Y.Z -m "…"` → `git push origin master vX.Y.Z` → `gh release create vX.Y.Z -R OMSociety/Omnimo`(双 remote 下 `gh` 必须显式 `-R`,否则默认解析到 upstream);Release 正文 = 一句中文摘要 + CHANGELOG 对应小节原文(中英两段照抄)。
+
+## 已知风险区
+
+| 位置 | 风险(历史踩过) | 前置动作 |
+|---|---|---|
+| agenda.lua 数据通路 | WebParser `Download=1` 时字符串值是下载文件路径,不是正文(实测 58-64 字符);必须 `RegExp=(?s)^(.*)$` + `StringIndex=1` 整页捕获 | 改数据通路前读本表与"修改契约" |
+| agenda.lua 窗口计算 | 0.4.0 起窗口 = **恰好 `RangeDays` 个日历日**(闭区间,`hi = addDays(today, RangeDays-1)`),不再是“从今天起 N 天之后”的定长推进;老配置 `RangeDays=6` 由 7 天变 6 天是有意的行为变更 | 改窗口逻辑先读 CHANGELOG 0.4.0 |
+| agenda.lua 的 TZID 偏移表 | 表内是**标准时偏移**,夏令时期间偏 1 小时(实测 10 月的 `America/New_York` 9am 显示 22:00 而非 21:00);未知 TZID 按本机墙上时间显示并只记一次 Notice | 改表前读 CHANGELOG 0.4.0;不要引入完整 IANA 库 |
+| agenda.lua 每秒门控 | `Update()` 里的 `parseKey`/`renderKey` 两级缓存不能拆(实测 23 次 tick 只解析 1 次、渲染 1 次;旧代码每 tick 推约 120 条 bang) | 验证用仓库外探针皮肤:让 `ScriptFile` 直指本文件 + 本地 .ics fixture,读数只能用 `SKIN:GetMeter('Row1'):GetOption('Text')`(`[Row1]` 在 bang/Measure 字符串里不会被替换) |
+| `[Clip]` 裁剪 | 被指定为 Container 的表自身不绘制,拿 `[bg]` 当遮罩会让磁贴背景消失 | 另建不透明独立遮罩表(Agenda 的 [Clip] 即此法) |
+| RainConfigure.cfg | 第 4 行非空且不是 `[Options]` 会弹 "Unable to read RainConfigure.cfg";每组后必须留空行 | 改 schema 前按 4 行一组逐行核对 |
+| 新建皮肤目录 | 不 `!RefreshApp` 直接 ActivateConfig 找不到 | 先 RefreshApp 再 Activate |
+| `git add -A` | exclude 清单里的 5 个被跟踪文件(Common/Variables/UserVariables.inc、WeatherCom 两件、color.inc、Colors.inc)不受 exclude 保护,运行时改写后会被暂存 | 提交前逐文件确认;exclude 只对未跟踪文件生效 |
+| 大网格自动排布 | 5x5-9x9 曾因行计数器混用叠进同一列(0.3.0 已修 ActivePanels.au3 与 OmnimoApp.au3) | 改排布逻辑两处源码必须同步改 |
+| 本文件引用的行号 | Config.au3 的写盘/显示态在 528/553(0.3.0 前后文档写过 458/507、471/520;本地覆盖回落读 base 在 407) | 引用行号前现查,不凭记忆 |
+
+## 出错怎么办
+
+| 症状(可检索片段) | 处理 |
 |---|---|
-| `Languages\Chinese.inc` | **284 键**（与 `English.inc` 键数一致、行序一致），UTF-16LE+BOM；界面/菜单中文、磁贴表面英文；已是默认 `MainLanguage` |
-| `Common\Background\Language\Chinese.cfg` | 33 键，与同目录 `English.cfg`（33 键）键名同序 |
-| `AutoIT\Language\Chinese.cfg` | 33 键（同目录 `English.cfg` 31 键，实测源码侧多 `Apply`、`Reset`） |
-| 8 份语言包的 `PanelAgenda` 键 | 中文包＝`日程`，其余＝`Agenda`（用于面板名本地化） |
+| `12006` / `未使用可识别的协议` | 面板配置 inc 缺 `[Variables]` 段头,或 Url 变量未定义;查 include 顺序与变量拼写(变量名不区分大小写) |
+| `Unable to parse line`(报错行落在 Include) | 解释器低于 3.3.10:现行 WinAPI UDF 含三元运算符;换 3.3.18.0,别去改自己的代码 |
+| `Unable to read RainConfigure.cfg` | schema 格式坏,见已知风险区 |
+| Aut2Exe 弹模态错误框 | 源码或参数错;逐源独立调用修参数 |
+| Aut2Exe 静默 exit 0 且无产物 | 重定向了 stdout/stderr;去掉 `>log 2>&1` 重跑 |
+| `not a valid application for this OS platform` / 193 | 注入版本资源时搬动了已有节(节表 VirtualAddress 不再单调递增),或改完镜像没重算 `CheckSum`;改为在节表末尾追加新节 + 重算校验和 |
+| Aut2Exe 弹 "Command Line Parameters" 帮助框 | 传了 `/fileversion 6.0.0.0` 这类点分写法;去掉版本参数,版本号编译后注入。`Start-Process -ArgumentList` 传数组也会报类型错,必须传单个拼接字符串 |
+| `tag exists locally but has not been pushed` | `gh` 解析到了 upstream;命令补 `-R OMSociety/Omnimo` |
+| 截图每张都不同 | 半透明面板透出动态壁纸/亚像素抖动;关动态壁纸,用差异像素占比判据,别要求逐字节相同 |
+| Python 写回后文件行尾全乱 | `\r\n` 被写成 `\r\r\n`;补丁脚本加 `newline=""` 重写 |
 
-**界面键与磁贴表面键的划界规则**（生成 `Chinese.inc` 的依据）：
+## 维护
 
-```
-翻成中文的键 = (设置界面用到的键 ∪ 右键菜单用到的键) − (磁贴表面可见 Text= 用到的键)
-```
-
-判"可见"要跳过整段 `Hidden=1` 的表（`Hidden=` 常写在 `Text=` 之后，须整段读完再判）。**刻意保持英文的 7 个键**：`Folders` `weather` `Humidity` `Pressure` `Wind` `brightness` `start`——它们出现在磁贴表面，而表面按英文宽度排版；这 7 个都不在右键菜单里，所以菜单仍可全中文。
-
-**覆盖率现状（已按产品决策收敛，别再"补全"）**：`Chinese.inc` 284 键中 143 个值含中文；剩余未译＝上面那类刻意英文的表面键（含 Donate 面板的作者留言）∪ 全库无消费方的上游死键（`ChangeColors`/`RefreshAll`/`SidebarColors` 等），不算遗漏。设置界面与功能提示类 21 键（含 `24HourTime`、`Missing1`）已在 0.3.0 前补齐。
-
-**面板名本地化**：面板库磁贴默认取 `Text=#CURRENTSECTION#`（即目录名，英文）。要本地化就在登记表里覆盖：`[Agenda]` 加 `Text="#PanelAgenda#"` 与 `ToolTipText=#PanelAgenda#`（实测生效，中文界面显示「日程」）。
-
-## 5. Rainmeter 机制坑（每条都有实测依据）
-
-| # | 坑 | 现象 | 正解 |
-|---|---|---|---|
-| 1 | `@include`/`@include1..N` 按数字升序生效 | 后写覆盖先写 | 要让某个覆盖生效，就把它放在编号更大的 include 里 |
-| 2 | 变量名**不区分大小写** | `TextItems` 与 `textitems` 是同一个变量 | 改一个键要改掉所有拼写（按小写比对） |
-| 3 | Lua 里 **`0` 是真值** | `if compact then` 对 `compact=0` 也成立 | 显式比较：`if compact == 1 then` |
-| 4 | `MeasureWebParser` 底层 `InternetOpenUrl`，**只能 GET** | 需 PROPFIND 的 iCloud 私密 CalDAV 做不了 | 只做公开 ICS 订阅；面板里把 `webcal://` 改写成 `https://` |
-| 5 | WebParser 取正文 | `Download=1` 时字符串值是**下载文件路径**（实测仅 58~64 字符） | 用 `RegExp=(?s)^(.*)$` + `StringIndex=1` |
-| 6 | Container 语义 | 被指定为 Container 的表**自身不绘制**（拿 `[bg]` 当遮罩 → 磁贴背景消失）；它是**按像素做 alpha 蒙版**（遮罩 alpha≈0 → 内容全被蒙掉） | 裁剪要**另建不透明的独立遮罩表**再 `Container=` 指向它（Agenda 的 `[Clip]` 即此法） |
-| 7 | 档位几何来自 `Structure\<档位>\Main.inc` | 尺寸算错会露出边界 | `Height=150` 为基准单位，`#Height#*TypeW/TypeH`；那个 `+10` **只加在长边**（`double` 只加宽、`doubleV` 只加高） |
-| 8 | **被 include 的配置 inc 必须自带 `[Variables]` 段头** | 缺段头时其中的键不属于任何段、被**静默忽略**；日志不报 include 错，只有下游异常（实测：WebParser 报 `ErrorCode=12006 URL 未使用可识别的协议`，诊断表原样打出 `#Feed1#`） | `Config\Panels\<Name>\UserVariables.inc` **第一行写 `[Variables]`** |
-| 9 | **`RainConfigure.cfg` 的格式是死的** | 4 行一组：参数名 / 界面标题 / 控件类型 / **空行**；`Config.au3:162-188` 读第 4 行，非空且不是 `[Options]` 就弹「Unable to read RainConfigure.cfg」 | 每组后面**必须留空行**；尾段 `[Options]` + `Colorizable=1`（`$Colorizable` 取 `[Options]` 下一行最后一个字符）；编码用 UTF-16LE+BOM |
-| 10 | 滚轮的正规接法 | 面板滚不动 | 在 `[Rainmeter]` 段写 `MouseScrollUpAction=` / `MouseScrollDownAction=`（范例 `Panels\Volume\Item.ini:12-13`）。另注：**面板库自身也带滚轮动作**（`Gallery\cat1.inc:23/24/34`）且窗口几乎占满屏幕，面板库开着时滚轮会被它吃掉 |
-| 11 | `Rainmeter.ini` 记的是哪一档 | 多文件面板重开时档位不对 | `Active = 文件序号 + 1`（源码 `Library\Rainmeter.cpp:1157-1159`：`ActivateSkin(*iter, skinFolder.active - 1)`）；配置段的 `WindowX`/`WindowY` 是窗口屏幕坐标（源码 `Library\Skin.cpp:2243-2244`） |
-| 12 | 面板库常用面板那排是**两层**的 | 插/删一格磁贴，后面的图标全错位 | 磁贴是 `catN.inc` 手写的 String 表；图标是 `mask-<类>.png` 里**按格烤好的 2 倍图**，由 `[Cat1Mask]` 类表 + `imagetint=#textcolor2#` 绘制。**增删/移动磁贴必须同时改两处**，几何见 §6 路线 A 第 6 步 |
-| 13 | 往磁贴之间插辅助表 | 其后所有区块的标签整体偏移 | 相对定位（`Y=...R`/`X=...r`）只看**文件里上一个表**。辅助表要放**文件末尾**并用 `[表名:X]`/`[表名:Y]` 绝对定位 |
-| 14 | 新建的皮肤目录 | 启动后新目录不被发现 | 先 `!RefreshApp`，再 `!ActivateConfig` |
-| 15 | **每套主题自带 `Padding`，它决定所有卡片的尺寸** | 换版本或换主题后，所有面板看起来「缩了一圈」 | 卡片宽度公式是 `(#Height#+(#Padding#*2))*#ScaleDpi#`，而 `Padding` **只由主题文件** `@Resources\Common\Color\*.inc` 定义（`Structure\*\Main.inc` 与 85 个面板配置里都是 0 处，实测），所以它直接生效、不会被覆盖。master 的 33 套主题取 0（少数取 3 或 4），而 Omnimo 10 Lite 里用户桌面用的那套取 5 —— 差 10 逻辑像素，且卡片还内缩 5px（`X=(5-#Padding#)`）。本仓库已把该文件的当前值提交为默认（`Padding=5`、`Opacity=50`、`Opacity2=240`、`Globalblurenable=0`、`Xposition=10`）；注意**在面板库换主题会把 `Padding` 改回那套主题自带的值**（master 的主题多为 0，少数 3/4） |
-| 16 | **`RainConfigure.cfg` 的 `Checkbox:a:b` 是「未勾选写 a、勾选写 b」** | 把 `Checkbox:1:0` 读成"勾选=1"会把 `Hidden=#X#` 的语义判反（本仓库因此误"修"过 DigitalClock 两处） | 源码 `Config.au3`：`StringSplit` 后 `VarOpts[2]=a`、`VarOpts[3]=b`；写盘 `_WriteOption` 勾选取 `VarOpts[3]`、未勾选取 `VarOpts[2]`（实测行 458），显示态 `$value == VarOpts[3]` 即勾选（行 507）。推论：`Checkbox:1:0` 的变量**勾选启用时值为 0**，`Hidden=#X#` 恰好是"启用即显示"；判断 `Update=#X#1000` 这类拼接也要按真实取值展开（`0`→`01000`→十进制 1000，Rainmeter 源码 `wcstol(…, 10)`，前导零不是八进制） |
-
-## 6. 新增一个面板的标准流程
-
-**路线 A：进「常用面板」那排（改视觉才走这条：手写磁贴 + 图标层）**
-
-1. 建 `WP7\Panels\<Name>\`，**一档一个文件**（`Item.ini` `Item2.ini` `Item3.ini`…）。每个文件 `[Variables]` 至少要有 `Height=150` 与 `PanelType=<档位>`；档位名取 `Structure\` 下的目录名（上游大小写混用：`Single`/`single`、`DoubleV`/`doubleV` 并存，Windows 上都能用，新写统一小写更稳——**（推论）**跨平台会踩）。
-2. 头部骨架照抄 `Panels\Agenda\Item.ini` 或 `Panels\Network\Item.ini`：`DragGroup=WP7Panel`、`Group=Panel`、`Author=`、`MouseActionCursor=0`、`MiddleMouseUpAction=!DeactivateConfig`、`Blur=#globalblurenable#`、`BlurRegion=#blurtype#,(5-#Padding#),(5-#Padding#),<卡片宽>,#blurcornerradius#`（宽高按 §5 第 7 条算），以及 §5 第 10 条的滚轮动作。
-3. `[Rainmeter]` 里写标准右键菜单：`RightMouseUpAction=[!SkinCustomMenu]`，`ContextTitle/ContextAction` 成对写，分隔线用 `ContextTitleN=----`；菜单文字取语言包键（`#Settings#` `#Refresh#` `#Close#` `#Alternative#`…）因此随 `MainLanguage` 切换。`#Settings#` 的动作是
-   `["#@#Common\Config\config.exe" #PanelType# "#CURRENTCONFIG#" "#CURRENTFILE#" "#SETTINGSPATH#" "#SKINSPATH#"]`。
-4. include 顺序照 §4 的五连写。
-5. 用户参数与设置界面：`WP7\@Resources\Config\Panels\<Name>\UserVariables.inc`（**第一行 `[Variables]`**，见 §5 第 8 条）+ 同目录 `RainConfigure.cfg`（格式见 §5 第 9 条）。
-6. 在对应登记表（`WP7\Gallery\cat1.inc`…`cat7.inc`）加**与目录同名的表**，并**同时改图标层**：
-
-```
-[<Name>]
-Meter=String
-MeterStyle=EssentialPanel
-solidcolor=#colorskin# ,215
-Text="#<语言键>#"          ; 可选：本地化磁贴名
-ToolTipText=#<语言键>#     ; 可选
-```
-
-   - 图标层几何（实测）：`mask-<类>.png` 是 2 倍图，**列中心 `57,178,300,421,543,664,786,907`**（格距 121.43 图内像素 = 60.92 逻辑像素，等于磁贴间距 61），**格子 = 中心 ± 60.7**；行中心按内容带实测，如 `mask-essential.png` 的时间与日期第 1/2 行 = **391 / 513**，信息第 1/2 行 = **717.5 / 838.5**。
-   - 改字形请**复制它自己的字形**（例如日历取自该图 Date 那格），不要自己画。
-   - **跨行回流靠"行锚点"**：默认所有磁贴横向排（`X=(61*#ScaleDpi#)r`），谁"另起一行"就看谁带 `Y=(1*#ScaleDpi#)R` + `x=(360*#ScaleDpi#)`。增删磁贴时把这组锚点交接给下一个磁贴，并同步搬移图标层字形（整段左移一格、末尾清空）。
-
-**路线 B：进「自定义面板」（内容型面板走这条，源码 `AutoIT\PanelCreator.au3` 就是这么干的）**
-
-1. 图标放**面板自己的目录**：`WP7\Panels\<Name>\<Name>.png`（源码第 446 行给面板配置写 `IconLocation=<Name>.png`）。
-2. 在 `WP7\Gallery\panels.inc` 追加三元组（源码第 291 行 `IniWrite($PanelsInc,"Variables","Icon"&$i, $foldername&'.png')`）。`panels.inc` 现状只有 `TaskManager` 一组，序号从 2 起：
-
-```
-Name2=Example
-Path2=Example
-Icon2=Example.png
-```
-
-   注意 Agenda **不走这条路**：它已按路线 A 登记进 `cat1.inc` 的常用面板排，`panels.inc` 里的 Agenda 条目是早期尝试的残留，已删除（该文件与上游净 diff 为零）。
-3. 前端在 `cat4.inc`（自定义面板）：`[c2] Meter=Image / MeterStyle=EssentialPanelBlank / ImageName="#ROOTCONFIGPATH#Panels\#Path2#\#Icon2#" / LeftMouseUpAction=!ToggleConfig "WP7\Panels\#Path2#" "Item.ini"`。格子通用，**增删不会错位**。
-4. 删除面板时两处都要清（源码第 52-57 行：`DirRemove` 面板目录 + `IniDelete` 该条 + `!Refresh WP7\Gallery`）。
-
-两条路线通用的许可写法：面板 ini 的 `License=` 统一写 `Creative Commons Attribution-Noncommercial-Share Alike 3.0 License`（与 `THIRD-PARTY.md` 的分层一致）。
-
-## 7. 验证方法（靠实测，不靠推断）
-
-1. **先备份** `%APPDATA%\Rainmeter\Rainmeter.ini`，在 `[Rainmeter]` 段置 `Logging=1`，刷新后读 `%APPDATA%\Rainmeter\Rainmeter.log` 抓 `ERRO`；收尾时还原 ini 并逐字节比对。项目本就存在的噪声：`OverlayBorder\none0.png` 缺图、`FrostedGlass.dll` 缺失（`Plugins\` 目录为空），与本 fork 的改动无关。
-2. 激活：`Rainmeter.exe "!RefreshApp"` → 等约 9 秒 → `Rainmeter.exe "!ActivateConfig" "WP7\Panels\<Name>" "Item.ini"`。
-3. 取窗口：类名 `RainmeterMeterWindow`，标题含配置路径；`GetWindowRect` 定位后 `CopyFromScreen` 截图（进程需 DPI 感知：`SetThreadDpiAwarenessContext(-4)`）。
-4. **比对判据的两个前提**：内容加载完成（WebParser 是异步的，早拍会拍到"数据还在进入"的画面）；**把光标移离面板**（底板 `[bg]` 的 `MouseOverAction` 会改卡片 tint）。违反任一条都会得到假阳性。
-5. 判据选择：验证状态量（如 `Active`）直接读变量最稳；视觉问题用图像比对，但**面板是半透明的**（透出壁纸），亚像素渲染抖动会让「逐字节相同」永远不成立——实测两张「稳定」截图仍有 0.04% 的像素差。正确做法是算**差异像素占比并给阈值**：实测滚动生效 = 14.2%，静置回顶 = 0.04%。另外，测试期间要关掉**第三方动态壁纸**（实测：动态壁纸每帧都在变，会让半透明面板的每张截图都不同；面板库里的 Slideshow 面板不是原因）。收尾：`!DeactivateConfig`；`git checkout -- WP7\Gallery\scroll.inc WP7\Gallery\main.ini`（它们会被运行时写脏）。
-
-## 8. 凭据与隐私纪律
-
-日历订阅链接（`https://…/published/2/…`）**本身就是凭据**：拿到链接的任何人都能读那份日历。
-
-1. **绝不写进仓库、脚本或文档**。测试时以命令行参数传入，落点只能是本地忽略目录；测完重新生成并全文检索确认干净。自检要用**不自我匹配**的判据：`git log -p --all -- "WP7/@Resources/Config/Panels/Agenda/UserVariables.inc"` 里 `Feed1=` 的取值只应出现本条第 2 款的公开默认源；快速比对用「值长度 + sha256 前 16 位」的指纹即可。**不要**用 `git log -S'<关键词>' --all` 当这条自检：关键词会随本文档一起进提交，检索必然命中引入它的那次提交（实测命中 `8853d7bb`），自检永远失败；同理不要把任何检索字面量写进文档。
-2. 仓库里带的默认订阅必须是公开源（实测可用：`https://www.officeholidays.com/ics/china`、`…/south-korea`、`…/hong-kong`）。Apple 的 `calendars.icloud.com` 是 gzip 传输，Python 直取会拿到二进制（实测），不适合做默认。
-3. `.git/info/exclude` 实际内容（本机生效、不入库）：
-
-```
-WP7/@Resources/**/UserVariables.inc
-WP7/@Resources/**/Varrar.inc
-WP7/@Resources/Common/hue.ini
-WP7/@Resources/Common/Color/color.inc
-WP7/@Resources/Common/Weather/WeatherComVariables.inc
-WP7/@Resources/Common/Weather/WeatherComJSONVariables.inc
-WP7/@Resources/Common/PanelCreator/Resources/Colors.inc
-WP7/Gallery/MultiManager/Saved/
-WP7/Gallery/main.ini
-WP7/Gallery/scroll.inc
-WP7/Gallery/Intro/save.inc
-
-# 日程面板的本地订阅覆盖（含真实订阅链接＝凭据，绝不提交）
-WP7/@Resources/Config/Panels/Agenda/UserVariables.local.inc
-```
-
-4. **exclude 只对未跟踪文件生效**：已跟踪文件照旧出现在 `git status`，也不受它保护。改这些文件的默认值要 `git add -f`（已这样提交过 `Common\Variables\UserVariables.inc`、`Config\Panels\Network\UserVariables.inc`）。
-5. 本地已对下列文件打 **`skip-worktree`**（`git ls-files -v` 显示 `S`）：这些是**会被用户或运行时改写**的已跟踪文件，标记后既不显示为脏、也不会被误提交。撤销用 `git update-index --no-skip-worktree <路径>`。
-
-```
-WP7/@Resources/Config/Panels/WorldClock/UserVariables.inc      # 面板会写成运行机器所在时区
-WP7/Gallery/MultiManager/TimeSettings.inc                      # 布局保存的运行时状态
-WP7/@Resources/Config/Panels/Slideshow/UserVariables.inc       # 用户本机的图片目录与播放参数
-WP7/@Resources/Config/TextItems/MultiManager/UserVariables.inc # 各布局格的保存标记
-WP7/Gallery/MultiManager/Saved/2/screenshot.png                # 布局保存时生成的缩略图
-```
-6. `Config\Panels\Network\UserVariables.inc`（`PingURL`）等同理：这类"用户参数文件"都是已跟踪的，改动会显示为脏，提交前逐个确认。
-7. **私人订阅走本地覆盖 include，不再靠 skip-worktree**：`Config\Panels\Agenda\UserVariables.local.inc`（未跟踪；忽略规则写进**入库的 `.gitignore`**，故任何 clone 都成立，本机 `.git/info/exclude` 里的同名条目是冗余副本）由 `Panels\Agenda\Item/Item2/Item3.ini` 的 `@include5` 引入，覆盖 `@include3` 的公开默认。该文件缺失时皮肤照常加载并回落公开源（实测：移除后刷新显示 officeholidays 公开假日、无报错；放回后渲染与基线逐像素一致）。已跟踪的 `Config\Panels\Agenda\UserVariables.inc` 因此保持公开默认、无 skip-worktree 标记。
-
-## 9. 提交与发版规范
-
-1. commit message 用**英文**，说清 **Why**，不罗列 What；一个提交只做一件事。
-2. 改动面用 `git diff --name-status upstream/master -- .` 核对，别把 §7 第 5 条提到的运行时文件带进去。
-3. 对外文档**零 emoji**：表格与标题写纯文本，提示块用 `> **注意：**`；代码块里程序真实输出的字面量逐字保留。
-4. 许可分层：软件 **GPL-2.0**（`LICENSE`），图像/媒体 **CC BY-NC-SA 3.0**（各面板 ini 的 `License=`）；逐文件声明优先，细节与未决项见 `THIRD-PARTY.md`。
-5. 发版看 `CHANGELOG.md` 的体例；无 CI 的仓库发版＝**版本号 + CHANGELOG + tag + Release 一次闭口**：先把改动全部提交，再 `git tag -a vX.Y.Z -m "…"`、`git push origin master vX.Y.Z`、`gh release create vX.Y.Z -R OMSociety/Omnimo --title "vX.Y.Z" -F <说明文件>`。已发布的 tag 不要移动。
-   - **`gh` 的仓库级子命令必须显式 `-R OMSociety/Omnimo`**：双 remote 下 `gh` 默认解析到 `upstream`（fediaFedia/Omnimo），会报 "tag exists locally but has not been pushed" 或干脆操作错仓库（实测）。`git push` 走 `origin`，不受影响。
-   - Release 正文的体例＝一句中文摘要 + `CHANGELOG.md` 对应小节的原文（该小节自带中文段与英文段，**正文即双语，两段照抄、不删英文**；摘要风格照 v0.3.0）；写完核一下 GitHub 上存的是合法 UTF-8（本地终端是 GBK，直接看输出会是乱码，别据此判断写坏了）。
-   - 撤下一个版本（用户要求"移除 vX.Y.Z"）＝删 Release + 删远端与本地 tag；删前把 tag message 与 Release 正文备份到仓库外，`CHANGELOG.md` 的历史条目**保留**，并在 §1 的「已发布」行注明。
-6. **重编译分发 exe（改过 `AutoIT\*.au3` 就必须做，否则修复只停在源码）**：工具链是 AutoIt **3.3.18.0** 的裸 `Aut2Exe`，命令形态锁定为
-   `MSYS_NO_PATHCONV=1 MSYS2_ARG_CONV_EXCL='*' Aut2exe.exe /in X.au3 /out <win路径> /icon <ico> /x86 /nopack`
-   - 随仓库分发的只有 **7 个** exe（`Uninstall.au3`/`miniShell.au3` 不产出分发件）。
-   - **解释器下限由 Include 决定，不是由项目源码决定**：`ActivePanels.au3`/`MultiManager.au3` 引的现行 `WinAPIConv.au3`/`WinAPIFiles.au3`/`GDIPlus.au3`/`ScreenCapture.au3` 已用三元运算符，3.3.8.1 直接 `Unable to parse line`，报错行落在 Include 里，别误判成自己的代码坏了。
-   - **不能用 `build.bat`**：它走 `AutoIt3Wrapper` 且依赖已下线的 `wmic`；官方 3.3.18 完整安装包**也不含 wrapper**。
-   - `/nopack` 不能省：`Aut2Exe` 默认 UPX 加壳，`/comp 0` 仍加壳。
-   - 缺了 `MSYS_NO_PATHCONV=1 MSYS2_ARG_CONV_EXCL='*'`，Git-Bash 会把 `/in /out /icon` 当 POSIX 路径改写，程序收到烂参数后**弹 GUI 挂住 shell**；同理别对 GUI 子系统 exe 跑 `/?`。**3.3.18 下不能重定向它的 stdout/stderr**（`>log 2>&1` 会静默 exit 0 且不产出 exe），逐个源码独立调用；编译错误本身会弹模态 "Aut2Exe Error" 对话框，用户在打游戏时别这么干。
-   - 裸 `Aut2Exe` **忽略** `#AutoIt3Wrapper_Res_*` 指令、且 3.3.18 下**完全不写版本资源**，所以版本号要靠事后注入：仓库外 `omni_stamp_all.ps1 -Ver <x.y.z.0>`（内部调 `omni_stamp_ver.ps1`，用 `UpdateResource` 写 RT_VERSION）把 7 个 exe 原地盖成发布号并回读校验。`FileVersion`/`ProductVersion` 是纯 PE 元数据，这些工具运行时不读，**与仓库里的 `Version=` 字段无关**（后者是上游自有一套：Rainstaller.cfg 10.0.4、OmnimoVersion 10.0、Settings 6.0.1、RMSKIN.inc 1.0，别去改）。
-   - 验收用对照编译：把修复前源码（`git show <fix前commit>:AutoIT/<x>.au3`）也编一份，其 sha 应 ≠ 分发 exe，证明源码修复确已嵌入。上游构建的版本资源本来就不统一（`ColorChanger.exe` 带 `6.0`、4 个是 3.3.8.1 产物、2 个无版本资源），细节见 `THIRD-PARTY.md` §3。
-7. **fork 的发布号只活在 tag + CHANGELOG 标题 + GitHub Release 三处**，改版本号＝改这三处（外加 exe 的版本资源，见第 6 条），别去动仓库里的 `Version=`。
-8. **保护性忽略规则要写进入库的 `.gitignore`**，不能只放 `.git/info/exclude`（后者别的 clone 拿不到）；理由与实例见 §8 第 7 条。
-
-## 10. 当前状态与未决项
-
-**相对 `upstream/master`（已提交，实测）：新增 14 / 修改 60 / 删除 16**
-
-| 类别 | 内容 |
-|---|---|
-| 新增 | `LICENSE`、`THIRD-PARTY.md`、`AGENTS.md`、`CHANGELOG.md`、`Languages\Chinese.inc`、皮肤侧与源码侧两份 `Chinese.cfg`、`Panels\Agenda\`（`Item/Item2/Item3.ini` + `agenda.lua` + `Agenda.png`）、`Config\Panels\Agenda\`（`UserVariables.inc` + `RainConfigure.cfg`） |
-| 修改 | 27 个面板文件（缺陷修复：13 处删去悬挂的 `!CommandMeasure GetMhz "Run"`、Slideshow/DigitalClock 各尺寸档 `Height` 对齐、Volume 进度条居中、Network/DigitalClock4 若干表达式与 `Hidden`）、7 份语言包（补 `PanelAgenda` 键；第 8 份中文包是新增文件）、`Gallery\cat1.inc`（Agenda 磁贴落在时间与日期第 2 行；Corona 移除后整段回流）、`Gallery\cat7.inc`（语言列表「简体中文」取代 `[Help Translate]`）、`Gallery\Intro\intro.ini`、`Graphics\Gallery\mask-essential.png`（图标层）、`Common\Variables\UserVariables.inc`（`MainLanguage` 与 `SubstituteFeed` 编码修复）、`Config\Panels\Network\UserVariables.inc`（默认 ping 改字面 IP）、`Common\Color\color.inc`（默认主题改为桌面所依据的那套值）、`AutoIT\` 下 10 个源码文件（`OmnimoApp.au3`/`Config.au3` 各一处行为缺陷修复，加上覆盖全部工具的加固 pass——参数个数检查、数组上限、面板删除路径校验、`Execute()` 限制、5x5–9x9 布局计数器、`@ScriptDir` 路径锚定、`build.bat` 去 wmic、卸载器 `WP7` 标记校验——已全部编译进分发二进制，工具链与坑见 §9 第 6 条）、7 个 exe（`OmnimoApp.exe`、`config.exe`、`ColorChanger.exe`、`ConfigBackground.exe`、`PanelCreator.exe`、`ActivePanels.exe`、`MultiManager.exe`；AutoIt 3.3.18.0 重编译产物，FileVersion/ProductVersion 盖为 `0.3.0.0`）、`.gitignore`（忽略 Agenda 私人订阅本地覆盖 `UserVariables.local.inc`，规则入库故任何 clone 都成立）、`readme.md` |
-| 删除 | `Panels\Corona\`、`Config\Panels\Corona\`（共 10 个文件，用户要求删；`cat1.inc` 与图标层已同步回流）、`@Resources\Fonts\` 下 6 个 Microsoft Segoe `.ttf`（不可再分发、皮肤从不加载，见 `THIRD-PARTY.md` §4）——合计 16 |
-
-**已实机验证**：设置界面 7 页中文且无溢出；语言列表出现「简体中文」；面板右键菜单全中文；Agenda 面板在面板库可见可加、卡片裁剪正确、订阅抓取成功（日志无 12006）、真实滚轮滚动生效（差异像素占比 14.2%）且静置回顶成立（0.04%）；网络面板显示真实延迟；桌面布置与备份逐面板对齐（含尺寸）；被修表达式在日志中的报错消失。
-**未做实机验证**：0.3.0 重编译的 7 个 exe 只过了 `Au3Check`、编译无错与版本资源回读，**没有做 GUI 功能实测**（发布时桌面被占用，不便弹窗）；下次动到这些工具时顺手跑一遍。
-
-| # | 未决项 | 现状 |
-|---|---|---|
-| 1 | AutoIt 工具默认语言 | 保持英文（运行时值），用户需在设置界面选一次「简体中文」 |
-| 2 | 7 个表面键保持英文 | 见 §4；设置界面里对应 7 格也随之显示英文 |
-| 3 | 提交前要还原的运行时文件 | `WP7\Gallery\main.ini`、`scroll.inc`、`MultiManager\TimeSettings.inc`、`MultiManager\Saved\*\screenshot.png` 会被 Rainmeter 运行时改写；`git checkout --` 还原或按 §8 第 5 条标记 |
-| 4 | `agenda.lua:303` 夏令时 | 用定长 86400 秒推窗口末日，夏令时回拨那周末一天会被少算（`buildRows` 用 `hour=12` 规避了同类问题，此处没有）；本机时区无夏令时，实际影响为零 |
-
-**已收敛的历史项去哪查**：滚轮动作与静置回顶的判据留在 §7 第 5 条；Agenda 死源超时提示看 `agenda.lua` 的 `LOAD_TIMEOUT`；Segoe 字体移除看 `THIRD-PARTY.md` §4；AutoIt 加固与 7 个 exe 的重编译看 §9 第 6 条、`CHANGELOG.md` 的 0.3.0 与仓库外 `D:\WorkSpace\Omnimo-代码质量复审报告.md`；中文覆盖的取舍看 §4；发版记录看 §1。
+- 本文件与触发它的代码改动进同一个提交,不攒批;发现本文件与代码不符时,先改本文件再继续改代码。
+- 改动以下内容必须同步本文件:验收命令、include 链、Checkbox 契约、凭据规则、分发 exe 清单与重编译命令、产品边界。
+- 事实性数字(键数、目录数、差异计数)引用前现查,不凭记忆。
