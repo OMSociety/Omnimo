@@ -57,7 +57,17 @@ For $i = 1 To $Sections[0][0]
 Const $scaledpi = IniRead($skinpath & "WP7\@Resources\Common\Variables\UserVariables.inc", "Variables", "ScaleDpi", "1")
 
 Const $Variables  = $SkinPath & "WP7\@Resources\Common\Variables\"
-Const $VarFile    = $SkinPath & "WP7\@Resources\Config" & StringTrimLeft($Config, 3) & "\UserVariables.inc"
+Global $VarBaseFile = $SkinPath & "WP7\@Resources\Config" & StringTrimLeft($Config, 3) & "\UserVariables.inc"
+; A panel may carry a local override file next to UserVariables.inc. The skin @includes both,
+; with the local file later in the chain so its keys win; the settings tool therefore has to
+; read and write that same file, or every edit is silently overridden by a stale local value.
+Global $VarOverrideFile = $SkinPath & "WP7\@Resources\Config" & StringTrimLeft($Config, 3) & "\UserVariables.local.inc"
+Global $VarFile = $VarBaseFile
+Global $VarLocal = 0
+If FileExists($VarOverrideFile) Then
+	$VarLocal = 1
+	$VarFile = $VarOverrideFile
+EndIf
 
 
 
@@ -328,6 +338,14 @@ $sliderE = GUICtrlCreateSlider(0, $height - $Size / 3.125, $width, $Size / 6.25,
 GUICtrlSetLimit($sliderE, 300, 70)
 GUICtrlSetData($sliderE, $Size)
 
+; Tell the user when this panel keeps its settings in the local override file
+If $VarLocal = 1 And $Colorizable <> 1 And $Comments == "" Then
+	GUICtrlCreateLabel($Language.Item("VariablesFromLocalFile"), 10, $height - $Size / 3.125 - $Size / 15, $width - 20, $Size / 24)
+	GUICtrlSetBkColor(-1, $GUI_BKCOLOR_TRANSPARENT)
+	GUICtrlSetColor(-1, $TextColor)
+	GUICtrlSetFont(-1, $Size / 20 / $scaledpi, 400, 0, $Font)
+EndIf
+
 
 
 GUICtrlSetBkColor(-1, $BgColor)
@@ -384,6 +402,9 @@ While 1
 				$Colorizable = 0
 				$VarOpts = StringSplit($CurrentVarType, ":")
 				$CurrentValue = IniRead($VarFile, $CurrentVarSection, $CurrentVarName, "")
+				; A key the local file does not define still comes from the base file, so show the
+				; value the panel actually renders with rather than an empty control.
+				If $CurrentValue == "" And $VarLocal = 1 Then $CurrentValue = IniRead($VarBaseFile, $CurrentVarSection, $CurrentVarName, "")
 
 				; Create the GUI control
 				Switch $VarOpts[1]
