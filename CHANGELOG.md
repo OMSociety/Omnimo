@@ -28,11 +28,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 配置工具：面板存在 `UserVariables.local.inc` 覆盖文件时，设置界面读写的是被该文件遮蔽的 `UserVariables.inc`，改动不生效（此前记为已接受的交互缺陷）。现在检测到同目录的覆盖文件就直接读写它，界面加一行说明；覆盖文件里没写的键仍回落到 `UserVariables.inc`——两个 include 是合并关系，不是遮蔽，所以不需要为本地文件补齐任何键。
 - 日程面板：四种状态提示（`loading feed...`/`feed unavailable`/`no feed configured`/`no events in the next N days`）此前硬编码英文，现在走语言包新增的 `AgendaLoading`/`AgendaUnavailable`/`AgendaNoFeed`/`AgendaNoEvents` 四个键，未翻译的语言回落英文。`AgendaNoEvents` 的 `%1` 替换成天数——这是本仓库语言文件里唯一的占位符约定。星期缩写与 `all day` 按设计保持英文。
 
+- 日程面板：标题里连续三个以上引号会被 Rainmeter 的参数解析截断，残余还会被当成皮肤名去执行；现在折叠成两个引号送出，并在日志里提示一次。
+- 日程面板：1970-01-01 之前的 `DTSTART` 会让 `os.time` 返回 nil，一次算术就打断整个 `Update()`，而失败的那次解析已经写进缓存、不会重试。日期运算改成纯整数日历，表示不了的时刻整条跳过；解析整段包进 `pcall`，失败时保留上一份事件表并在下一个 tick 重试。
+- 配置工具：本地覆盖提示在可换肤（`Colorizable=1`）的面板（含日程面板）上被条件挡住，永远不显示；现在只要覆盖文件存在就显示。
+- 配置工具：保存（Set）时把第 6 个命令行参数当 Rainmeter 安装目录，而面板调用点只传 5 个参数，于是每次保存都弹 AutoIt 错误框（`Array variable has incorrect number of subscripts`，config.exe Line 10488），皮肤也不会刷新。现在按 `#PROGRAMPATH#` 取值，参数不足时回落到常见安装目录。
+- 皮肤配置调用点：428 处 `Config\config.exe` 调用补上第 6 个参数 `#PROGRAMPATH#`，与其它 Omnimo 工具的约定一致。
+- 配置工具：`bg`（背景设置）分支对覆盖文件里没有的键直接用内置默认值，与面板路径不对称；现在同样回落到基础文件。当前调用点到不了该分支，属一致性修正。
+- 语言包：本地覆盖提示键 `VariablesFromLocalFile` 此前只加在中文与英文两个 cfg 里，其余六种语言缺这个键；现已八种齐全。
+
 ### 变更
 
 - 日程面板：`RangeDays` 此前是闭区间（填 6 会显示 7 个日历日），配置标签「显示天数（今天起）」因此差一天。现在窗口正好等于 `RangeDays` 天。升级后同一配置会少显示一天，这是有意的行为变更。
 - `THIRD-PARTY.md` 更正两处与事实不符的说明：中文语言包并非本 fork 翻译（`Translated=` 记的是上游作者），以及 `readme.md` 并非未改动（加了 25 行的 fork 说明）。
 - 七个可执行文件用 AutoIt 3.3.18.0（`Aut2Exe`、x86、`/nopack`）从修正后的源码重新编译，为「配置工具」的覆盖感知补上新的界面文案，并把版本资源盖为下一个发布号 `0.4.0.0`。
+- `AGENTS.md` 更正三处事实：语言包是 288 键定义/283 唯一键（原写 287/280）、`Config.au3` 的写盘与显示态在 519/568 行（原写 528/553）、以及「注入后每个 exe 比上游多 1024 字节」的说法（上游二进制是 UPX 加壳的，体积差来自 `/nopack`，版本资源本身只占 1024 字节）。
+- `THIRD-PARTY.md` 第 3 节的可执行文件体积表与版本号更新为本轮 0.4.0 重编译的结果。
+- 本轮改动后七个可执行文件再次重编译（同上参数集），版本资源保持 `0.4.0.0`。
 
 > **Note:** the seven shipped executables already carry the next release number `0.4.0.0` in their version resource; nothing under this heading is tagged or released yet.
 
@@ -96,6 +107,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   repository's language files. Weekday abbreviations and `all day` stay English
   by design.
 
+- Agenda panel: a title with a run of three or more double quotes was cut short by
+  Rainmeter's argument parser, and the remainder was even executed as a skin name.
+  Such a run is now collapsed to two quotes before the value is sent, with one log
+  notice.
+- Agenda panel: a `DTSTART` before 1970-01-01 made `os.time` return nil, and one
+  arithmetic on it aborted the whole `Update()`, while the failed parse had already
+  been written to the cache and was never retried. Date arithmetic now runs on an
+  integer calendar, unrepresentable instants are skipped whole, and the parse runs
+  inside `pcall`: on failure the previous list is kept and the next tick retries.
+- Config tool: the local-override notice was hidden by a condition on colour-capable
+  (`Colorizable=1`) panels, the Agenda panel included, so it never appeared. It is now
+  shown whenever the override file exists.
+- Config tool: saving (Set) treated the 6th command line argument as the Rainmeter
+  install directory while panel call sites pass only five arguments, so every save
+  raised the AutoIt error box (`Array variable has incorrect number of subscripts`,
+  config.exe Line 10488) and the skin was never refreshed. The path now comes from
+  `#PROGRAMPATH#` and falls back to the usual install locations when it is absent.
+- Skin config call sites: the 6th argument `#PROGRAMPATH#` was added to all 428
+  `Config\config.exe` invocations, matching what the other Omnimo tools already do.
+- Config tool: the `bg` (background settings) branch used built-in defaults for keys
+  missing from the override file instead of falling back to the base file, unlike the
+  panel path. It now falls back the same way. No current call site reaches that
+  branch, so this is a consistency fix.
+- Language packs: the `VariablesFromLocalFile` notice key existed only in the Chinese
+  and English cfgs; the other six now carry it too.
+
 ### Changed
 
 - Agenda panel: `RangeDays` was a closed interval (6 meant 7 calendar days), so
@@ -109,6 +146,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   3.3.18.0 (`Aut2Exe`, x86, `/nopack`), including the new window text for the
   Config tool's override awareness, and their version resource is stamped with
   the next release number `0.4.0.0`.
+- `AGENTS.md`: three facts corrected — the language packs hold 288 defined / 283
+  unique keys (was 287/280), the Config tool's write and display-state lines are
+  519/568 (was 528/553), and the "+1024 bytes vs upstream" claim (upstream binaries
+  are UPX-packed, so the size gap comes from `/nopack`; the version resource itself
+  costs 1024 bytes).
+- `THIRD-PARTY.md`: the section 3 executable size table and the version reference now
+  match this round's 0.4.0 rebuild.
+- All seven executables were rebuilt again after this round's changes (same argument
+  set), their version resource staying at `0.4.0.0`.
 
 ## [0.3.0] - 2026-09-26
 

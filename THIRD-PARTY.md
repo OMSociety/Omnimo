@@ -120,13 +120,13 @@ Seven executables ship inside the repository. They are upstream's own AutoIt hel
 the sources in `AutoIT/`; the binaries themselves carry no source and no declared licence.
 
 ```
-WP7/@Resources/Common/ColorChanger.exe                       1356800 bytes
-WP7/@Resources/Common/OmnimoApp.exe                          1187328 bytes
-WP7/@Resources/Common/Background/ConfigBackground.exe        1353728 bytes
-WP7/@Resources/Common/Config/ActivePanels.exe                1030656 bytes
-WP7/@Resources/Common/Config/config.exe                      1133056 bytes
-WP7/@Resources/Common/MultiManager/MultiManager.exe          1106944 bytes
-WP7/@Resources/Common/PanelCreator/PanelCreator.exe          1604096 bytes
+WP7/@Resources/Common/ColorChanger.exe                       1357824 bytes
+WP7/@Resources/Common/OmnimoApp.exe                          1188352 bytes
+WP7/@Resources/Common/Background/ConfigBackground.exe        1354240 bytes
+WP7/@Resources/Common/Config/ActivePanels.exe                1031168 bytes
+WP7/@Resources/Common/Config/config.exe                      1134592 bytes
+WP7/@Resources/Common/MultiManager/MultiManager.exe          1107968 bytes
+WP7/@Resources/Common/PanelCreator/PanelCreator.exe          1604608 bytes
 ```
 
 Upstream let `config.exe` drift from its source: the binary was committed on 2020-05-18, while
@@ -141,10 +141,10 @@ and `MultiManager.exe` carry no version resource at all. Those last two cannot h
 upstream compiled them against AutoIt 3.3.10 or newer. As of release 0.3.0 this fork rebuilds all
 seven from the corrected sources with AutoIt 3.3.18.0 (plain `Aut2Exe`, `/x86`, `/nopack`, each
 source's own icon), which parses every source, so the section 2 fixes and hardening reach the
-binaries users run; the byte sizes above are this fork's builds.
+binaries users run; the byte sizes above are this fork's 0.4.0 builds. Because those rebuilds are unpacked (`/nopack`), they are far larger than upstream's UPX-packed originals; that gap is the packing, not the version resource, which costs 1024 bytes.
 
 Plain `Aut2Exe` writes no version resource, so each rebuild is stamped afterwards with a
-`VS_VERSIONINFO` whose `FileVersion` and `ProductVersion` equal the fork release (`0.3.0.0`),
+`VS_VERSIONINFO` whose `FileVersion` and `ProductVersion` equal the fork release (`0.4.0.0`),
 keeping every executable's reported version in step with the release it ships in. The
 `FileDescription`, `LegalCopyright` and `OriginalFilename` strings reproduce the sources'
 `#AutoIt3Wrapper_Res_*` directives, except `ActivePanels.au3`, which declares none and is stamped

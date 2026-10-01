@@ -1,7 +1,7 @@
 # AGENTS.md — Omnimo(DSH 侧 fork)Agent 宪法
 
 适用范围:本仓库全部目录(单文件,无子目录级 AGENTS.md)。
-最后更新:2026-10-01
+最后更新:2026-10-02
 
 ## 项目概览
 
@@ -60,12 +60,12 @@ AutoIt 工具(AutoIT\*.au3 → 7 个 exe)
 - **改 AutoIt 源码**:必须用 `Aut2Exe`(AutoIt 3.3.18.0)重编译**全部 7 个分发 exe**,再注入版本资源;否则修复只停在源码。禁止用 `build.bat`(依赖已下线的 wmic)。Git-Bash 调 Aut2Exe 必须带 `MSYS_NO_PATHCONV=1` `MSYS2_ARG_CONV_EXCL='*'`,且 3.3.18 下不能重定向其 stdout/stderr(会静默 exit 0 不产出);`/nopack` 不能省(默认 UPX 加壳)。
   - 已验证的参数集:`/in <Src>.au3 /out <绝对路径> /icon <Icons\X.ico> /x86 /nopack /companyname Omnimo /filedescription "<desc>" /internalname <Name>.exe /legalcopyright "Xyrfo 2013" /originalfilename <Name>.exe /comments "Made for Omnimo UI"`。**不要传 `/fileversion` / `/productversion`**:点分写法会弹 "Command Line Parameters" 帮助框,逗号写法只写出 `0,0,0`。
   - PowerShell 侧必须 `Start-Process -ArgumentList <单个拼接好的字符串>`(传数组报“无法将 System.Object[] 转换为参数 FilePath 所需的类型”);`-WorkingDirectory` 指到 `AutoIT\`,等约 7 秒看 `HasExited`:还活着说明弹了模态框,`Stop-Process` 并判失败。
-  - **版本资源要编译后自己注入**(裸 Aut2Exe 产物没有可读版本号):重建 `VS_VERSIONINFO` 叶(8 个 string entry + `VarFileInfo\Translation`;`wLength`/`wValueLength`/`wType` 在偏移 0/2/4,key 结束补到 4 字节对齐处才是 value 起点——少这一步 Windows 读不出),**放进节表末尾新增的节**。不要搬动已有节:节表按 VirtualAddress 必须单调递增,顺序被打乱会得到 `ERROR_BAD_EXE_FORMAT` 193;改完镜像还必须重算 `OptionalHeader.CheckSum`(不重算同样 193)。注入后每个 exe 比上游多 1024 字节,属预期形态。
-  - 自检:PowerShell 读 `VersionInfo.FileVersion` 应等于本次发布号;再用 `CreateProcess` 带 `CREATE_SUSPENDED` 映射镜像后立刻 `TerminateProcess`——与真实启动同一套校验、零副作用,能区分“资源读得出但加载器拒绝”。本机三个助手脚本(`_omni_build.ps1` / `_omni_vsver.py` / `_omni_loadcheck.ps1`)在仓库外,不随仓库分发。
+  - **版本资源要编译后自己注入**(裸 Aut2Exe 产物没有可读版本号):重建 `VS_VERSIONINFO` 叶(8 个 string entry + `VarFileInfo\Translation`;`wLength`/`wValueLength`/`wType` 在偏移 0/2/4,key 结束补到 4 字节对齐处才是 value 起点——少这一步 Windows 读不出),**放进节表末尾新增的节**。不要搬动已有节:节表按 VirtualAddress 必须单调递增,顺序被打乱会得到 `ERROR_BAD_EXE_FORMAT` 193;改完镜像还必须重算 `OptionalHeader.CheckSum`(不重算同样 193)。注入本身只给每个 exe 增加 1024 字节(节表新增一项);本仓库的产物是 `/nopack` 重编译,整体比上游那些 UPX 加壳的二进制大得多,差别来自加壳而不是版本资源。
+  - 自检:PowerShell 读 `VersionInfo.FileVersion` 应等于本次发布号;再用 `CreateProcess` 带 `CREATE_SUSPENDED` 映射镜像后立刻 `TerminateProcess`——与真实启动同一套校验、零副作用,能区分“资源读得出但加载器拒绝”。本机三个助手脚本(`_omni_build.ps1` / `_omni_vsver.py` / `_omni_loadcheck.ps1`)在仓库外,不随仓库分发。config.exe 解析 Rainmeter 安装路径的顺序是:第 6 个命令行参数 `#PROGRAMPATH#`(仓库里 428 处 `Config\\config.exe` 调用点都已补上)→ `ProgramW6432` / `ProgramFilesDir` / `ProgramFiles(x86)` 下的 `Rainmeter\Rainmeter.exe` → PATH 中的 `Rainmeter.exe`,见 `_RainmeterExe()`(`Config.au3:75`)。
 - **改面板用户参数**:`Config\Panels\<Name>\UserVariables.inc` 第一行必须是 `[Variables]`——缺段头整文件键被静默忽略,日志只有下游异常。这些文件被跟踪,改完会显示脏,提交前逐个确认。
-- **改私人订阅**:只写 `Config\Panels\Agenda\UserVariables.local.inc`(未跟踪,.gitignore 已覆盖);它经 @include5 与 `UserVariables.inc` **合并**,同名键以后者为准。0.4.0 起 config.exe 自动跟随:同目录存在该文件时 `$VarFile` 指向它,界面另显示一行本地覆盖提示,面板缺的键回落到 `UserVariables.inc`(见 `Config.au3:60-70`、`:407`)——不要再按“设置界面改动不生效”的旧交互缺陷描述它。
-- **改语言文案**:改 `Chinese.inc` 时与 `English.inc` 键集逐键对照(现均 287 键定义/280 唯一键,双向零差);**全库唯一的占位符约定是 `AgendaNoEvents` 的 `%1`(=显示天数),agenda.lua 用 `gsub('%%1', …)` 替换**——不要发明第二种写法;7 个表面键 `Folders` `weather` `Humidity` `Pressure` `Wind` `brightness` `start` 保持英文;右键菜单键跟随语言包,面板名本地化在 cat1..7 的磁贴表覆盖 `Text="#<语言键>#"`。
-- **改面板设置 schema**:`RainConfigure.cfg` 4 行一组(参数名/标题/控件类型/空行),编码 UTF-16LE+BOM;`Checkbox:a:b` 的契约是**未勾选写 a、勾选写 b**(Config.au3:528 写、:553 显示态)——把 `Checkbox:1:0` 读成“勾选=1”会把 `Hidden=#X#` 判反,本仓库曾因此误修过 DigitalClock 两处后回退。
+- **改私人订阅**:只写 `Config\Panels\Agenda\UserVariables.local.inc`(未跟踪,.gitignore 已覆盖);它经 @include5 与 `UserVariables.inc` **合并**,同名键以后者为准。0.4.0 起 config.exe 自动跟随:同目录存在该文件时 `$VarFile` 指向它,界面另显示一行本地覆盖提示,面板缺的键回落到 `UserVariables.inc`(见 `Config.au3:64-70`、`:434`)——不要再按“设置界面改动不生效”的旧交互缺陷描述它。
+- **改语言文案**:改 `Chinese.inc` 时与 `English.inc` 键集逐键对照(现均 288 键定义/283 唯一键,双向零差);**全库唯一的占位符约定是 `AgendaNoEvents` 的 `%1`(=显示天数),agenda.lua 用 `gsub('%%1', …)` 替换**——不要发明第二种写法;7 个表面键 `Folders` `weather` `Humidity` `Pressure` `Wind` `brightness` `start` 保持英文;右键菜单键跟随语言包,面板名本地化在 cat1..7 的磁贴表覆盖 `Text="#<语言键>#"`。
+- **改面板设置 schema**:`RainConfigure.cfg` 4 行一组(参数名/标题/控件类型/空行),编码 UTF-16LE+BOM;`Checkbox:a:b` 的契约是**未勾选写 a、勾选写 b**(Config.au3:519 写、:568 显示态)——把 `Checkbox:1:0` 读成“勾选=1”会把 `Hidden=#X#` 判反,本仓库曾因此误修过 DigitalClock 两处后回退。
 - **改 cat1..7 磁贴**:增删/移动一格必须同步改 `mask-<类>.png` 图标层(复制相邻字形,不要自画);跨行回流靠 `Y=(1*#ScaleDpi#)R` + `x=(360*#ScaleDpi#)` 行锚点交接。
 - **改 agenda.lua**:Rainmeter 公式里 `**` 是幂运算符(如 `7**#TypeH#`),不是畸形表达式,别“修”;Lua `0` 是真值,判断开关用显式比较;含 `"` 的值必须走**三引号** bang 形式 `!SetOption <meter> <opt> """值"""`(`set()` 已如此实现;Rainmeter 只在三引号形式下保留值内引号,写成 `""` 会报 `Skin "X" does not exist` 且值不变),且 bang 值里的 `[SomeSection]` 会被当段变量替换掉(不存在的段名原样保留);**Rainmeter 按 ANSI(本机 CP936)读 .lua 源**,字符串字面量必须纯 ASCII(中文注释无害),要显示中文只能从变量/ini 取。
 - **改 agenda 渲染样式**:0.4.0 起只剩一套排布——style 3/4 死分支与恒为 1 的 `AgendaStyle` 变量已删除;不要再按“未接线分支”去改 ini/RainConfigure,要加样式请单独提案。
@@ -103,7 +103,7 @@ AutoIt 工具(AutoIT\*.au3 → 7 个 exe)
 | 新建皮肤目录 | 不 `!RefreshApp` 直接 ActivateConfig 找不到 | 先 RefreshApp 再 Activate |
 | `git add -A` | exclude 清单里的 5 个被跟踪文件(Common/Variables/UserVariables.inc、WeatherCom 两件、color.inc、Colors.inc)不受 exclude 保护,运行时改写后会被暂存 | 提交前逐文件确认;exclude 只对未跟踪文件生效 |
 | 大网格自动排布 | 5x5-9x9 曾因行计数器混用叠进同一列(0.3.0 已修 ActivePanels.au3 与 OmnimoApp.au3) | 改排布逻辑两处源码必须同步改 |
-| 本文件引用的行号 | Config.au3 的写盘/显示态在 528/553(0.3.0 前后文档写过 458/507、471/520;本地覆盖回落读 base 在 407) | 引用行号前现查,不凭记忆 |
+| 本文件引用的行号 | Config.au3 的写盘/显示态在 519/568(0.3.0 前后文档写过 458/507、471/520;本地覆盖回落读 base 在 434) | 引用行号前现查,不凭记忆 |
 
 ## 出错怎么办
 
