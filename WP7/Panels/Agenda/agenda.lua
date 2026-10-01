@@ -9,7 +9,8 @@
      时区：DTSTART 支持 Z（UTC）、TZID 参数、无参数的本地时间。TZID 用下面的固定偏移表
      换算到本机时间；表里没有的时区按本机时间原样显示，并在日志里提示一次。
      固定偏移不跟夏令时走（欧洲/北美部分区域在夏令时期间可能差一小时），这是刻意取舍：
-     一个日历面板不值得内置 tzdata。
+     一个日历面板不值得内置 tzdata。日期运算走整数日历、不经过 os.time，所以 1970 年
+      之前的时刻不会把刷新打断：表示不了的日期整条跳过。
 
      重复事件：支持 RRULE 的有界子集（DAILY/WEEKLY/MONTHLY/YEARLY + INTERVAL/COUNT/
      UNTIL/BYDAY/BYMONTHDAY/BYMONTH），只展开面板窗口内的实例。带其它参数（WKST/BYSETPOS/
@@ -20,7 +21,10 @@
      未翻译的语言自动回落英文）。AgendaNoEvents 里的 %1 会替换成天数——这是本仓库语言文件
      里唯一的占位符约定（其它键都是纯文本）。星期缩写与 "all day" 保持英文不翻译。
 
-     性能：面板为了"静置回顶"设了 Update=1000（见 Item.ini），但每秒的 tick 会在订阅正文、
+     引号：SUMMARY 里带双引号时值用三引号形式送出；连续三个以上引号会被 Rainmeter 的
+      参数解析器截断（残余还会被当成皮肤名去执行），这类标题折叠成两个引号显示。
+
+      性能：面板为了"静置回顶"设了 Update=1000（见 Item.ini），但每秒的 tick 会在订阅正文、
      日期窗口、滚动偏移都没变时直接返回，既不再解析 ICS 也不重推上百个 !SetOption（Update 里
      的 parseKey/renderKey 判定）。
 ]]
@@ -66,7 +70,7 @@ local TZ_OFFSET = {
 }
 
 local feeds, VIS, headerH, eventH, viewH, listTop, rowW, padX, tc, rangeDays, hasData
-local lastOff, lastMove, loadStart, warnedTzid, lastMaxOff
+local lastOff, lastMove, loadStart, warnedTzid, lastMaxOff, warnedQuote, warnedParse
 local cache = { parseKey = nil, renderKey = nil, msgKey = nil, rows = {}, count = 0 }
 
 local function num(v, d)
@@ -82,16 +86,55 @@ local function unescape(s)
   return s:gsub('^%s+', ''):gsub('%s+$', '')
 end
 
+-- 儒略日序数（1970-01-01 = 0），纯整数运算（Hinnant 的 days_from_civil）。os.time 对
+-- 1970 之前的墙上时间返回 nil（Windows 的 C 运行库表示不了），而周对齐会退到上一周、
+-- 时区换算也可能退过 epoch，所以日期算术一律不走 os.time。
+local function dayNum(y, m, d)
+  y = y - ((m <= 2) and 1 or 0)
+  local era = math.floor(y / 400)
+  local yoe = y - era * 400
+  local doy = math.floor((153 * (m + ((m > 2) and -3 or 9)) + 2) / 5) + d - 1
+  local doe = yoe * 365 + math.floor(yoe / 4) - math.floor(yoe / 100) + doy
+  return era * 146097 + doe - 719468
+end
+
+-- dayNum 的逆运算
+local function dayToYMD(z)
+  z = z + 719468
+  local era = math.floor(z / 146097)
+  local doe = z - era * 146097
+  local yoe = math.floor((doe - math.floor(doe / 1460) + math.floor(doe / 36524)
+    - math.floor(doe / 146096)) / 365)
+  local y = yoe + era * 400
+  local doy = doe - (365 * yoe + math.floor(yoe / 4) - math.floor(yoe / 100))
+  local mp = math.floor((5 * doy + 2) / 153)
+  local d = doy - math.floor((153 * mp + 2) / 5) + 1
+  local m = mp + (mp < 10 and 3 or -9)
+  if m <= 2 then y = y + 1 end
+  return y, m, d
+end
+
 -- 本机相对 UTC 的偏移（秒）。按给定时刻取，跨夏令时比固定值准。
 local function localOffset(e)
+  if not e then return nil end
   return os.difftime(os.time(os.date('*t', e)), os.time(os.date('!*t', e)))
 end
 
--- 把"某时区的墙上时间"换成本机墙上时间；offHours = 该时区相对 UTC 的小时数
+-- 把"某时区的墙上时间"换成本机墙上时间；offHours = 该时区相对 UTC 的小时数。
+-- 源时刻或换算结果落到 os.time 表示不了的范围时返回 nil（调用方按"跳过该事件"处理）。
 local function toLocal(y, m, d, H, M, offHours)
   local e = os.time({ year = y, month = m, day = d, hour = H, min = M, sec = 0 })
-  local lt = os.date('*t', e + localOffset(e) - offHours * 3600)
+  local off = localOffset(e)
+  if not off then return nil end
+  local lt = os.date('*t', e + off - offHours * 3600)
   return { y = lt.year, m = lt.month, d = lt.day, H = lt.hour, M = lt.min }
+end
+
+-- 只收 os.time 表示得了的日期。表示不了的（1970 之前）整条事件丢弃，而不是等到第一次
+-- 取时间戳时抛 "attempt to perform arithmetic on a nil value" 把整个刷新打断。
+local function dayFields(y, m, d, H, M)
+  if not os.time({ year = y, month = m, day = d, hour = 12 }) then return nil end
+  return { y = y, m = m, d = d, H = H, M = M }
 end
 
 -- params = 属性名后面的参数串（形如 ";TZID=Asia/Shanghai"）；v = 值
@@ -118,10 +161,10 @@ local function parseDT(params, v)
         SKIN:Bang('!Log "Agenda: unknown TZID=' .. tzid .. ', showing the event at this machine local time" Notice')
       end
     end
-    return { y = y, m = m, d = d, H = H, M = M }
+    return dayFields(y, m, d, H, M)
   end
   local y2, m2, d2 = v:match('^(%d%d%d%d)(%d%d)(%d%d)')
-  if y2 then return { y = num(y2), m = num(m2), d = num(d2) } end
+  if y2 then return dayFields(num(y2), num(m2), num(d2)) end
   return nil
 end
 
@@ -139,28 +182,29 @@ local function prop(blk, name)
   return v
 end
 
--- 一律按本地中午取时间戳，躲开夏令时造成的 23/25 小时日
-local function noon(y, m, d) return os.time({ year = y, month = m, day = d, hour = 12 }) end
-
 local function daysBetween(y1, m1, d1, y2, m2, d2)
-  return math.floor((noon(y2, m2, d2) - noon(y1, m1, d1)) / 86400 + 0.5)
+  return dayNum(y2, m2, d2) - dayNum(y1, m1, d1)
 end
 
 local function addDays(y, m, d, n)
-  local t = os.date('*t', noon(y, m, d) + n * 86400)
-  return t.year, t.month, t.day
+  return dayToYMD(dayNum(y, m, d) + n)
 end
 
-local function wdayOf(y, m, d) return os.date('*t', noon(y, m, d)).wday end
+-- 1=周日 .. 7=周六，与 os.date('*t').wday 对齐（1970-01-01 是周四 = 5）
+local function wdayOf(y, m, d) return (dayNum(y, m, d) + 4) % 7 + 1 end
 
 local function daysInMonth(y, m)
-  return os.date('*t', os.time({ year = y, month = m + 1, day = 0, hour = 12 })).day
+  if m == 2 then
+    return (y % 4 == 0 and (y % 100 ~= 0 or y % 400 == 0)) and 29 or 28
+  end
+  return (m == 4 or m == 6 or m == 9 or m == 11) and 30 or 31
 end
 
 -- 给重复实例加上与首个实例相同的时长；全天事件（没有 H 字段）保持"没有时刻"的形状
 local function addSecs(t, secs)
-  local e = os.time({ year = t.y, month = t.m, day = t.d, hour = num(t.H, 0), min = num(t.M, 0), sec = 0 }) + secs
-  local lt = os.date('*t', e)
+  local base = os.time({ year = t.y, month = t.m, day = t.d, hour = num(t.H, 0), min = num(t.M, 0), sec = 0 })
+  if not base then return nil end
+  local lt = os.date('*t', base + secs)
   local o = { y = lt.year, m = lt.month, d = lt.day }
   if t.H then o.H, o.M = lt.hour, lt.min end
   return o
@@ -421,7 +465,7 @@ local function parseICS(raw, lo, hi, out)
       if e then
         local sd = os.time({ year = s.y, month = s.m, day = s.d, hour = num(s.H, 0), min = num(s.M, 0), sec = 0 })
         local ed = os.time({ year = e.y, month = e.m, day = e.d, hour = num(e.H, 0), min = num(e.M, 0), sec = 0 })
-        if ed > sd then evt.dur = ed - sd end
+        if sd and ed and ed > sd then evt.dur = ed - sd end
       end
       out[#out + 1] = evt
       local rrule = parseRRule(prop(blk, 'RRULE'))
@@ -437,8 +481,7 @@ local function buildRows(events)
   local rows, curDay = {}, nil
   for _, ev in ipairs(events) do
     local k = dayKey(ev.s)
-    local wt = os.date('*t', os.time({ year = ev.s.y, month = ev.s.m, day = ev.s.d, hour = 12 }))
-    local dayText = string.format('%s %d', DAYNAMES[wt.wday], ev.s.d)
+    local dayText = string.format('%s %d', DAYNAMES[wdayOf(ev.s.y, ev.s.m, ev.s.d)], ev.s.d)
 
     local r = { kind = 'ev', h = eventH, title = ev.title }
     if ev.s.H and ev.e and (ev.e.H or ev.e.M) then
@@ -472,10 +515,20 @@ local function hideAll()
   end
 end
 
--- 值里带双引号时用三引号形式（Rainmeter 只剥最外层三引号，里面的单引号原样保留）；
+-- 值里带双引号时用三引号形式（Rainmeter 只剥最外层三引号，里面的引号原样保留）；
 -- 否则沿用普通写法。（源码见 CommandHandler::ParseString 的三引号分支）
+-- 例外：连续三个及以上引号会被那个解析器当成收尾符，值被腰斩、残余还会被当作皮肤名
+-- 执行（"!SetOption: Skin "quote" does not exist"）。这种标题折叠成两个引号照常显示，
+-- 只丢一点标点，好过整行静默消失。
 local function set(meter, opt, val)
   val = tostring(val)
+  if val:find('"""', 1, true) then
+    if not warnedQuote then
+      warnedQuote = true
+      SKIN:Bang('!Log "Agenda: a title has a run of quotes, collapsed to two so the row can still render" Notice')
+    end
+    val = val:gsub('"""+', '""')
+  end
   if val:find('"', 1, true) then
     SKIN:Bang('!SetOption ' .. meter .. ' ' .. opt .. ' """' .. val .. '"""')
   else
@@ -661,36 +714,46 @@ function Update()
 
   local parseKey = feedKey .. '|' .. loK .. '|' .. hiK
   if parseKey ~= cache.parseKey then
-    cache.parseKey = parseKey
-    local all, seen = {}, {}
-    for _, m in ipairs(feeds) do
-      local raw = m:GetStringValue()
-      if raw and raw:find('BEGIN:VCALENDAR', 1, true) then
-        local got = {}
-        parseICS(raw, lo, hi, got)
-        for _, ev in ipairs(got) do
-          local sig = dayKey(ev.s) .. '|' .. num(ev.s.H, 0) .. ':' .. num(ev.s.M, 0) .. '|' .. ev.title
-          if not seen[sig] then
-            seen[sig] = true
-            all[#all + 1] = ev
+    local ok = pcall(function()
+      local all, seen = {}, {}
+      for _, m in ipairs(feeds) do
+        local raw = m:GetStringValue()
+        if raw and raw:find('BEGIN:VCALENDAR', 1, true) then
+          local got = {}
+          parseICS(raw, lo, hi, got)
+          for _, ev in ipairs(got) do
+            local sig = dayKey(ev.s) .. '|' .. num(ev.s.H, 0) .. ':' .. num(ev.s.M, 0) .. '|' .. ev.title
+            if not seen[sig] then
+              seen[sig] = true
+              all[#all + 1] = ev
+            end
           end
         end
       end
-    end
-    -- 每个订阅内部 parseICS 已排好，但跨源合并后仍是"一路接一路"，必须重排
-    table.sort(all, function(a, b)
-      if a.key ~= b.key then return a.key < b.key end
-      return a.title < b.title
-    end)
+      -- 每个订阅内部 parseICS 已排好，但跨源合并后仍是"一路接一路"，必须重排
+      table.sort(all, function(a, b)
+        if a.key ~= b.key then return a.key < b.key end
+        return a.title < b.title
+      end)
 
-    local inRange = {}
-    for _, ev in ipairs(all) do
-      local k = dayKey(ev.s)
-      if k >= loK and k <= hiK then inRange[#inRange + 1] = ev end
+      local inRange = {}
+      for _, ev in ipairs(all) do
+        local k = dayKey(ev.s)
+        if k >= loK and k <= hiK then inRange[#inRange + 1] = ev end
+      end
+      if #inRange > 0 then hasData = true end
+      cache.rows = buildRows(inRange)
+      cache.count = #inRange
+    end)
+    -- 解析成功才提交 parseKey：失败时保留上一份行表，下一个 tick 还会重试
+    -- （旧写法先提交再解析，一次坏数据会让面板卡到订阅正文变化为止）。
+    if ok then
+      cache.parseKey = parseKey
+      warnedParse = false
+    elseif not warnedParse then
+      warnedParse = true
+      SKIN:Bang('!Log "Agenda: could not parse a feed, keeping the last good list" Error')
     end
-    if #inRange > 0 then hasData = true end
-    cache.rows = buildRows(inRange)
-    cache.count = #inRange
   end
   local rows = cache.rows
 
