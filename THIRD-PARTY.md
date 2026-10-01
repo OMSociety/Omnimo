@@ -201,7 +201,7 @@ licensing is not determined by Rainmeter's.
 - **Omnimo / fediaFedia** — the design this fork is based on and the source of almost every file.
 - **Yashied, Ward, wraithdu, guinness and MrCreatoR** — the AutoIt UDFs in `AutoIT/Includes/`.
 - The upstream Omnimo translators, credited inside each language pack's `Translated=` key. The
-  Simplified Chinese packs carry `Translated=OMSociety`.
+  Chinese pack carries `Translated=fediaFedia`, as upstream wrote it.
 
 ## 8. Open items
 
@@ -211,7 +211,7 @@ licensing is not determined by Rainmeter's.
 | 2 | 22 `.ini` plus 960 `.inc`/`.lua`/`.cfg`/`.js` and 1670 images with no declaration | Carried as-is with provenance traceable through the retained git history. No rights claimed. |
 | 3 | 7 upstream `.exe` with no source and no declared licence | Repository-only. Closes if the binaries are dropped and users build from `AutoIT/`. |
 | 4 | ~~6 Microsoft Segoe `.ttf` in `WP7/@Resources/Fonts/`~~ | Resolved: the six files are removed. The skin resolved those faces by system name and never loaded the files, so nothing renders differently; the Segoe WP fallback on systems without that face is unchanged. |
-| 5 | The repository has no README of its own; upstream's `readme.md` is unchanged | A short note that this is a fork with a Chinese localization is not yet written. |
+| 5 | The repository has no README of its own. Upstream's `readme.md` is brought forward but **not** left unchanged: a 25-line fork header was added to it | The header explains what this fork changes and points at `AGENTS.md`; a proper standalone README is not yet written. |
 
 ---
 
