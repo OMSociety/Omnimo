@@ -8,7 +8,7 @@
 
 **基于 Rainmeter 的 Windows Phone 7 风格交互式桌面信息中心** —— 接手 Omnimo 的开发。
 
-[![Version](https://img.shields.io/github/v/tag/OMSociety/Omnimo?label=version&color=blue)](https://github.com/OMSociety/Omnimo/releases)
+[![Version](https://img.shields.io/github/v/release/OMSociety/Omnimo?label=version&color=blue)](https://github.com/OMSociety/Omnimo/releases)
 [![Rainmeter](https://img.shields.io/badge/Rainmeter-%E2%89%A54.3-green.svg)](https://www.rainmeter.net/)
 [![License: GPL v2](https://img.shields.io/badge/License-GPL%20v2-blue.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
 [![Stars](https://img.shields.io/github/stars/OMSociety/Omnimo)](https://github.com/OMSociety/Omnimo/stargazers)

@@ -7,7 +7,7 @@
 
 - 一句话定位:Rainmeter 磁贴面板集 ReOmnimo,接手 fediaFedia/Omnimo 的开发,保留上游设计,只做四件事:设置/保存面板中文化、公开 ICS 日程订阅、修既有 bug、微小工作。
 - 技术栈:Rainmeter 皮肤(ini/inc/cfg/lua)+ AutoIt 3.3.18.0 配置工具(9 个 .au3,其中 7 个编译为分发 exe;`miniShell.au3`/`Uninstall.au3` 源码保留但当前不产出分发 exe)。无 CI、无测试框架,验收靠本文件的命令与实机判据。
-- 环境前提(本机):Aut2Exe 在 `C:\Program Files (x86)\AutoIt3\Aut2Exe\Aut2exe.exe`;`Rainmeter.exe`/`git`/`gh` 在 PATH;所有 `git` 命令在仓库根执行;构建/验收助手脚本(`_omni_build.ps1`、`_omni_vsver.py`、`_omni_loadcheck.ps1`、`_omni_set_logging2.py` 等)在 `D:\WorkSpace\`(与仓库同级,**不随仓库分发**)。
+- 环境前提(本机):Aut2Exe 在 `C:\Program Files (x86)\AutoIt3\Aut2Exe\Aut2exe.exe`;`Rainmeter.exe`/`git`/`gh` 在 PATH;所有 `git` 命令在仓库根执行;构建/验收助手脚本(`_omni_build.ps1`、`_omni_vsver.py`、`_omni_loadcheck.ps1`、`_omni_set_logging2.py` 等)在 `D:\WorkSpace\`(与仓库同级,**不随仓库分发**);该目录可能已被清理(2026-10-02 实测已无 `_omni_*`),用到时按本文件「常用命令」「修改契约」描述的写入规则重建,不要跳过其中自检。
 - 文档索引:
   - 逐版本变更:`CHANGELOG.md`
   - 许可与来源:`LICENSE`、`THIRD-PARTY.md`(含差异集逐文件清单)
@@ -18,7 +18,7 @@
 
 - 接到需求先归类:属于四件事之一才做;"待办同步"用户已决定不做,不要实现。
 - 明确不做:重画视觉、复刻面板、自建控件层、改设计语言、换字体。磁贴表面保持英文(按英文宽度排版)。
-- 已发布 Release 仅 v0.3.0(v0.1.0-0.2.0 的 tag 与 Release 已按要求删除,CHANGELOG 历史条目保留);已发布的 tag 不移动。
+- 已发布 Release:`0.4.0` 与历史遗留的 `v0.3.0`(v0.1.0-0.2.0 的 tag 与 Release 已按要求删除,CHANGELOG 历史条目保留);**tag 名不带 `v` 前缀**(`v0.3.0` 是历史遗留,不要沿用);已发布的 tag 不移动。
 - 桌面映射:`Documents\Rainmeter\Skins\WP7` 是指向本仓库 `WP7\` 的 junction,改仓库即改桌面。
 
 ## 常用命令
@@ -63,7 +63,7 @@ AutoIt 工具(AutoIT\*.au3 → 7 个 exe)
   - 已验证的参数集:`/in <Src>.au3 /out <绝对路径> /icon <Icons\X.ico> /x86 /nopack /companyname Omnimo /filedescription "<desc>" /internalname <Name>.exe /legalcopyright "Xyrfo 2013" /originalfilename <Name>.exe /comments "Made for Omnimo UI"`。**不要传 `/fileversion` / `/productversion`**:点分写法会弹 "Command Line Parameters" 帮助框,逗号写法只写出 `0,0,0`。
   - PowerShell 侧必须 `Start-Process -ArgumentList <单个拼接好的字符串>`(传数组报“无法将 System.Object[] 转换为参数 FilePath 所需的类型”);`-WorkingDirectory` 指到 `AutoIT\`,等约 7 秒看 `HasExited`:还活着说明弹了模态框,`Stop-Process` 并判失败。
   - **版本资源要编译后自己注入**(裸 Aut2Exe 产物没有可读版本号):重建 `VS_VERSIONINFO` 叶(8 个 string entry + `VarFileInfo\Translation`;`wLength`/`wValueLength`/`wType` 在偏移 0/2/4,key 结束补到 4 字节对齐处才是 value 起点——少这一步 Windows 读不出),**放进节表末尾新增的节**。不要搬动已有节:节表按 VirtualAddress 必须单调递增,顺序被打乱会得到 `ERROR_BAD_EXE_FORMAT` 193;改完镜像还必须重算 `OptionalHeader.CheckSum`(不重算同样 193)。注入本身只给每个 exe 增加 1024 字节(节表新增一项);本仓库的产物是 `/nopack` 重编译,整体比上游那些 UPX 加壳的二进制大得多,差别来自加壳而不是版本资源。
-  - 自检:PowerShell 读 `VersionInfo.FileVersion` 应等于本次发布号;再用 `CreateProcess` 带 `CREATE_SUSPENDED` 映射镜像后立刻 `TerminateProcess`——与真实启动同一套校验、零副作用,能区分“资源读得出但加载器拒绝”。本机三个助手脚本(`_omni_build.ps1` / `_omni_vsver.py` / `_omni_loadcheck.ps1`)在仓库外,不随仓库分发。config.exe 解析 Rainmeter 安装路径的顺序是:第 6 个命令行参数 `#PROGRAMPATH#`(仓库里 428 处 `Config\\config.exe` 调用点都已补上)→ `ProgramW6432` / `ProgramFilesDir` / `ProgramFiles(x86)` 下的 `Rainmeter\Rainmeter.exe` → PATH 中的 `Rainmeter.exe`,见 `_RainmeterExe()`(`Config.au3:75`)。
+  - 自检:PowerShell 读 `VersionInfo.FileVersion` 应等于本次发布号;再用 `CreateProcess` 带 `CREATE_SUSPENDED` 映射镜像后立刻 `TerminateProcess`——与真实启动同一套校验、零副作用,能区分“资源读得出但加载器拒绝”。本机三个助手脚本(`_omni_build.ps1` / `_omni_vsver.py` / `_omni_loadcheck.ps1`)在仓库外,不随仓库分发(`D:\WorkSpace\` 下若无则按本文件重建)。config.exe 解析 Rainmeter 安装路径的顺序是:第 6 个命令行参数 `#PROGRAMPATH#`(仓库里 428 处 `Config\\config.exe` 调用点都已补上)→ `ProgramW6432` / `ProgramFilesDir` / `ProgramFiles(x86)` 下的 `Rainmeter\Rainmeter.exe` → PATH 中的 `Rainmeter.exe`,见 `_RainmeterExe()`(`Config.au3:75`)。
 - **改面板用户参数**:`Config\Panels\<Name>\UserVariables.inc` 第一行必须是 `[Variables]`——缺段头整文件键被静默忽略,日志只有下游异常。这些文件被跟踪,改完会显示脏,提交前逐个确认。
 - **改私人订阅**:只写 `Config\Panels\Agenda\UserVariables.local.inc`(未跟踪,.gitignore 已覆盖);它经 @include5 与 `UserVariables.inc` **合并**,同名键以后者为准。0.4.0 起 config.exe 自动跟随:同目录存在该文件时 `$VarFile` 指向它,界面另显示一行本地覆盖提示,面板缺的键回落到 `UserVariables.inc`(见 `Config.au3:64-70`、`:434`)——不要再按“设置界面改动不生效”的旧交互缺陷描述它。
 - **改语言文案**:改 `Chinese.inc` 时与 `English.inc` 键集逐键对照(现均 288 键定义/283 唯一键,双向零差);**全库唯一的占位符约定是 `AgendaNoEvents` 的 `%1`(=显示天数),agenda.lua 用 `gsub('%%1', …)` 替换**——不要发明第二种写法;7 个表面键 `Folders` `weather` `Humidity` `Pressure` `Wind` `brightness` `start` 保持英文;右键菜单键跟随语言包,面板名本地化在 cat1..7 的磁贴表覆盖 `Text="#<语言键>#"`。
@@ -71,7 +71,7 @@ AutoIt 工具(AutoIT\*.au3 → 7 个 exe)
 - **改 cat1..7 磁贴**:增删/移动一格必须同步改 `mask-<类>.png` 图标层(复制相邻字形,不要自画);跨行回流靠 `Y=(1*#ScaleDpi#)R` + `x=(360*#ScaleDpi#)` 行锚点交接。
 - **改 agenda.lua**:Rainmeter 公式里 `**` 是幂运算符(如 `7**#TypeH#`),不是畸形表达式,别“修”;Lua `0` 是真值,判断开关用显式比较;含 `"` 的值必须走**三引号** bang 形式 `!SetOption <meter> <opt> """值"""`(`set()` 已如此实现;Rainmeter 只在三引号形式下保留值内引号,写成 `""` 会报 `Skin "X" does not exist` 且值不变),且 bang 值里的 `[SomeSection]` 会被当段变量替换掉(不存在的段名原样保留);**Rainmeter 按 ANSI(本机 CP936)读 .lua 源**,字符串字面量必须纯 ASCII(中文注释无害),要显示中文只能从变量/ini 取。
 - **改 agenda 渲染样式**:0.4.0 起只剩一套排布——style 3/4 死分支与恒为 1 的 `AgendaStyle` 变量已删除;不要再按“未接线分支”去改 ini/RainConfigure,要加样式请单独提案。
-- **改发版**:本仓库发布号只活在 tag + CHANGELOG 标题 + GitHub Release 三处(外加 exe 版本资源);仓库内 `Version=` 字段(Rainstaller.cfg 10.0.4、OmnimoVersion 10.0、Settings 6.0.1、RMSKIN.inc 1.0)属上游自有体系,不要动。"本次发布号"= 本轮用户指定的版本(如 `0.4.0.0`),必须与 tag 名(去 `v` 前缀)、CHANGELOG 标题、注入 exe 的 `FileVersion` 三者一致;动手前先向用户确认号码,不要自己编。核对改动面与凭据自检都依赖 `upstream` remote:用 `git remote -v` 确认它指向 `https://github.com/fediaFedia/Omnimo.git`,缺失则 `git remote add upstream <该地址>` 后 `git fetch upstream`。
+- **改发版**:本仓库发布号只活在 tag + CHANGELOG 标题 + GitHub Release 三处(外加 exe 版本资源);仓库内 `Version=` 字段(Rainstaller.cfg 10.0.4、OmnimoVersion 10.0、Settings 6.0.1、RMSKIN.inc 1.0)属上游自有体系,不要动。"本次发布号"= 本轮用户指定的版本(如 `0.4.0.0`),必须与 tag 名(**自 `0.4.0` 起不带 `v` 前缀**,`v0.3.0` 是历史遗留)、CHANGELOG 标题、注入 exe 的 `FileVersion`(四位,tag `0.4.0` ↔ `0.4.0.0`)三者一致;动手前先向用户确认号码,不要自己编。核对改动面与凭据自检都依赖 `upstream` remote:用 `git remote -v` 确认它指向 `https://github.com/fediaFedia/Omnimo.git`,缺失则 `git remote add upstream <该地址>` 后 `git fetch upstream`。
 
 ## 禁止操作
 
@@ -90,7 +90,7 @@ AutoIt 工具(AutoIT\*.au3 → 7 个 exe)
 1. `git diff --name-status upstream/master -- .` 改动面与意图一致,不含运行时文件与 exclude 列出的被跟踪文件。"exclude" 指 `.git/info/exclude`(本机忽略清单,未跟踪);其头部注释列明了 419 个**已跟踪但会被运行时改写**的文件,它们不受 exclude 保护、会出现在 status 里,提交前用 `git ls-files -ci --exclude-standard` 全量枚举、逐个确认。
 2. 改过 `.au3`:7 个 exe 重编译并重新注入版本资源,PowerShell 读 `VersionInfo.FileVersion` 全部等于本次发布号,且 7 个都通过 `CREATE_SUSPENDED` 可加载性自检。
 3. 动过皮肤行为:开日志实机验证,无新增 `ERRO`(基线噪声只这几类——2026-10-02 全量重启实测,计数随会话长短浮动:`WP7\@Resources\Common\OverlayBorder\none5.png` 缺图、`WP7\@Resources\Graphics\Panels\Volume\` 的 `v0.png` 与 `0.png` 缺图、`FrostedGlass.dll` 找不到(error 126)、`WP7\Panels\Network\Item.ini` 的 `Meter=Calc is not valid in [MeasureNetInMbps]` 与 `[MeasureNetOutMbps]` 各一条、同文件一条 `Measure: Invalid Substitute=Current IP Address: …`,以及变量为空时的 `ImageName: Unable to open: …\OverlayBorder\`);**验完把 `Rainmeter.ini` 的 `Logging` 改回**;视觉对比用差异像素占比给阈值(本仓库实测参考:滚动生效 14.2%,静置回顶 0.04%),截图前把光标移离面板(底板 MouseOverAction 会改 tint)、等 WebParser 完成。
-4. 发版一次闭口:改动全提交 → `git tag -a vX.Y.Z -m "…"` → `git push origin master vX.Y.Z` → `gh release create vX.Y.Z -R OMSociety/Omnimo`(双 remote 下 `gh` 必须显式 `-R`,否则默认解析到 upstream);Release 正文 = 一句中文摘要 + CHANGELOG 对应小节原文(中英两段照抄)。
+4. 发版一次闭口:改动全提交 → `git tag -a X.Y.Z -m "…"`(不带 `v` 前缀,见「产品边界」) → `git push origin master X.Y.Z` → `gh release create X.Y.Z -R OMSociety/Omnimo --title X.Y.Z -F <正文文件>`(双 remote 下 `gh` 必须显式 `-R`,否则默认解析到 upstream;正文走 `-F` 文件传,避免命令行对中文的引号与编码损耗);Release 正文 = 一句中文摘要 + CHANGELOG 对应小节原文(中英两段照抄)。
 
 ## 已知风险区
 
