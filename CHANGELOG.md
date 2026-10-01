@@ -12,8 +12,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-> **说明：**随仓库分发的七个可执行文件已按下一个发布号 `0.4.0.0` 加盖版本资源；本节尚未打 tag、也未发布 Release。
-
 ### 修复
 
 - 日程面板：重复事件（`RRULE`）此前整条被忽略，只画 `DTSTART` 那一条。现在支持 `DAILY`/`WEEKLY`/`MONTHLY`/`YEARLY` 加 `INTERVAL`/`COUNT`/`UNTIL`/`BYDAY`/`BYMONTHDAY`/`BYMONTH` 的有界子集，并且只在面板窗口内展开实例；带其它参数（`WKST`/`BYSETPOS`/`BYHOUR` 等）或参数组合不支持的规则整条不认，退回只画 `DTSTART`——宁可少画也不画错。`RDATE`/`EXDATE`/`RECURRENCE-ID` 一律忽略。
@@ -44,8 +42,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `AGENTS.md` 更正三处事实：语言包是 288 键定义/283 唯一键（原写 287/280）、`Config.au3` 的写盘与显示态在 519/568 行（原写 528/553）、以及「注入后每个 exe 比上游多 1024 字节」的说法（上游二进制是 UPX 加壳的，体积差来自 `/nopack`，版本资源本身只占 1024 字节）。
 - `THIRD-PARTY.md` 第 3 节的可执行文件体积表与版本号更新为本轮 0.4.0 重编译的结果。
 - 本轮改动后七个可执行文件再次重编译（同上参数集），版本资源保持 `0.4.0.0`。
-
-> **Note:** the seven shipped executables already carry the next release number `0.4.0.0` in their version resource; nothing under this heading is tagged or released yet.
 
 ### Fixed
 
