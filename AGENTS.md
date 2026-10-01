@@ -11,7 +11,7 @@
   - 逐版本变更:`CHANGELOG.md`
   - 许可与来源:`LICENSE`、`THIRD-PARTY.md`(含差异集逐文件清单)
   - 用户说明:`readme.md`
-- 基准:与 `upstream/master`(fediaFedia/Omnimo)的差异数为 14 增 / 61 改 / 16 删(0.3.0 时为 14/60/16;0.4.0 新增的一处是 `Background\Language\English.cfg` 的本地覆盖提示键),勿凭记忆引用旧数字。
+- 基准:与 `upstream/master`(fediaFedia/Omnimo)的差异数为 14 增 / 451 改 / 16 删(0.3.0 时为 14/60/16;0.4.0 把 428 处 config.exe 调用点补上了第 6 个参数 `#PROGRAMPATH#`,这是“改”从 61 涨到 451 的主因),勿凭记忆引用旧数字。
 
 ## 产品边界
 
@@ -29,7 +29,7 @@
 | 凭据入库自检(指纹法) | 对 `git rev-list --all -- "WP7/@Resources/Config/Panels/Agenda/UserVariables.inc"` 的每个 blob,比对 Feed 行的"长度 + sha256 前 16 位" |
 | 刷新 Rainmeter 并重发现 | `Rainmeter.exe !RefreshApp`(等约 9 秒) |
 | 激活单个面板 | `Rainmeter.exe !ActivateConfig "WP7\Panels\<Name>" "Item.ini"` |
-| 开日志 | `%APPDATA%\Rainmeter\Rainmeter.ini` 置 `Logging=1`(该文件是 UTF-16LE 且开头 4 字节是坏 BOM;`Logging=0` 与 `Logging=1` 在 utf-16 下等长,直接在字节层替换,别整文件重编码;**验完改回 0**),读 `Rainmeter.log` 抓 `ERRO` |
+| 开日志 | 改 `%APPDATA%\Rainmeter\Rainmeter.ini` **必须**先 `Rainmeter.exe !Quit` 并备份:它是 **UTF-16LE + 真 `FF FE` BOM + CRLF**,Rainmeter 只认这个 BOM;BOM 被写坏(残迹形如 `EF BF BD EF BF BD`,是“`FF FE` 被当 UTF-8 读再写回 UTF-8”的产物)时它按 CP936 读成空配置,**随即把整份文件重写成默认值,所有 section 全丢**。用仓库外的 `_omni_set_logging2.py 0|1 --apply` 改 `Logging`,它会自检 BOM / 行尾 / section 数;**验完改回 0**,再读 `Rainmeter.log` 抓 `ERRO` |
 | 还原被运行时写脏的文件 | `git checkout -- WP7\Gallery\main.ini WP7\Gallery\scroll.inc` |
 
 改皮肤文件必须用 Python 补丁脚本:二进制读入 → 按嗅探编码解码 → 替换 → 按同一编码写回且 `newline=""`。直接用文本工具写会把 `\r\n` 写成 `\r\r\n`(实测过);控制台是 GBK,`print` 中文会抛 UnicodeEncodeError,结果写 UTF-8 文件再看。编码嗅探顺序:UTF-16LE+BOM → UTF-8+BOM → UTF-8 → cp936 → cp1252;纯 ASCII 文件会同时通过多种编码,另看"是否含 >=0x80 字节"。
@@ -118,7 +118,7 @@ AutoIt 工具(AutoIT\*.au3 → 7 个 exe)
 | Aut2Exe 弹 "Command Line Parameters" 帮助框 | 传了 `/fileversion 6.0.0.0` 这类点分写法;去掉版本参数,版本号编译后注入。`Start-Process -ArgumentList` 传数组也会报类型错,必须传单个拼接字符串 |
 | `tag exists locally but has not been pushed` | `gh` 解析到了 upstream;命令补 `-R OMSociety/Omnimo` |
 | 截图每张都不同 | 半透明面板透出动态壁纸/亚像素抖动;关动态壁纸,用差异像素占比判据,别要求逐字节相同 |
-| Python 写回后文件行尾全乱 | `\r\n` 被写成 `\r\r\n`;补丁脚本加 `newline=""` 重写 |
+\1| 重启后 `Rainmeter.ini` 只剩一百多字节、桌面皮肤全没了 | 文件头真 BOM 被写坏(残迹 `EF BF BD EF BF BD`),Rainmeter 按 CP936 读成空配置后写回默认值;从备份恢复,按 `FF FE` + UTF-16LE + CRLF 写回(`_omni_rm_ini_repair.py`),别在缺 BOM 的文件上做字节级替换 |
 
 ## 维护
 
