@@ -2,17 +2,17 @@
 
 <div align="center">
 
-<img src="https://raw.githubusercontent.com/OMSociety/Omnimo/master/Rainstaller.bmp" width="480" alt="ReOmnimo 横幅" />
+<img src="https://raw.githubusercontent.com/OMSociety/ReOmnimo/master/Rainstaller.bmp" width="480" alt="ReOmnimo 横幅" />
 
 # ReOmnimo
 
 **基于 Rainmeter 的 Windows Phone 7 风格交互式桌面信息中心** —— 接手 Omnimo 的开发。
 
-[![Version](https://img.shields.io/github/v/release/OMSociety/Omnimo?label=version&color=blue)](https://github.com/OMSociety/Omnimo/releases)
+[![Version](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fapi.github.com%2Frepos%2FOMSociety%2FReOmnimo%2Freleases%2Flatest&query=tag_name&label=version&color=blue)](https://github.com/OMSociety/ReOmnimo/releases)
 [![Rainmeter](https://img.shields.io/badge/Rainmeter-%E2%89%A54.3-green.svg)](https://www.rainmeter.net/)
 [![License: GPL v2](https://img.shields.io/badge/License-GPL%20v2-blue.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
-[![Stars](https://img.shields.io/github/stars/OMSociety/Omnimo)](https://github.com/OMSociety/Omnimo/stargazers)
-[![Issues](https://img.shields.io/github/issues/OMSociety/Omnimo)](https://github.com/OMSociety/Omnimo/issues)
+[![Stars](https://img.shields.io/github/stars/OMSociety/ReOmnimo)](https://github.com/OMSociety/ReOmnimo/stargazers)
+[![Issues](https://img.shields.io/github/issues/OMSociety/ReOmnimo)](https://github.com/OMSociety/ReOmnimo/issues)
 
 </div>
 
@@ -67,4 +67,4 @@ Omnimo 由 [fediaFedia](https://github.com/fediaFedia) 与 Xyrfo 创作,感谢 M
 - 软件与组件:[GPL-2.0](LICENSE)
 - 图像与媒体:[CC BY-NC-SA 3.0](https://creativecommons.org/licenses/by-nc-sa/3.0/)
 
-ReOmnimo 由 [OMSociety](https://github.com/OMSociety/Omnimo) 维护。
+ReOmnimo 由 [OMSociety](https://github.com/OMSociety/ReOmnimo) 维护。

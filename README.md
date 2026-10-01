@@ -2,17 +2,17 @@
 
 <div align="center">
 
-<img src="https://raw.githubusercontent.com/OMSociety/Omnimo/master/Rainstaller.bmp" width="480" alt="ReOmnimo banner" />
+<img src="https://raw.githubusercontent.com/OMSociety/ReOmnimo/master/Rainstaller.bmp" width="480" alt="ReOmnimo banner" />
 
 # ReOmnimo
 
 **A Windows Phone 7 inspired interactive desktop information center for Rainmeter** — taking over development of Omnimo.
 
-[![Version](https://img.shields.io/github/v/release/OMSociety/Omnimo?label=version&color=blue)](https://github.com/OMSociety/Omnimo/releases)
+[![Version](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fapi.github.com%2Frepos%2FOMSociety%2FReOmnimo%2Freleases%2Flatest&query=tag_name&label=version&color=blue)](https://github.com/OMSociety/ReOmnimo/releases)
 [![Rainmeter](https://img.shields.io/badge/Rainmeter-%E2%89%A54.3-green.svg)](https://www.rainmeter.net/)
 [![License: GPL v2](https://img.shields.io/badge/License-GPL%20v2-blue.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
-[![Stars](https://img.shields.io/github/stars/OMSociety/Omnimo)](https://github.com/OMSociety/Omnimo/stargazers)
-[![Issues](https://img.shields.io/github/issues/OMSociety/Omnimo)](https://github.com/OMSociety/Omnimo/issues)
+[![Stars](https://img.shields.io/github/stars/OMSociety/ReOmnimo)](https://github.com/OMSociety/ReOmnimo/stargazers)
+[![Issues](https://img.shields.io/github/issues/OMSociety/ReOmnimo)](https://github.com/OMSociety/ReOmnimo/issues)
 
 [What is ReOmnimo?](#what-is-reomnimo) • [What changed](#what-changed) • [Install](#install) • [Agenda panel](#agenda-panel) • [Development](#development) • [Changelog](CHANGELOG.md) • [中文](README.zh.md)
 
@@ -69,4 +69,4 @@ Omnimo is by [fediaFedia](https://github.com/fediaFedia) and Xyrfo, with contrib
 - Software and components: [GPL-2.0](LICENSE)
 - Images and media: [CC BY-NC-SA 3.0](https://creativecommons.org/licenses/by-nc-sa/3.0/)
 
-ReOmnimo is maintained under [OMSociety](https://github.com/OMSociety/Omnimo).
+ReOmnimo is maintained under [OMSociety](https://github.com/OMSociety/ReOmnimo).

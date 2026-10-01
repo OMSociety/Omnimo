@@ -19,6 +19,7 @@
 - 接到需求先归类:属于四件事之一才做;"待办同步"用户已决定不做,不要实现。
 - 明确不做:重画视觉、复刻面板、自建控件层、改设计语言、换字体。磁贴表面保持英文(按英文宽度排版)。
 - 已发布 Release:`0.4.0` 与历史遗留的 `v0.3.0`(v0.1.0-0.2.0 的 tag 与 Release 已按要求删除,CHANGELOG 历史条目保留);**tag 名不带 `v` 前缀**(`v0.3.0` 是历史遗留,不要沿用);已发布的 tag 不移动。
+- GitHub 仓库:`OMSociety/ReOmnimo`(2026-10-02 由 `OMSociety/Omnimo` 改名,GitHub 对旧全名与 `raw.githubusercontent.com` 旧路径都仍重定向;`origin` 已更新为新名,`upstream` 保持 `fediaFedia/Omnimo`)。
 - 桌面映射:`Documents\Rainmeter\Skins\WP7` 是指向本仓库 `WP7\` 的 junction,改仓库即改桌面。
 
 ## 常用命令
@@ -90,7 +91,7 @@ AutoIt 工具(AutoIT\*.au3 → 7 个 exe)
 1. `git diff --name-status upstream/master -- .` 改动面与意图一致,不含运行时文件与 exclude 列出的被跟踪文件。"exclude" 指 `.git/info/exclude`(本机忽略清单,未跟踪);其头部注释列明了 419 个**已跟踪但会被运行时改写**的文件,它们不受 exclude 保护、会出现在 status 里,提交前用 `git ls-files -ci --exclude-standard` 全量枚举、逐个确认。
 2. 改过 `.au3`:7 个 exe 重编译并重新注入版本资源,PowerShell 读 `VersionInfo.FileVersion` 全部等于本次发布号,且 7 个都通过 `CREATE_SUSPENDED` 可加载性自检。
 3. 动过皮肤行为:开日志实机验证,无新增 `ERRO`(基线噪声只这几类——2026-10-02 全量重启实测,计数随会话长短浮动:`WP7\@Resources\Common\OverlayBorder\none5.png` 缺图、`WP7\@Resources\Graphics\Panels\Volume\` 的 `v0.png` 与 `0.png` 缺图、`FrostedGlass.dll` 找不到(error 126)、`WP7\Panels\Network\Item.ini` 的 `Meter=Calc is not valid in [MeasureNetInMbps]` 与 `[MeasureNetOutMbps]` 各一条、同文件一条 `Measure: Invalid Substitute=Current IP Address: …`,以及变量为空时的 `ImageName: Unable to open: …\OverlayBorder\`);**验完把 `Rainmeter.ini` 的 `Logging` 改回**;视觉对比用差异像素占比给阈值(本仓库实测参考:滚动生效 14.2%,静置回顶 0.04%),截图前把光标移离面板(底板 MouseOverAction 会改 tint)、等 WebParser 完成。
-4. 发版一次闭口:改动全提交 → `git tag -a X.Y.Z -m "…"`(不带 `v` 前缀,见「产品边界」) → `git push origin master X.Y.Z` → `gh release create X.Y.Z -R OMSociety/Omnimo --title X.Y.Z -F <正文文件>`(双 remote 下 `gh` 必须显式 `-R`,否则默认解析到 upstream;正文走 `-F` 文件传,避免命令行对中文的引号与编码损耗);Release 正文 = 一句中文摘要 + CHANGELOG 对应小节原文(中英两段照抄)。
+4. 发版一次闭口:改动全提交 → `git tag -a X.Y.Z -m "…"`(不带 `v` 前缀,见「产品边界」) → `git push origin master X.Y.Z` → `gh release create X.Y.Z -R OMSociety/ReOmnimo --title X.Y.Z -F <正文文件>`(双 remote 下 `gh` 必须显式 `-R`,否则默认解析到 upstream;正文走 `-F` 文件传,避免命令行对中文的引号与编码损耗);Release 正文 = 一句中文摘要 + CHANGELOG 对应小节原文(中英两段照抄)。
 
 ## 已知风险区
 
@@ -118,7 +119,7 @@ AutoIt 工具(AutoIT\*.au3 → 7 个 exe)
 | Aut2Exe 静默 exit 0 且无产物 | 重定向了 stdout/stderr;去掉 `>log 2>&1` 重跑 |
 | `not a valid application for this OS platform` / 193 | 注入版本资源时搬动了已有节(节表 VirtualAddress 不再单调递增),或改完镜像没重算 `CheckSum`;改为在节表末尾追加新节 + 重算校验和 |
 | Aut2Exe 弹 "Command Line Parameters" 帮助框 | 传了 `/fileversion 6.0.0.0` 这类点分写法;去掉版本参数,版本号编译后注入。`Start-Process -ArgumentList` 传数组也会报类型错,必须传单个拼接字符串 |
-| `tag exists locally but has not been pushed` | `gh` 解析到了 upstream;命令补 `-R OMSociety/Omnimo` |
+| `tag exists locally but has not been pushed` | `gh` 解析到了 upstream;命令补 `-R OMSociety/ReOmnimo` |
 | 截图每张都不同 | 半透明面板透出动态壁纸/亚像素抖动;关动态壁纸,用差异像素占比判据,别要求逐字节相同 |
 | Python 写回后文件行尾全乱 | `\r\n` 被写成 `\r\r\n`;补丁脚本加 `newline=""` 重写 |
 | 重启后 `Rainmeter.ini` 只剩一百多字节、桌面皮肤全没了 | 文件头真 BOM 被写坏(残迹 `EF BF BD EF BF BD`),Rainmeter 按 CP936 读成空配置后写回默认值;从备份恢复,按 `FF FE` + UTF-16LE + CRLF 写回(`_omni_rm_ini_repair.py`),别在缺 BOM 的文件上做字节级替换 |
