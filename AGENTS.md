@@ -87,7 +87,7 @@ AutoIt 工具(AutoIT\*.au3 → 7 个 exe)
 
 1. `git diff --name-status upstream/master -- .` 改动面与意图一致,不含运行时文件与 exclude 列出的被跟踪文件。
 2. 改过 `.au3`:7 个 exe 重编译并重新注入版本资源,PowerShell 读 `VersionInfo.FileVersion` 全部等于本次发布号,且 7 个都通过 `CREATE_SUSPENDED` 可加载性自检。
-3. 动过皮肤行为:开日志实机验证,无新增 `ERRO`(基线噪声:`OverlayBorder\none0.png` 缺图、变量为空时的 `ImageName: Unable to open: …\OverlayBorder\`、`FrostedGlass.dll` 缺失);**验完把 `Rainmeter.ini` 的 `Logging` 改回**;视觉对比用差异像素占比给阈值(本仓库实测参考:滚动生效 14.2%,静置回顶 0.04%),截图前把光标移离面板(底板 MouseOverAction 会改 tint)、等 WebParser 完成。
+3. 动过皮肤行为:开日志实机验证,无新增 `ERRO`(基线噪声只这几类——2026-10-02 全量重启实测,计数随会话长短浮动:`WP7\@Resources\Common\OverlayBorder\none5.png` 缺图、`WP7\@Resources\Graphics\Panels\Volume\` 的 `v0.png` 与 `0.png` 缺图、`FrostedGlass.dll` 找不到(error 126)、`WP7\Panels\Network\Item.ini` 的 `Meter=Calc is not valid in [MeasureNetInMbps]` 与 `[MeasureNetOutMbps]` 各一条、同文件一条 `Measure: Invalid Substitute=Current IP Address: …`,以及变量为空时的 `ImageName: Unable to open: …\OverlayBorder\`);**验完把 `Rainmeter.ini` 的 `Logging` 改回**;视觉对比用差异像素占比给阈值(本仓库实测参考:滚动生效 14.2%,静置回顶 0.04%),截图前把光标移离面板(底板 MouseOverAction 会改 tint)、等 WebParser 完成。
 4. 发版一次闭口:改动全提交 → `git tag -a vX.Y.Z -m "…"` → `git push origin master vX.Y.Z` → `gh release create vX.Y.Z -R OMSociety/Omnimo`(双 remote 下 `gh` 必须显式 `-R`,否则默认解析到 upstream);Release 正文 = 一句中文摘要 + CHANGELOG 对应小节原文(中英两段照抄)。
 
 ## 已知风险区
