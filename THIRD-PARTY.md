@@ -241,7 +241,7 @@ $lic.GetEnumerator() | Sort-Object Value -Descending
 "no License= line: $none   empty value: $empty"
 ```
 
-> **Note:** the regex must anchor the value to its own line. A looser pattern such as
+> **Note**: the regex must anchor the value to its own line. A looser pattern such as
 > `^\s*License\s*=\s*(.*?)\s*$` swallows the following line — the `.ini` metadata blocks put
 > `Variant=` right after `License=` — which turns the two genuinely empty declarations into a bogus
 > `Variant=` value and inflates the total.

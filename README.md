@@ -39,7 +39,7 @@ ReOmnimo takes over development of [Omnimo](https://github.com/fediaFedia/Omnimo
 
 ReOmnimo ships as a Rainmeter skin suite. Install [Rainmeter](https://www.rainmeter.net/) 4.3 or later, then load the suite through Rainmeter's skin management. The `Rainstaller.cfg` at the repository root describes the package (`MinRainmeterVer=4.3`).
 
-> **Note:** The desktop mapping expects the suite under `Documents\Rainmeter\Skins\WP7`. See `AGENTS.md` for the working setup.
+> **Note**: The desktop mapping expects the suite under `Documents\Rainmeter\Skins\WP7`. See `AGENTS.md` for the working setup.
 
 ## Agenda panel
 
@@ -50,7 +50,7 @@ The Agenda panel subscribes to published ICS calendars and renders the coming da
 - Event times are converted to local time through a built-in fixed-offset table; the offsets do not follow daylight saving, so some zones can be an hour off during DST — a deliberate trade-off.
 - `RangeDays` is the exact number of calendar days shown.
 
-> **Note:** A published calendar subscription URL is a credential in itself. Do not commit it to any tracked file; keep it in the untracked `UserVariables.local.inc`. See `AGENTS.md`.
+> **Note**: A published calendar subscription URL is a credential in itself. Do not commit it to any tracked file; keep it in the untracked `UserVariables.local.inc`. See `AGENTS.md`.
 
 ## Development
 

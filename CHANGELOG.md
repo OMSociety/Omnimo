@@ -162,7 +162,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.3.0] - 2026-09-26
 
-> **说明：**上游早于本文件，因此最早的条目汇总了 fork 到那时为止的全部改动。只有 0.3.0 发布过 tag 与 GitHub Release；0.1.0、0.1.1、0.2.0 的条目是 tag 与 Release 事后被撤回的那段工作的记录，其内容全部随 0.3.0 发布。
+> **说明**：上游早于本文件，因此最早的条目汇总了 fork 到那时为止的全部改动。只有 0.3.0 发布过 tag 与 GitHub Release；0.1.0、0.1.1、0.2.0 的条目是 tag 与 Release 事后被撤回的那段工作的记录，其内容全部随 0.3.0 发布。
 
 ### 修复
 
@@ -186,7 +186,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - 加固 AutoIt 助手源码以应对畸形输入与不安全路径（已重编译进全部七个可执行文件，见「修复」）。参数个数经过校验，工具会带提示退出，而不是越界索引入参；配置数组与面板数组在写入前先做上限约束。`config.exe` 的源码不再把从 `Rainmeter.ini` 读到的 `WindowX`/`WindowY` 直接交给 `Execute()`：只求值纯算术，其它一律按数值解析。`OmnimoApp` 与 `PanelCreator` 删除面板时会拒绝含 `..` 的配置路径，而不是删掉面板目录之外的东西；卸载器拒绝递归进不带 `WP7` 标记的目录。
 
-> **Note:** Upstream predates this file, so the earliest entry covers everything this fork had changed up to that point. Only 0.3.0 is published as a tag and GitHub Release; the 0.1.0, 0.1.1 and 0.2.0 entries are kept as the record of work whose tags and releases were later withdrawn, and all of it ships in 0.3.0.
+> **Note**: Upstream predates this file, so the earliest entry covers everything this fork had changed up to that point. Only 0.3.0 is published as a tag and GitHub Release; the 0.1.0, 0.1.1 and 0.2.0 entries are kept as the record of work whose tags and releases were later withdrawn, and all of it ships in 0.3.0.
 
 ### Fixed
 

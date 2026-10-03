@@ -37,7 +37,7 @@ ReOmnimo 接手 [Omnimo](https://github.com/fediaFedia/Omnimo)(fediaFedia 与 Xy
 
 ReOmnimo 以 Rainmeter 皮肤套件分发。先安装 [Rainmeter](https://www.rainmeter.net/) 4.3 或更高版本,再经 Rainmeter 的皮肤管理加载本套件。仓库根的 `Rainstaller.cfg` 描述了该包(`MinRainmeterVer=4.3`)。
 
-> **注意：**桌面映射要求套件位于 `Documents\Rainmeter\Skins\WP7`,工作配置见 `AGENTS.md`。
+> **注意**：桌面映射要求套件位于 `Documents\Rainmeter\Skins\WP7`,工作配置见 `AGENTS.md`。
 
 ## 日程面板
 
@@ -48,7 +48,7 @@ ReOmnimo 以 Rainmeter 皮肤套件分发。先安装 [Rainmeter](https://www.ra
 - 事件时间经内置固定偏移表换算到本机时间;偏移不跟夏令时走,部分区域在夏令时期间可能差一小时,这是刻意取舍。
 - `RangeDays` 是显示的确切日历日天数。
 
-> **注意：**公开的日历订阅 URL 本身就是凭据,不要提交进任何被跟踪文件,放在未跟踪的 `UserVariables.local.inc` 里。详见 `AGENTS.md`。
+> **注意**：公开的日历订阅 URL 本身就是凭据,不要提交进任何被跟踪文件,放在未跟踪的 `UserVariables.local.inc` 里。详见 `AGENTS.md`。
 
 ## 开发
 
