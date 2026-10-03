@@ -81,7 +81,7 @@ AutoIt 工具(AutoIT\*.au3 → 7 个 exe)
 - 禁止手改 7 个 exe,或只改 .au3 不重编译就发版。原因:用户运行的是二进制,源码修复不重编译等于没修(上游 config.exe 曾与源码漂移两年)。
 - 禁止为"修语义反转"改 `Hidden=#ShowSeconds#` / `Hidden=#ShowExternalIP#` 一类写法。原因:前者配 `Checkbox:1:0`(勾选写 0,启用即显示,正确);后者是外网/内网 IP 同位互换设计(靠 `Formula=-1*#ShowExternalIP#+1` 反转配合)。改前先读该面板 RainConfigure.cfg 的 Checkbox 规约与相邻 Calc 公式。
 - 禁止"顺手修复"上游遗留死文件:`Languages\Backup\`、`lang.inc`、`Common\Settings\UserVariables.inc`(只有写入者无读取者)、`Config\Panels\Radio\`(上下游都无 Radio 面板)。原因:属上游历史形态,清理需单独提案,混进功能改动会污染 diff。
-- 禁止在文档与提交里放凭据、真实邮箱;对外文档零 emoji,提示块用 `> **注意:**`;commit message 用英文说清 Why,一个提交只做一件事。
+- 禁止在文档与提交里放凭据、真实邮箱;对外文档零 emoji,提示块用 `> **注意**:`;commit message 用英文说清 Why,一个提交只做一件事。
 - 面板 ini 的 `License=` 统一写 `Creative Commons Attribution-Noncommercial-Share Alike 3.0 License`;不许改动 `TextItems/Search/` 三份 NoDerivs 文件的许可声明。
 
 ## 验收标准
